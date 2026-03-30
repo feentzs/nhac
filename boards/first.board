@@ -1,0 +1,15 @@
+{
+    "showGrid": false,
+    "canvases": [
+        {
+            "x": 500.0,
+            "y": 200.0,
+            "w": 393.0,
+            "h": 808.0,
+            "widget": "const BemVindo()",
+            "deps": [
+                "lib/pages/bem_vindo.dart"
+            ]
+        }
+    ]
+}

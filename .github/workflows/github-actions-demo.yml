@@ -1,0 +1,48 @@
+name: Flutter Build APK (Debug)
+
+# Define quando o workflow será executado
+on:
+  push:
+    branches: [ "main", "develop" ] # Altere para o nome da sua branch principal
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: # Permite rodar o workflow manualmente
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Faz o checkout do código do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configura o Java (necessário para o Android SDK)
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu' # Pode usar 'temurin' também
+          java-version: '17'
+
+      # 3. Configura o Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x' # Ou especifique a versão exata, ex: '3.19.0'
+          channel: 'stable'
+          cache: true # Ativa o cache para acelerar builds futuras
+
+      # 4. Instala as dependências do projeto
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 5. Executa o build do APK em modo Debug
+      - name: Build Debug APK
+        run: flutter build apk --debug
+
+      # 6. Faz o upload do arquivo gerado para que você possa baixá-lo
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk

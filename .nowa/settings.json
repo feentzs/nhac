@@ -1,0 +1,12 @@
+{
+    "version": "3.6.4",
+    "app": {
+        "name": "nhac",
+        "bundleId": "com.feentzs.nhac"
+    },
+    "main": {},
+    "experimental": {
+        "load_packages": true
+    },
+    "permissions": []
+}
