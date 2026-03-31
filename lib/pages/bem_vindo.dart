@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:nhac/nhac_logo.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +20,13 @@ class BemVindo extends StatefulWidget {
 class _BemVindoState extends State<BemVindo> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+   return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        
+        statusBarIconBrightness: Brightness.dark, 
+        statusBarBrightness: Brightness.light, 
+      ),
+      child: Scaffold(
       appBar: null,
       body: SafeArea(
         child: Stack(
@@ -125,6 +132,7 @@ class _BemVindoState extends State<BemVindo> {
           ],
         ),
       ),
-    );
+    ),
+   );
   }
 }

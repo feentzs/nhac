@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/botao_nhac.dart';
@@ -10,7 +11,14 @@ class BemVindoMotoca extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        
+        statusBarIconBrightness: Brightness.light, 
+        statusBarBrightness: Brightness.dark, 
+      ),
+      child: Scaffold(
       appBar: null,
       extendBody: true,
       body: Stack(
@@ -106,6 +114,7 @@ class BemVindoMotoca extends StatelessWidget {
           ),
         ],
       ),
+    )
     );
   }
 }

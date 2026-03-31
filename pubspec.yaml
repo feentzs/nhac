@@ -30,8 +30,8 @@ flutter:
       fonts:
         - asset: assets/fonts/Roboto.ttf
 flutter_native_splash:
-  color: "#FFE7E5" 
-  image: "assets/transparente.png" 
+  color: #FFE7E5
+  image: assets/transparente.png
   android_12:
-    color: "#FFE7E5"
-    image: "assets/transparente.png"
+    color: #FFE7E5
+    image: assets/transparente.png
