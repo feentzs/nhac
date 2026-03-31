@@ -10,6 +10,16 @@
             "deps": [
                 "lib/pages/bem_vindo.dart"
             ]
+        },
+        {
+            "x": 968.0,
+            "y": 200.0,
+            "w": 393.0,
+            "h": 808.0,
+            "widget": "const BemVindoMotoca()",
+            "deps": [
+                "lib/bem_vindo_motoca.dart"
+            ]
         }
     ]
 }

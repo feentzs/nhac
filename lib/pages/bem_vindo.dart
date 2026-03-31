@@ -1,13 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:nhac/nhac_logo.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nhac/botao_nhac.dart';
 
 @NowaGenerated()
-class BemVindo extends StatelessWidget {
+class BemVindo extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
   const BemVindo({super.key});
 
+  @override
+  State<BemVindo> createState() {
+    return _BemVindoState();
+  }
+}
+
+@NowaGenerated()
+class _BemVindoState extends State<BemVindo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,51 +27,47 @@ class BemVindo extends StatelessWidget {
           alignment: const Alignment(0.0, 0.0),
           children: [
             const Positioned(
-              top: 47.0,
+              top: 17.0,
               left: 33.0,
               width: 132.0,
               height: 49.0,
               child: NhacLogo(),
             ),
             Positioned(
-              top: 51.0,
+              top: 22.0,
               left: 205.0,
               height: 40.0,
               width: 172.0,
-              child: GestureDetector(
-                onTap: () {},
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: const ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll<Color?>(
-                      Color(0xFFFFF5F5),
-                    ),
-                    foregroundColor: WidgetStatePropertyAll<Color?>(null),
-                    shadowColor: WidgetStatePropertyAll<Color?>(
-                      Color(0x00FFFFFF),
-                    ),
-                    elevation: WidgetStatePropertyAll<double?>(null),
-                    side: WidgetStatePropertyAll<BorderSide?>(null),
-                    shape: WidgetStatePropertyAll<RoundedRectangleBorder?>(
-                      null,
-                    ),
+              child: ElevatedButton(
+                onPressed: () {
+                  context.go('/bem-vindo-motoca');
+                },
+                style: const ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll<Color?>(
+                    Color(0xFFFFF5F5),
                   ),
-                  child: const Text(
-                    '       Para Entregadores',
-                    style: TextStyle(
-                      color: Color(0xFF7C6F6F),
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
-                    ),
-                    textAlign: TextAlign.start,
-                    textDirection: TextDirection.rtl,
+                  foregroundColor: WidgetStatePropertyAll<Color?>(null),
+                  shadowColor: WidgetStatePropertyAll<Color?>(Color(0xFFFFFF)),
+                  elevation: WidgetStatePropertyAll<double?>(null),
+                  side: WidgetStatePropertyAll<BorderSide?>(null),
+                  shape: WidgetStatePropertyAll<RoundedRectangleBorder?>(null),
+                ),
+                onLongPress: null,
+                child: const Text(
+                  '       Para Entregadores',
+                  style: TextStyle(
+                    color: Color(0xFF7C6F6F),
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.1,
                   ),
+                  textAlign: TextAlign.start,
+                  textDirection: TextDirection.rtl,
                 ),
               ),
             ),
             const Positioned(
-              top: 64.5,
+              top: 35.5,
               left: 336.0,
               width: 15.0,
               height: 15.0,
