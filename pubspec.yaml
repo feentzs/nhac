@@ -14,6 +14,9 @@ dependencies:
   dio: ^5.9.1
   lottie: ^2.7.0
   go_router: ^17.1.0
+  sign_in_button: ^3.2.0
+  pin_code_fields: ^8.0.1
+  flutter_svg: ^2.2.3
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -30,8 +33,8 @@ flutter:
       fonts:
         - asset: assets/fonts/Roboto.ttf
 flutter_native_splash:
-  color: #FFE7E5
+  color:
   image: assets/transparente.png
   android_12:
-    color: #FFE7E5
+    color:
     image: assets/transparente.png

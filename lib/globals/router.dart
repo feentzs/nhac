@@ -4,6 +4,7 @@ import 'package:nhac/pages/bem_vindo.dart';
 import 'package:nhac/pages/email_cliente.dart';
 import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/bem_vindo_motoca.dart';
+import 'package:nhac/pages/verificacao.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 
 CustomTransitionPage _buildSlideRightToLeftPage({
@@ -14,19 +15,24 @@ CustomTransitionPage _buildSlideRightToLeftPage({
     key: key,
     child: child,
     transitionDuration: const Duration(milliseconds: 400),
+    reverseTransitionDuration: const Duration(milliseconds: 400),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var enterTween = Tween(
-        begin: const Offset(1.0, 0.0),
-        end: Offset.zero,
-      ).chain(CurveTween(curve: Curves.easeOutQuart));
-      var exitTween = Tween(
-        begin: Offset.zero,
-        end: const Offset(-0.3, 0.0),
-      ).chain(CurveTween(curve: Curves.easeOutQuart));
+      var curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutQuart,
+        reverseCurve: Curves.easeInQuart,
+      );
+      var curvedSecondaryAnimation = CurvedAnimation(
+        parent: secondaryAnimation,
+        curve: Curves.easeOutQuart,
+        reverseCurve: Curves.easeInQuart,
+      );
+      var enterTween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero);
+      var exitTween = Tween(begin: Offset.zero, end: const Offset(-0.3, 0.0));
       return SlideTransition(
-        position: secondaryAnimation.drive(exitTween),
+        position: exitTween.animate(curvedSecondaryAnimation),
         child: SlideTransition(
-          position: animation.drive(enterTween),
+          position: enterTween.animate(curvedAnimation),
           child: child,
         ),
       );
@@ -55,7 +61,22 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/email-cliente',
-      builder: (context, state) => const EmailCliente(),
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const EmailCliente(),
+      ),
+    ),
+    GoRoute(
+      path: '/verificacao',
+      pageBuilder: (context, state) {
+        // ✨ Captura o email enviado pela tela anterior. Se vier vazio, coloca um fallback de segurança.
+        final emailRecebido = state.extra as String? ?? 'seu email'; 
+        
+        return _buildSlideRightToLeftPage(
+          key: state.pageKey,
+          child: Verificacao(email: emailRecebido), // ✨ Passa a variável para a tela
+        );
+      },
     ),
   ],
 );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
+import 'package:go_router/go_router.dart';
 
 @NowaGenerated({'auto-width': 351, 'auto-height': 49})
 class BotaoNhac extends StatelessWidget {
@@ -11,11 +11,11 @@ class BotaoNhac extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.go('/email-cliente');
+        context.push('/email-cliente');
       },
       child: ElevatedButton(
         onPressed: () {
-          context.go('/email-cliente');
+          context.push('/email-cliente');
         },
         style: const ButtonStyle(
           backgroundColor: WidgetStatePropertyAll<Color?>(Color(0xFFFE645C)),
