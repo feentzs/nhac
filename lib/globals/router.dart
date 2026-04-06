@@ -5,6 +5,8 @@ import 'package:nhac/pages/email_cliente.dart';
 import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/bem_vindo_motoca.dart';
 import 'package:nhac/pages/verificacao.dart';
+
+import 'package:nhac/pages/home_page.dart'; 
 import 'package:nowa_runtime/nowa_runtime.dart';
 
 CustomTransitionPage _buildSlideRightToLeftPage({
@@ -45,13 +47,24 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+    
+    
     GoRoute(
       path: '/home-page',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const HomePage(), 
+      ),
+    ),
+
+    GoRoute(
+      path: '/bem-vindo', 
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
         child: const BemVindo(),
       ),
     ),
+    
     GoRoute(
       path: '/bem-vindo-motoca',
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
@@ -69,12 +82,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/verificacao',
       pageBuilder: (context, state) {
-        // ✨ Captura o email enviado pela tela anterior. Se vier vazio, coloca um fallback de segurança.
-        final emailRecebido = state.extra as String? ?? 'seu email'; 
-        
+        final emailRecebido = state.extra as String? ?? 'seu email';
         return _buildSlideRightToLeftPage(
           key: state.pageKey,
-          child: Verificacao(email: emailRecebido), // ✨ Passa a variável para a tela
+          child: Verificacao(email: emailRecebido),
         );
       },
     ),

@@ -96,6 +96,11 @@ class _VerificacaoState extends State<Verificacao> {
                 ),
                 controller: pinCode,
                 onChanged: (value) {},
+                
+                onCompleted: (value) {
+                  
+                  context.go('/home-page');
+                },
                 autoFocus: true,
                 enableActiveFill: true,
                 cursorColor: const Color(0xFFFF6961),

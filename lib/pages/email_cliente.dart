@@ -16,6 +16,9 @@ class EmailCliente extends StatefulWidget {
 @NowaGenerated()
 class _EmailClienteState extends State<EmailCliente> {
   TextEditingController text = TextEditingController();
+  
+  
+  bool _emailValido = false;
 
   final List<String> _dominios = [
     '@gmail.com',
@@ -24,6 +27,35 @@ class _EmailClienteState extends State<EmailCliente> {
     '@yahoo.com.br',
     '@icloud.com',
   ];
+
+  
+  @override
+  void initState() {
+    super.initState();
+    text.addListener(_verificarEmail);
+  }
+
+  
+  void _verificarEmail() {
+    
+    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final ehValido = regex.hasMatch(text.text);
+    
+    
+    if (_emailValido != ehValido) {
+      setState(() {
+        _emailValido = ehValido;
+      });
+    }
+  }
+
+
+  @override
+  void dispose() {
+    text.removeListener(_verificarEmail);
+    text.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +94,7 @@ class _EmailClienteState extends State<EmailCliente> {
                   color: Color(0xFF5D201C),
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.w600,
-                  shadows: const [
+                  shadows: [
                     Shadow(offset: Offset(0.0, 0.0), color: Color(0xFFEC1212)),
                   ],
                 ),
@@ -189,18 +221,27 @@ class _EmailClienteState extends State<EmailCliente> {
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
-                onPressed: () {
-                  context.push('/verificacao', extra: text.text);
-                },
-                style: const ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll<Color?>(
-                    Color(0xFFFE645C),
+                // ✨ 5. Se for válido, navega. Se não for, fica null (desativa o botão)
+                onPressed: _emailValido 
+                    ? () {
+                        context.push('/verificacao', extra: text.text);
+                      }
+                    : null, 
+                style: ButtonStyle(
+                  // ✨ 6. Resolvemos a cor com base no estado do botão
+                  backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                    (Set<WidgetState> states) {
+                      if (states.contains(WidgetState.disabled)) {
+                        return const Color(0xFFC9BCBC);
+                      }
+                      return const Color(0xFFFE645C); // Cor quando válido/ativado
+                    },
                   ),
-                  foregroundColor: WidgetStatePropertyAll<Color?>(null),
-                  shadowColor: WidgetStatePropertyAll<Color?>(null),
-                  elevation: WidgetStatePropertyAll<double?>(null),
-                  side: WidgetStatePropertyAll<BorderSide?>(null),
-                  shape: WidgetStatePropertyAll<RoundedRectangleBorder?>(null),
+                  foregroundColor: const WidgetStatePropertyAll<Color?>(null),
+                  shadowColor: const WidgetStatePropertyAll<Color?>(null),
+                  elevation: const WidgetStatePropertyAll<double?>(null),
+                  side: const WidgetStatePropertyAll<BorderSide?>(null),
+                  shape: const WidgetStatePropertyAll<RoundedRectangleBorder?>(null),
                 ),
                 child: const Text(
                   'Continuar',
