@@ -5,8 +5,10 @@ import 'package:nhac/pages/email_cliente.dart';
 import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/bem_vindo_motoca.dart';
 import 'package:nhac/pages/verificacao.dart';
-
-import 'package:nhac/pages/home_page.dart'; 
+import 'package:nhac/pages/home_page.dart';
+// ✨ 1. Adicionamos os imports das novas telas (Verifique se as pastas estão corretas no seu projeto)
+import 'package:nhac/pages/Cadastro/nome.dart'; 
+import 'package:nhac/pages/Cadastro/senha.dart'; // Supondo que a tela de senha esteja na mesma pasta
 import 'package:nowa_runtime/nowa_runtime.dart';
 
 CustomTransitionPage _buildSlideRightToLeftPage({
@@ -47,24 +49,20 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
-    
-    
     GoRoute(
       path: '/home-page',
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
-        child: const HomePage(), 
+        child: const HomePage(),
       ),
     ),
-
     GoRoute(
-      path: '/bem-vindo', 
+      path: '/bem-vindo',
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
         child: const BemVindo(),
       ),
     ),
-    
     GoRoute(
       path: '/bem-vindo-motoca',
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
@@ -88,6 +86,24 @@ final GoRouter appRouter = GoRouter(
           child: Verificacao(email: emailRecebido),
         );
       },
+    ),
+    
+    // ✨ 2. MUDANÇA AQUI: Arrumámos a rota '/nome' para ter a animação de deslizar
+    GoRoute(
+      path: '/Cadastro/nome', 
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const Nome(),
+      ),
+    ),
+    
+    // ✨ 3. MUDANÇA AQUI: Arrumámos a rota '/senha' para ter a animação de deslizar
+    GoRoute(
+      path: '/Cadastro/senha', 
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const Senha(),
+      ),
     ),
   ],
 );
