@@ -19,44 +19,44 @@ class _SenhaState extends State<Senha> {
   bool _senhaValida = false;
 
   String? _erroSenha;
+
   String? _erroConfirmacao;
 
   bool _senhaVisivel = false;
+
   bool _confirmacaoVisivel = false;
 
-  // Controladores de Texto
   TextEditingController text = TextEditingController();
+
   TextEditingController text1 = TextEditingController();
 
-  // Controladores de Foco
   FocusNode focus1 = FocusNode();
+
   FocusNode focus2 = FocusNode();
 
   void _verificarSenha() {
-    if (!mounted) return; 
-
+    if (!mounted) {
+      return;
+    }
     final senha = text.text;
     final confirmacao = text1.text;
-
     String? erroSenhaTemp;
     String? erroConfirmacaoTemp;
-
     if (senha.isNotEmpty) {
       if (senha.length < 8) {
         erroSenhaTemp = 'Mínimo de 8 caracteres';
-      } else if (!senha.contains(RegExp(r'[A-Z]'))) {
+      } else if (!senha.contains(RegExp('[A-Z]'))) {
         erroSenhaTemp = 'Precisa de pelo menos uma letra maiúscula';
       }
     }
-
     if (confirmacao.isNotEmpty && senha != confirmacao) {
       erroConfirmacaoTemp = 'As senhas não coincidem';
     }
-
     setState(() {
       _erroSenha = erroSenhaTemp;
       _erroConfirmacao = erroConfirmacaoTemp;
-      _senhaValida = senha.isNotEmpty &&
+      _senhaValida =
+          senha.isNotEmpty &&
           confirmacao.isNotEmpty &&
           _erroSenha == null &&
           _erroConfirmacao == null;
@@ -65,8 +65,6 @@ class _SenhaState extends State<Senha> {
 
   @override
   void dispose() {
-    // ✨ A CORREÇÃO ESTÁ AQUI: Removemos os focus.unfocus()! 
-    // Deixamos apenas os comandos de destruir a memória (dispose), que é o correto.
     focus1.dispose();
     focus2.dispose();
     text.dispose();
@@ -91,10 +89,8 @@ class _SenhaState extends State<Senha> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Botão Voltar
                       GestureDetector(
                         onTap: () {
-                          // Aqui podemos manter o unfocus, pois a tela ainda está "viva" enquanto o clique ocorre
                           focus1.unfocus();
                           focus2.unfocus();
                           if (GoRouter.of(context).canPop()) {
@@ -116,9 +112,7 @@ class _SenhaState extends State<Senha> {
                           ),
                         ),
                       ),
-                      
                       const SizedBox(height: 18.0),
-                      
                       const Text(
                         'Vamos criar a sua senha',
                         style: TextStyle(
@@ -128,11 +122,9 @@ class _SenhaState extends State<Senha> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      
                       const SizedBox(height: 8.0),
-
                       const Text(
-                        'A sua nova senha tem que ter pelo menos 8 caracteres.',
+                        'A sua nova senha tem que ter pelo menos 8 caracteres e 1 letra maiúscula.',
                         style: TextStyle(
                           fontSize: 16.0,
                           color: Color(0xFF5D201C),
@@ -140,15 +132,12 @@ class _SenhaState extends State<Senha> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      
                       const SizedBox(height: 24.0),
-                      
-                      // Campo: Senha Principal
                       TextFormField(
                         controller: text,
-                        focusNode: focus1, 
+                        focusNode: focus1,
                         onChanged: (value) => _verificarSenha(),
-                        obscureText: !_senhaVisivel, 
+                        obscureText: !_senhaVisivel,
                         obscuringCharacter: '⬤',
                         autofocus: true,
                         cursorColor: const Color(0xFFFF6961),
@@ -156,37 +145,43 @@ class _SenhaState extends State<Senha> {
                           color: const Color(0xFF5D201C),
                           fontFamily: 'Roboto',
                           fontWeight: FontWeight.w600,
-                          letterSpacing: _senhaVisivel ? 0.0 : 4.0, 
+                          letterSpacing: _senhaVisivel ? 0.0 : 4.0,
                         ),
                         decoration: InputDecoration(
                           enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey,
+                              width: 1.0,
+                            ),
                           ),
                           focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFFC9BCBC), width: 2.0),
+                            borderSide: BorderSide(
+                              color: Color(0xFFC9BCBC),
+                              width: 2.0,
+                            ),
                           ),
                           hintText: 'Senha',
                           hintStyle: const TextStyle(
-                            color: Color(0xFFC9BCBC), 
-                            letterSpacing: 0,
+                            color: Color(0xFFC9BCBC),
+                            letterSpacing: 0.0,
                             fontSize: 16.0,
                           ),
                           errorText: _erroSenha,
                           suffixIcon: IconButton(
-                            icon: _senhaVisivel 
-                              ? const Icon(
-                                  Icons.visibility,
-                                  color: Color(0xFFFF6961),
-                                )
-                              : SvgPicture.asset(
-                                  'assets/olho-fechado.svg',
-                                  width: 24.0,
-                                  height: 24.0,
-                                  colorFilter: const ColorFilter.mode(
-                                    Color(0xFFC9BCBC),
-                                    BlendMode.srcIn,
+                            icon: _senhaVisivel
+                                ? const Icon(
+                                    Icons.visibility,
+                                    color: Color(0xFFFF6961),
+                                  )
+                                : SvgPicture.asset(
+                                    'assets/olho-fechado.svg',
+                                    width: 24.0,
+                                    height: 24.0,
+                                    colorFilter: const ColorFilter.mode(
+                                      Color(0xFFC9BCBC),
+                                      BlendMode.srcIn,
+                                    ),
                                   ),
-                                ),
                             onPressed: () {
                               setState(() {
                                 _senhaVisivel = !_senhaVisivel;
@@ -195,13 +190,10 @@ class _SenhaState extends State<Senha> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 24.0),
-
-                      // Campo: Confirmar Senha
                       TextFormField(
                         controller: text1,
-                        focusNode: focus2, 
+                        focusNode: focus2,
                         onChanged: (value) => _verificarSenha(),
                         obscureText: !_confirmacaoVisivel,
                         obscuringCharacter: '⬤',
@@ -214,33 +206,39 @@ class _SenhaState extends State<Senha> {
                         ),
                         decoration: InputDecoration(
                           enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                            borderSide: BorderSide(
+                              color: Colors.grey,
+                              width: 1.0,
+                            ),
                           ),
                           focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFFC9BCBC), width: 2.0),
+                            borderSide: BorderSide(
+                              color: Color(0xFFC9BCBC),
+                              width: 2.0,
+                            ),
                           ),
                           hintText: 'Confirmar senha',
                           hintStyle: const TextStyle(
                             color: Color(0xFFC9BCBC),
-                            letterSpacing: 0,
+                            letterSpacing: 0.0,
                             fontSize: 16.0,
                           ),
                           errorText: _erroConfirmacao,
                           suffixIcon: IconButton(
-                            icon: _confirmacaoVisivel 
-                              ? const Icon(
-                                  Icons.visibility,
-                                  color: Color(0xFFFF6961),
-                                )
-                              : SvgPicture.asset(
-                                  'assets/olho-fechado.svg',
-                                  width: 24.0,
-                                  height: 24.0,
-                                  colorFilter: const ColorFilter.mode(
-                                    Color(0xFFC9BCBC),
-                                    BlendMode.srcIn,
+                            icon: _confirmacaoVisivel
+                                ? const Icon(
+                                    Icons.visibility,
+                                    color: Color(0xFFFF6961),
+                                  )
+                                : SvgPicture.asset(
+                                    'assets/olho-fechado.svg',
+                                    width: 24.0,
+                                    height: 24.0,
+                                    colorFilter: const ColorFilter.mode(
+                                      Color(0xFFC9BCBC),
+                                      BlendMode.srcIn,
+                                    ),
                                   ),
-                                ),
                             onPressed: () {
                               setState(() {
                                 _confirmacaoVisivel = !_confirmacaoVisivel;
@@ -254,31 +252,33 @@ class _SenhaState extends State<Senha> {
                 ),
               ),
             ),
-            
-            // Botão Continuar
             Padding(
-              padding: const EdgeInsets.only(left: 21.0, right: 21.0, bottom: 24.0, top: 8.0),
+              padding: const EdgeInsets.only(
+                left: 21.0,
+                right: 21.0,
+                bottom: 24.0,
+                top: 8.0,
+              ),
               child: SizedBox(
                 height: 49.0,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _senhaValida 
+                  onPressed: _senhaValida
                       ? () {
-                          // Tiramos o foco das caixas (esconde o teclado) suavemente
                           focus1.unfocus();
                           focus2.unfocus();
-                          
-                          // Navega após um pequeno atraso, permitindo que a transição ocorra com segurança
                           Future.delayed(const Duration(milliseconds: 250), () {
                             if (mounted) {
                               context.go('/home-page');
                             }
                           });
-                        } 
+                        }
                       : null,
                   style: ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll<Color>(
-                      _senhaValida ? const Color(0xFFFE645C) : Colors.grey.shade400,
+                      _senhaValida
+                          ? const Color(0xFFFE645C)
+                          : Colors.grey.shade400,
                     ),
                     foregroundColor: const WidgetStatePropertyAll<Color?>(null),
                     shadowColor: const WidgetStatePropertyAll<Color?>(null),

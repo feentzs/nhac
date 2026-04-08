@@ -3,7 +3,10 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 
 @NowaGenerated()
 final ThemeData lightTheme = ThemeData(
-  colorScheme: const ColorScheme.light(surface: Color(0xFFFFE7E5)),
+  colorScheme: const ColorScheme.light(
+    surface: Color(0xFFFFE7E5),
+    primary: Color(0xFFFF6961),
+  ),
   textTheme: const TextTheme(),
   fontFamily: 'Roboto',
   elevatedButtonTheme: const ElevatedButtonThemeData(

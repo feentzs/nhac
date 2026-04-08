@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dados_globais.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -16,8 +18,7 @@ class EmailCliente extends StatefulWidget {
 @NowaGenerated()
 class _EmailClienteState extends State<EmailCliente> {
   TextEditingController text = TextEditingController();
-  
-  
+
   bool _emailValido = false;
 
   final List<String> _dominios = [
@@ -28,27 +29,21 @@ class _EmailClienteState extends State<EmailCliente> {
     '@icloud.com',
   ];
 
-  
   @override
   void initState() {
     super.initState();
     text.addListener(_verificarEmail);
   }
 
-  
   void _verificarEmail() {
-    
-    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final regex = RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$');
     final ehValido = regex.hasMatch(text.text);
-    
-    
     if (_emailValido != ehValido) {
       setState(() {
         _emailValido = ehValido;
       });
     }
   }
-
 
   @override
   void dispose() {
@@ -94,7 +89,7 @@ class _EmailClienteState extends State<EmailCliente> {
                   color: Color(0xFF5D201C),
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.w600,
-                  shadows: [
+                  shadows: const [
                     Shadow(offset: Offset(0.0, 0.0), color: Color(0xFFEC1212)),
                   ],
                 ),
@@ -150,6 +145,7 @@ class _EmailClienteState extends State<EmailCliente> {
                     );
                   },
                 ),
+                physics: const ClampingScrollPhysics(),
               ),
             ),
             Positioned(
@@ -189,59 +185,33 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 280.0,
-              left: 162.5,
-              width: 48.0,
-              height: 48.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey.shade300, width: 1.0),
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () {},
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Image.network(
-                        'https://developers.google.com/identity/images/g-logo.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
               bottom: 24.0,
               left: 21.0,
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
-                // ✨ 5. Se for válido, navega. Se não for, fica null (desativa o botão)
-                onPressed: _emailValido 
+                onPressed: _emailValido
                     ? () {
+                        emailDoUsuario = text.text; 
                         context.push('/verificacao', extra: text.text);
                       }
-                    : null, 
+                    : null,
                 style: ButtonStyle(
-                  // ✨ 6. Resolvemos a cor com base no estado do botão
-                  backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return const Color(0xFFC9BCBC);
-                      }
-                      return const Color(0xFFFE645C); // Cor quando válido/ativado
-                    },
-                  ),
+                  backgroundColor: WidgetStateProperty.resolveWith<Color>((
+                    states,
+                  ) {
+                    if (states.contains(WidgetState.disabled)) {
+                      return const Color(0xFFC9BCBC);
+                    }
+                    return const Color(0xFFFE645C);
+                  }),
                   foregroundColor: const WidgetStatePropertyAll<Color?>(null),
                   shadowColor: const WidgetStatePropertyAll<Color?>(null),
                   elevation: const WidgetStatePropertyAll<double?>(null),
                   side: const WidgetStatePropertyAll<BorderSide?>(null),
-                  shape: const WidgetStatePropertyAll<RoundedRectangleBorder?>(null),
+                  shape: const WidgetStatePropertyAll<RoundedRectangleBorder?>(
+                    null,
+                  ),
                 ),
                 child: const Text(
                   'Continuar',
@@ -277,6 +247,108 @@ class _EmailClienteState extends State<EmailCliente> {
                     image: AssetImage('assets/Arrow right (3).png'),
                     fit: BoxFit.cover,
                   ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 275.0,
+              left: 21.0,
+              height: 49.0,
+              width: 351.0,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.push('/email-cliente');
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll<Color?>(
+                    Theme.of(context).colorScheme.surface,
+                  ),
+                  foregroundColor: const WidgetStatePropertyAll<Color?>(null),
+                  shadowColor: const WidgetStatePropertyAll<Color?>(null),
+                  elevation: const WidgetStatePropertyAll<double?>(0.0),
+                  side: const WidgetStatePropertyAll<BorderSide>(
+                    BorderSide(color: Color(0xFF5D201C), width: 1.5),
+                  ),
+                  shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(width: 12.0),
+                    SvgPicture.asset(
+                      'assets/google-logo.svg',
+                      height: 24.0,
+                      width: 24.0,
+                    ),
+                    const Expanded(
+                      child: Text(
+                        'Continuar com o Google',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF5D201C),
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 36.0),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 345.0,
+              left: 21.0,
+              height: 49.0,
+              width: 351.0,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.push('/insira_telefone');
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll<Color?>(
+                    Theme.of(context).colorScheme.surface,
+                  ),
+                  foregroundColor: const WidgetStatePropertyAll<Color?>(null),
+                  shadowColor: const WidgetStatePropertyAll<Color?>(null),
+                  elevation: const WidgetStatePropertyAll<double?>(0.0),
+                  side: const WidgetStatePropertyAll<BorderSide>(
+                    BorderSide(color: Color(0xFF5D201C), width: 1.5),
+                  ),
+                  shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(width: 12.0),
+                    const Icon(
+                      Icons.phone,
+                      size: 24.0,
+                      color: Color(0xFF5D201C),
+                    ),
+                    const Expanded(
+                      child: Text(
+                        'Continuar com o telefone',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF5D201C),
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 36.0),
+                  ],
                 ),
               ),
             ),

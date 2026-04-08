@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/pages/bem_vindo.dart';
 import 'package:nhac/pages/email_cliente.dart';
+import 'package:nhac/pages/insira_telefone.dart';
 import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/bem_vindo_motoca.dart';
 import 'package:nhac/pages/verificacao.dart';
+import 'package:nhac/pages/verificacao_numero.dart'; 
 import 'package:nhac/pages/home_page.dart';
-// ✨ 1. Adicionamos os imports das novas telas (Verifique se as pastas estão corretas no seu projeto)
-import 'package:nhac/pages/Cadastro/nome.dart'; 
-import 'package:nhac/pages/Cadastro/senha.dart'; // Supondo que a tela de senha esteja na mesma pasta
+import 'package:nhac/pages/Cadastro/nome.dart';
+import 'package:nhac/pages/Cadastro/senha.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 
 CustomTransitionPage _buildSlideRightToLeftPage({
@@ -87,22 +88,32 @@ final GoRouter appRouter = GoRouter(
         );
       },
     ),
-    
-    // ✨ 2. MUDANÇA AQUI: Arrumámos a rota '/nome' para ter a animação de deslizar
     GoRoute(
-      path: '/Cadastro/nome', 
-      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
-        key: state.pageKey,
-        child: const Nome(),
-      ),
+      path: '/Cadastro/nome',
+      pageBuilder: (context, state) =>
+          _buildSlideRightToLeftPage(key: state.pageKey, child: const Nome()),
     ),
-    
-    // ✨ 3. MUDANÇA AQUI: Arrumámos a rota '/senha' para ter a animação de deslizar
     GoRoute(
-      path: '/Cadastro/senha', 
+      path: '/Cadastro/senha',
+      pageBuilder: (context, state) =>
+          _buildSlideRightToLeftPage(key: state.pageKey, child: const Senha()),
+    ),
+    GoRoute(
+      path: '/verificacao_numero',
+      pageBuilder: (context, state) { 
+        
+         final numeroRecebido = state.extra as String? ?? ''; 
+        return _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: VerificacaoNumero(numero: numeroRecebido),
+      );
+      },
+    ),
+     GoRoute(
+      path: '/insira_telefone',
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
-        child: const Senha(),
+        child: const InsiraTelefone(), 
       ),
     ),
   ],

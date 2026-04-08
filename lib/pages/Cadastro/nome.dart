@@ -15,9 +15,9 @@ class Nome extends StatefulWidget {
 
 @NowaGenerated()
 class _NomeState extends State<Nome> {
-  TextEditingController text = TextEditingController();
-
   bool _nomeValido = false;
+
+  TextEditingController text = TextEditingController();
 
   @override
   void initState() {
@@ -46,12 +46,11 @@ class _NomeState extends State<Nome> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        // ✨ A Column principal que divide a tela entre o formulário (em cima) e o botão (embaixo)
         child: Column(
           children: [
-            // ✨ O Expanded faz com que o formulário ocupe todo o espaço disponível.
-            // Quando o teclado subir, ele encolhe e permite o scroll!
-            Expanded(
+            FlexSizedBox(
+              width: 393.0,
+              height: 706.0,
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -61,7 +60,6 @@ class _NomeState extends State<Nome> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // 1. Botão Voltar
                       GestureDetector(
                         onTap: () {
                           if (GoRouter.of(context).canPop()) {
@@ -73,6 +71,7 @@ class _NomeState extends State<Nome> {
                         child: Transform(
                           alignment: Alignment.center,
                           transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
+                          origin: const Offset(0.0, 0.0),
                           child: const SizedBox(
                             width: 21.0,
                             height: 21.0,
@@ -83,10 +82,7 @@ class _NomeState extends State<Nome> {
                           ),
                         ),
                       ),
-                      
                       const SizedBox(height: 18.0),
-                      
-                      // 2. Título
                       const Text(
                         'Qual o seu nome?',
                         style: TextStyle(
@@ -96,12 +92,8 @@ class _NomeState extends State<Nome> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      
                       const SizedBox(height: 16.0),
-                      
-                      // 3. Campo de Entrada de Texto
                       TextFormField(
-                        controller: text,
                         enabled: true,
                         autofocus: true,
                         showCursor: true,
@@ -127,59 +119,64 @@ class _NomeState extends State<Nome> {
                           hintText: 'Nome',
                           hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
                         ),
+                        controller: text,
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            
-            // ✨ O botão solto no final da Column. O teclado vai empurrar isto para cima!
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 21.0,
-                right: 21.0,
-                bottom: 24.0,
-                top: 8.0, // Pequeno respiro em relação ao conteúdo de cima
-              ),
-              child: SizedBox(
-                height: 49.0,
-                width: double.infinity, // Faz o botão esticar de um lado ao outro
-                child: ElevatedButton(
-                  onPressed: _nomeValido
-                      ? () {
-                          context.push('/Cadastro/senha');
+            FlexSizedBox(
+              width: 393.0,
+              height: 81.0,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 21.0,
+                  right: 21.0,
+                  bottom: 24.0,
+                  top: 8.0,
+                ),
+                child: SizedBox(
+                  height: 49.0,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _nomeValido
+                        ? () {
+                            context.push('/insira_telefone');
+                          }
+                        : null,
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.resolveWith<Color>((
+                        states,
+                      ) {
+                        if (states.contains(WidgetState.disabled)) {
+                          return Colors.grey.shade400;
                         }
-                      : null,
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>((
-                      states,
-                    ) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return Colors.grey.shade400;
-                      }
-                      return const Color(0xFFFE645C);
-                    }),
-                    foregroundColor: const WidgetStatePropertyAll<Color?>(null),
-                    shadowColor: const WidgetStatePropertyAll<Color?>(null),
-                    elevation: const WidgetStatePropertyAll<double?>(null),
-                    side: const WidgetStatePropertyAll<BorderSide?>(null),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
+                        return const Color(0xFFFE645C);
+                      }),
+                      foregroundColor: const WidgetStatePropertyAll<Color?>(
+                        null,
+                      ),
+                      shadowColor: const WidgetStatePropertyAll<Color?>(null),
+                      elevation: const WidgetStatePropertyAll<double?>(null),
+                      side: const WidgetStatePropertyAll<BorderSide?>(null),
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
                       ),
                     ),
-                  ),
-                  child: const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Color(0xFFFEE3E1),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
+                    child: const Text(
+                      'Continuar',
+                      style: TextStyle(
+                        color: Color(0xFFFEE3E1),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.1,
+                      ),
+                      textAlign: TextAlign.start,
+                      textDirection: TextDirection.rtl,
                     ),
-                    textAlign: TextAlign.start,
-                    textDirection: TextDirection.rtl,
                   ),
                 ),
               ),
