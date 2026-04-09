@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
+import 'package:nhac/pages/dados_globais.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dados_globais.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -192,7 +192,7 @@ class _EmailClienteState extends State<EmailCliente> {
               child: ElevatedButton(
                 onPressed: _emailValido
                     ? () {
-                        emailDoUsuario = text.text; 
+                        emailDoUsuario = text.text;
                         context.push('/verificacao', extra: text.text);
                       }
                     : null,

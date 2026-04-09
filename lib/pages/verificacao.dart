@@ -204,6 +204,22 @@ class _VerificacaoState extends State<Verificacao> {
                         ),
                       ),
                     ),
+                    const Spacer(), 
+                   GestureDetector(
+                    onTap: () {
+                      
+                      GoRouter.of(context).push('/continuar_senha');
+                    },
+                    child: const Text(
+                      'Entrar com a senha',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Color(0xFFFF6961),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8.0),
                   ],
                 ),
               ],

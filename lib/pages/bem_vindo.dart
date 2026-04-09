@@ -54,7 +54,7 @@ class _BemVindoState extends State<BemVindo> {
                     ),
                     foregroundColor: WidgetStatePropertyAll<Color?>(null),
                     shadowColor: WidgetStatePropertyAll<Color?>(
-                      Color(0xFFFFFF),
+                      Color(0x00ffffff),
                     ),
                     elevation: WidgetStatePropertyAll<double?>(null),
                     side: WidgetStatePropertyAll<BorderSide?>(null),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 @NowaGenerated()
 class InsiraTelefone extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
-  const InsiraTelefone({super.key}); 
+  const InsiraTelefone({super.key});
 
   @override
   State<InsiraTelefone> createState() {
@@ -22,7 +22,7 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
 
   final maskFormatter = MaskTextInputFormatter(
     mask: '(##) #####-####',
-    filter: { "#": RegExp(r'[0-9]') },
+    filter: {'#': RegExp('[0-9]')},
     type: MaskAutoCompletionType.lazy,
   );
 
@@ -35,7 +35,7 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, 
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Stack(
           fit: StackFit.expand,
@@ -72,7 +72,6 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
                 onChanged: (value) {
                   final apenasNumeros = maskFormatter.getUnmaskedText();
                   final ehValido = apenasNumeros.length == 11;
-                  
                   if (_numeroValido != ehValido) {
                     setState(() {
                       _numeroValido = ehValido;
@@ -124,18 +123,20 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
               ),
             ),
             Positioned(
-              bottom: 24.0, 
+              bottom: 24.0,
               left: 21.0,
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
-               onPressed: _numeroValido 
-                ? () {
-                     context.push('/verificacao_numero', extra: text.text);
-                  }
-                : null,
+                onPressed: _numeroValido
+                    ? () {
+                        context.push('/verificacao_numero', extra: text.text);
+                      }
+                    : null,
                 style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+                  backgroundColor: WidgetStateProperty.resolveWith<Color>((
+                    states,
+                  ) {
                     if (states.contains(WidgetState.disabled)) {
                       return const Color(0xFFC9BCBC);
                     }
@@ -145,7 +146,9 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
                   shadowColor: const WidgetStatePropertyAll<Color?>(null),
                   elevation: const WidgetStatePropertyAll<double?>(null),
                   side: const WidgetStatePropertyAll<BorderSide?>(null),
-                  shape: const WidgetStatePropertyAll<RoundedRectangleBorder?>(null),
+                  shape: const WidgetStatePropertyAll<RoundedRectangleBorder?>(
+                    null,
+                  ),
                 ),
                 child: const Text(
                   'Continuar',

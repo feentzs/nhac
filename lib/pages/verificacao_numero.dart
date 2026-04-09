@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:nhac/pages/dados_globais.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dados_globais.dart';
 
 @NowaGenerated()
-class VerificacaoNumero extends StatefulWidget { 
+class VerificacaoNumero extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
-  
   const VerificacaoNumero({super.key, required this.numero, this.email});
 
-  final String numero; 
-  final String? email; 
+  final String numero;
+
+  final String? email;
 
   @override
   State<VerificacaoNumero> createState() {
@@ -24,7 +24,9 @@ class VerificacaoNumero extends StatefulWidget {
 @NowaGenerated()
 class _VerificacaoNumeroState extends State<VerificacaoNumero> {
   int _tempoRestante = 60;
+
   bool _podeReenviar = false;
+
   Timer? _timer;
 
   @override
@@ -64,14 +66,20 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
 
   @override
   Widget build(BuildContext context) {
-    final corAtual = _podeReenviar ? const Color(0xFFFF6961) : const Color(0xFF5D201C);
-    final textoAtual = _podeReenviar ? 'Reenviar código por SMS' : 'Reenviar código em 00:${_tempoRestante.toString().padLeft(2, '0')}';
-    
+    final corAtual = _podeReenviar
+        ? const Color(0xFFFF6961)
+        : const Color(0xFF5D201C);
+    final textoAtual = _podeReenviar
+        ? 'Reenviar código por SMS'
+        : 'Reenviar código em 00:${_tempoRestante.toString().padLeft(2, '0')}';
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 18.0,
+              vertical: 16.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -110,13 +118,23 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                 Text.rich(
                   TextSpan(
                     text: 'Insira o código enviado para ',
-                    style: const TextStyle(color: Color(0x995D201C), fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: Color(0x995D201C),
+                      fontWeight: FontWeight.w600,
+                    ),
                     children: [
                       TextSpan(
                         text: widget.numero,
-                        style: const TextStyle(color: Color(0xFF5D201C), fontWeight: FontWeight.w900, fontSize: 16.0),
+                        style: const TextStyle(
+                          color: Color(0xFF5D201C),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 16.0,
+                        ),
                       ),
-                      const TextSpan(text: '. O código pode demorar até 1 minuto para chegar.'),
+                      const TextSpan(
+                        text:
+                            '. O código pode demorar até 1 minuto para chegar.',
+                      ),
                     ],
                   ),
                 ),
@@ -134,23 +152,23 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                     borderWidth: 1.0,
                     shape: PinCodeFieldShape.box,
                     borderRadius: BorderRadius.circular(10.0),
-                    fieldWidth: 45.0, fieldHeight: 55.0,
+                    fieldWidth: 45.0,
+                    fieldHeight: 55.0,
                   ),
                   onChanged: (value) {},
-                 onCompleted: (value) {
-                  final router = GoRouter.of(context);
-                  
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    if (!mounted) return;
-                    
-
-                    if (emailDoUsuario.trim() == 'quemeessemano@gmail.com') {
-                      router.push('/Cadastro/senha');
-                    } else {
-                      router.go('/home-page'); 
-                    }
-                  });
-                },
+                  onCompleted: (value) {
+                    final router = GoRouter.of(context);
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      if (!mounted) {
+                        return;
+                      }
+                      if (emailDoUsuario.trim() == 'quemeessemano@gmail.com') {
+                        router.push('/Cadastro/senha');
+                      } else {
+                        router.go('/home-page');
+                      }
+                    });
+                  },
                   autoFocus: true,
                   enableActiveFill: true,
                   cursorColor: const Color(0xFFFF6961),
@@ -165,8 +183,12 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       onTap: _podeReenviar ? _iniciarTimer : null,
                       child: SvgPicture(
                         const SvgAssetLoader('assets/reload.svg'),
-                        width: 14.0, height: 14.0,
-                        colorFilter: ColorFilter.mode(corAtual, BlendMode.srcIn),
+                        width: 14.0,
+                        height: 14.0,
+                        colorFilter: ColorFilter.mode(
+                          corAtual,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8.0),
@@ -174,7 +196,11 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       onTap: _podeReenviar ? _iniciarTimer : null,
                       child: Text(
                         textoAtual,
-                        style: TextStyle(fontSize: 14.0, color: corAtual, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: corAtual,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],

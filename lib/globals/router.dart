@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/pages/bem_vindo.dart';
+import 'package:nhac/pages/continuar_senha.dart';
 import 'package:nhac/pages/email_cliente.dart';
 import 'package:nhac/pages/insira_telefone.dart';
 import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/bem_vindo_motoca.dart';
 import 'package:nhac/pages/verificacao.dart';
-import 'package:nhac/pages/verificacao_numero.dart'; 
+import 'package:nhac/pages/verificacao_numero.dart';
 import 'package:nhac/pages/home_page.dart';
 import 'package:nhac/pages/Cadastro/nome.dart';
 import 'package:nhac/pages/Cadastro/senha.dart';
@@ -100,20 +101,26 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/verificacao_numero',
-      pageBuilder: (context, state) { 
-        
-         final numeroRecebido = state.extra as String? ?? ''; 
+      pageBuilder: (context, state) {
+        final numeroRecebido = state.extra as String? ?? '';
         return _buildSlideRightToLeftPage(
-        key: state.pageKey,
-        child: VerificacaoNumero(numero: numeroRecebido),
-      );
+          key: state.pageKey,
+          child: VerificacaoNumero(numero: numeroRecebido),
+        );
       },
     ),
-     GoRoute(
+    GoRoute(
       path: '/insira_telefone',
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
-        child: const InsiraTelefone(), 
+        child: const InsiraTelefone(),
+      ),
+    ),
+    GoRoute(
+      path: '/continuar_senha',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const ContinuarSenha(),
       ),
     ),
   ],
