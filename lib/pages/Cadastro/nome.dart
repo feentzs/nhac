@@ -49,8 +49,8 @@ class _NomeState extends State<Nome> {
         child: Column(
           children: [
             FlexSizedBox(
+              height: 427.0,
               width: 393.0,
-              height: 706.0,
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
