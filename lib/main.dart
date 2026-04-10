@@ -5,13 +5,19 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:flutter/material.dart';
 import 'package:nhac/globals/app_state.dart';
 import 'package:nhac/globals/router.dart';
+import 'package:firebase_core/firebase_core.dart';
+import './firebase_options.dart';
 
 @NowaGenerated()
 late final SharedPreferences sharedPrefs;
 
 @NowaGenerated()
 main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+);
 
   sharedPrefs = await SharedPreferences.getInstance();
 
