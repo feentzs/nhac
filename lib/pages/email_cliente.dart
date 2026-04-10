@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:nhac/pages/dados_globais.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -256,8 +258,10 @@ class _EmailClienteState extends State<EmailCliente> {
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
-                onPressed: () {
-                  context.push('/email-cliente');
+                onPressed: () async {
+                await context.read<AuthService>().signInWithGoogle();
+                
+
                 },
                 style: ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll<Color?>(
@@ -299,6 +303,7 @@ class _EmailClienteState extends State<EmailCliente> {
                     const SizedBox(width: 36.0),
                   ],
                 ),
+                
               ),
             ),
             Positioned(

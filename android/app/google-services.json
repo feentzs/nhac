@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "261563193700",
+    "project_id": "nhac-backend",
+    "storage_bucket": "nhac-backend.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261563193700:android:c125c7b1b1497102eec271",
+        "android_client_info": {
+          "package_name": "com.feentzs.nhac"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "261563193700-j6opr2sih19ejvutug0nlg3ho991gulq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.feentzs.nhac",
+            "certificate_hash": "2b798c39c70053a5eb8374094b1606f08647856a"
+          }
+        },
+        {
+          "client_id": "261563193700-snhkp8paeqme3ilopc22unio3b1g7a3o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCI3jMGshUZGdmJKdyc-mSxFrHyRkspS-U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "261563193700-snhkp8paeqme3ilopc22unio3b1g7a3o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
