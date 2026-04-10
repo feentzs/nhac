@@ -11,6 +11,7 @@ import 'package:nhac/pages/verificacao_numero.dart';
 import 'package:nhac/pages/home_page.dart';
 import 'package:nhac/pages/Cadastro/nome.dart';
 import 'package:nhac/pages/Cadastro/senha.dart';
+import 'package:nhac/services/auth_check.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 
 CustomTransitionPage _buildSlideRightToLeftPage({
@@ -50,6 +51,7 @@ CustomTransitionPage _buildSlideRightToLeftPage({
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
   routes: [
+    GoRoute(path: '/', builder: (context, state) => const AuthCheck()),
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/home-page',
