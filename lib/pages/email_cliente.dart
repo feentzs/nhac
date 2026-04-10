@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:nhac/pages/dados_globais.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -78,8 +78,8 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 105.0,
-              left: 18.0,
+              top: 165.0,
+              left: 20.0,
               width: 337.0,
               child: TextFormField(
                 controller: text,
@@ -113,7 +113,7 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 169.0,
+              top: 229.0,
               left: 18.0,
               right: 0.0,
               height: 40.0,
@@ -151,7 +151,7 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 240.0,
+              top: 290.0,
               left: 18.0,
               width: 337.0,
               child: Row(
@@ -253,15 +253,13 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 275.0,
+              top: 325.0,
               left: 21.0,
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
                 onPressed: () async {
-                await context.read<AuthService>().signInWithGoogle();
-                
-
+                  await context.read<AuthService>().signInWithGoogle();
                 },
                 style: ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll<Color?>(
@@ -303,11 +301,10 @@ class _EmailClienteState extends State<EmailCliente> {
                     const SizedBox(width: 36.0),
                   ],
                 ),
-                
               ),
             ),
             Positioned(
-              top: 345.0,
+              top: 395.0,
               left: 21.0,
               height: 49.0,
               width: 351.0,
@@ -354,6 +351,21 @@ class _EmailClienteState extends State<EmailCliente> {
                     ),
                     const SizedBox(width: 36.0),
                   ],
+                ),
+              ),
+            ),
+            const Positioned(
+              top: 99.0,
+              left: 19.5,
+              width: 354.0,
+              height: 60.0,
+              child: Text(
+                'Precisamos dele para iniciar o seu cadastro ou acessar o aplicativo.',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Color(0xFF5D201C),
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
