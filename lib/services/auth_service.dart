@@ -2,13 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class AuthService extends ChangeNotifier {
+ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
+
+class AuthService with ChangeNotifier{
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   bool isLoading = false;
 
-  User? get usuarioAtual => _auth.currentUser;
+  User? get currentUser => _auth.currentUser;
 
   Future<void> signInWithGoogle() async {
     _setLoading(true);
@@ -31,14 +33,14 @@ class AuthService extends ChangeNotifier {
       await _auth.signInWithCredential(credential);
 
     } catch (e) {
-      //snackbar aqyu sem ser a barra
+      //snackbar aqui sem ser a barra de chocolate
       print("Erro no login com Google: $e");
     } finally {
       _setLoading(false);
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> signOutGoogle() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
     notifyListeners();
@@ -48,4 +50,86 @@ class AuthService extends ChangeNotifier {
     isLoading = value;
     notifyListeners();
   }
+
+
+
+  Future<UserCredential> signIn({
+    required String email,
+    required String password,
+
+  }) async {
+    return await _auth.signInWithEmailAndPassword(email: email, password: password);
+  }
+
+
+  Future<UserCredential> createAccount({
+    required String email,
+    required String password,
+
+  }) async {
+    return await _auth.createUserWithEmailAndPassword(email: email, password: password);
+  }
+
+   Future<void> signOut() async {
+    await _auth.signOut();
+    notifyListeners();
+  }
+
+  Future<void> resetPassword({
+    required String email,
+
+  } ) async {
+    return await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  Future<void> updateUserName({
+    required String userName,
+  }) async {
+    await currentUser!.updateDisplayName(userName);
+  }
+
+  Future<void> deleteAccount({
+    required String email,
+    required String password,
+  }) async {
+    AuthCredential credential = EmailAuthProvider.credential(email: email, password: password);
+    await currentUser!.reauthenticateWithCredential(credential);
+    await currentUser!.delete();
+    await _auth.signOut();
+  }
+
+   Future<void> resetPasswordFromCurrentPassword({
+    required String currentPassword,
+    required String newPassword,
+    required String email,
+   }) async {
+    AuthCredential credential = 
+              EmailAuthProvider.credential(email: email, password: currentPassword);
+    await currentUser!.reauthenticateWithCredential(credential);
+    await currentUser!.updatePassword(newPassword);
+
+   }
+
+
+  Future<bool> checarEmail(String email) async {
+  try {
+    await _auth.createUserWithEmailAndPassword(
+      email: email, 
+      password: 'senha_temporaria_muito_longa_123'
+    );
+    
+    await _auth.currentUser?.delete();
+    return true;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'email-already-in-use') {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
+
+
 }

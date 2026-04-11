@@ -1,11 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 
 @NowaGenerated()
 class ContinuarSenha extends StatefulWidget {
+  final String email;
+  
   @NowaGenerated({'loader': 'auto-constructor'})
-  const ContinuarSenha({super.key});
+  const ContinuarSenha({super.key, required this.email});
 
   @override
   State<ContinuarSenha> createState() {
@@ -36,6 +40,15 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
     text1.dispose();
     super.dispose();
   }
+
+   void logar() async {
+
+    try{
+      await authService.value.signIn(email: widget.email, password: text1.text);
+    } on FirebaseAuthException catch(e){
+      print(e.message);
+    }
+   }
 
   @override
   Widget build(BuildContext context) {

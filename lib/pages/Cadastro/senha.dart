@@ -1,12 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 @NowaGenerated()
 class Senha extends StatefulWidget {
+  final String email;
   @NowaGenerated({'loader': 'auto-constructor'})
-  const Senha({super.key});
+  const Senha({super.key, required this.email});
 
   @override
   State<Senha> createState() {
@@ -269,7 +272,9 @@ class _SenhaState extends State<Senha> {
                           focus2.unfocus();
                           Future.delayed(const Duration(milliseconds: 250), () {
                             if (mounted) {
-                              context.go('/home-page');
+                              register();
+
+
                             }
                           });
                         }
@@ -306,5 +311,16 @@ class _SenhaState extends State<Senha> {
         ),
       ),
     );
+  }
+  
+  void register() async{
+    try{
+    await authService.value.createAccount(email: widget.email, password: text.text);
+                                  context.go('cadastro/nome');
+
+
+} on FirebaseAuthException catch(e){
+  print(e.message);
+}
   }
 }
