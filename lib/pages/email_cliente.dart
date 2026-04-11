@@ -204,12 +204,12 @@ class _EmailClienteState extends State<EmailCliente> {
                             bool emailExiste = await authService.value.checarEmail(emailDoUsuario);
 
                             if(emailExiste){
-                              context.push('/continua_senha');
+                              context.push('/continuar_senha/$emailEncodado');
                             }
 
                         
                         
-                        context.push('/cadastro/senha/$emailEncodado');
+                        context.push('/Cadastro/senha/$emailEncodado');
                       }
                     : null,
                 style: ButtonStyle(
