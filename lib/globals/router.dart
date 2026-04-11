@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/pages/bem_vindo.dart';
 import 'package:nhac/pages/continuar_senha.dart';
+import 'package:nhac/pages/dados_globais.dart';
 import 'package:nhac/pages/email_cliente.dart';
 import 'package:nhac/pages/insira_telefone.dart';
 import 'package:nhac/pages/splash_screen.dart';
@@ -81,26 +82,23 @@ final GoRouter appRouter = GoRouter(
         child: const EmailCliente(),
       ),
     ),
-    GoRoute(
-      path: '/verificacao',
+   GoRoute(
+      path: '/Cadastro/senha/:email',
       pageBuilder: (context, state) {
-        final emailRecebido = state.extra as String? ?? 'seu email';
+        final email = state.pathParameters['email']!;
+        
         return _buildSlideRightToLeftPage(
-          key: state.pageKey,
-          child: Verificacao(email: emailRecebido),
+          key: state.pageKey, 
+          child: Senha(email: email), 
         );
       },
-    ),
+   ),
     GoRoute(
       path: '/Cadastro/nome',
       pageBuilder: (context, state) =>
           _buildSlideRightToLeftPage(key: state.pageKey, child: const Nome()),
     ),
-    GoRoute(
-      path: '/Cadastro/senha',
-      pageBuilder: (context, state) =>
-          _buildSlideRightToLeftPage(key: state.pageKey, child: const Senha()),
-    ),
+    
     GoRoute(
       path: '/verificacao_numero',
       pageBuilder: (context, state) {
@@ -119,11 +117,15 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/continuar_senha',
-      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
-        key: state.pageKey,
-        child: const ContinuarSenha(),
-      ),
+      path: '/continuar_senha/:email',
+      pageBuilder: (context, state) {
+        final email = state.pathParameters['email']!; 
+
+        return _buildSlideRightToLeftPage(
+          key: state.pageKey, 
+          child: ContinuarSenha(email: email),
+        );
+      },
     ),
   ],
 );

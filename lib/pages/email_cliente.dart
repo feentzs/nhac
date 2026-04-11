@@ -5,6 +5,7 @@ import 'package:nhac/pages/dados_globais.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:email_validator/email_validator.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -20,6 +21,8 @@ class EmailCliente extends StatefulWidget {
 @NowaGenerated()
 class _EmailClienteState extends State<EmailCliente> {
   TextEditingController text = TextEditingController();
+  
+
 
   bool _emailValido = false;
 
@@ -38,8 +41,9 @@ class _EmailClienteState extends State<EmailCliente> {
   }
 
   void _verificarEmail() {
-    final regex = RegExp('^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$');
-    final ehValido = regex.hasMatch(text.text);
+     String  emailUsuario = text.text;
+
+    final bool ehValido = EmailValidator.validate(emailUsuario);
     if (_emailValido != ehValido) {
       setState(() {
         _emailValido = ehValido;
@@ -193,9 +197,19 @@ class _EmailClienteState extends State<EmailCliente> {
               width: 351.0,
               child: ElevatedButton(
                 onPressed: _emailValido
-                    ? () {
-                        emailDoUsuario = text.text;
-                        context.push('/verificacao', extra: text.text);
+                    ? () async {
+                        emailDoUsuario = text.text.trim();
+                            final emailEncodado = Uri.encodeComponent(emailDoUsuario);
+
+                            bool emailExiste = await authService.value.checarEmail(emailDoUsuario);
+
+                            if(emailExiste){
+                              context.push('/continua_senha');
+                            }
+
+                        
+                        
+                        context.push('/cadastro/senha/$emailEncodado');
                       }
                     : null,
                 style: ButtonStyle(
@@ -260,9 +274,14 @@ class _EmailClienteState extends State<EmailCliente> {
               child: ElevatedButton(
                 onPressed: () async {
                 await context.read<AuthService>().signInWithGoogle();
-                
 
-                },
+                    if (authService.value.currentUser != null) {
+                        if (context.mounted) {
+                            context.go('/home-page');
+
+                           }
+                       }
+                    },
                 style: ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll<Color?>(
                     Theme.of(context).colorScheme.surface,
