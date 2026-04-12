@@ -202,6 +202,9 @@ class _EmailClienteState extends State<EmailCliente> {
                             final emailEncodado = Uri.encodeComponent(emailDoUsuario);
 
                             bool emailExiste = await authService.value.checarEmail(emailDoUsuario);
+                             ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Erro ao logar: $emailExiste")),
+    );
 
                             if(emailExiste){
                               context.push('/continuar_senha/$emailEncodado');
