@@ -119,7 +119,7 @@ class AuthService with ChangeNotifier{
     );
     
     await _auth.currentUser?.delete();
-    return true;
+    return false;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'email-already-in-use') {
       return true;

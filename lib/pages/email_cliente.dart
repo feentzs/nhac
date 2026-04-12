@@ -196,26 +196,27 @@ class _EmailClienteState extends State<EmailCliente> {
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
-                onPressed: _emailValido
-                    ? () async {
-                        emailDoUsuario = text.text.trim();
-                            final emailEncodado = Uri.encodeComponent(emailDoUsuario);
+               onPressed: text.text.isNotEmpty
+    ? () async {
+        final emailDoUsuario = text.text.trim();
+        final emailEncodado = Uri.encodeComponent(emailDoUsuario);
 
-                            bool emailExiste = await authService.value.checarEmail(emailDoUsuario);
-                             ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Erro ao logar: $emailExiste")),
-    );
+        
+        bool emailExiste = await authService.value.checarEmail(emailDoUsuario);
 
-                            if(emailExiste){
-                              context.push('/continuar_senha/$emailEncodado');
-                            }
-                            
+        if (!context.mounted) return; 
 
-                        
-                        
-                        context.push('/Cadastro/senha/$emailEncodado');
-                      }
-                    : null,
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(emailExiste ? "Bem-vindo de volta!" : "Criando sua conta...")),
+        );
+
+        if (emailExiste) {
+          context.push('/continuar_senha/$emailEncodado');
+        } else {
+          context.push('/Cadastro/senha/$emailEncodado');
+        }
+      }
+    : null,
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.resolveWith<Color>((
                     states,
@@ -277,15 +278,20 @@ class _EmailClienteState extends State<EmailCliente> {
               width: 351.0,
               child: ElevatedButton(
                 onPressed: () async {
-                await context.read<AuthService>().signInWithGoogle();
-
-                    if (authService.value.currentUser != null) {
-                        if (context.mounted) {
-                            context.go('/home-page');
-
-                           }
-                       }
-                    },
+  try {
+    await authService.value.signInWithGoogle(); 
+    
+    if (authService.value.currentUser != null) {
+      if (context.mounted) context.go('/home-page');
+    }
+  } catch (e) {
+    if (context.mounted) {
+       ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(content: Text("Erro no Google: $e")),
+       );
+    }
+  }
+},
                 style: ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll<Color?>(
                     Theme.of(context).colorScheme.surface,
