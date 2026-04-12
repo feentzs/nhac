@@ -1,5 +1,6 @@
 name: Flutter Build APK (Debug)
 
+
 # Define quando o workflow será executado
 on:
   push:
@@ -8,14 +9,17 @@ on:
     branches: [ "main" ]
   workflow_dispatch: # Permite rodar o workflow manualmente
 
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
 
     steps:
       # 1. Faz o checkout do código do repositório
       - name: Checkout repository
         uses: actions/checkout@v4
+
 
       # 2. Configura o Java (necessário para o Android SDK)
       - name: Set up Java
@@ -23,6 +27,7 @@ jobs:
         with:
           distribution: 'zulu' # Pode usar 'temurin' também
           java-version: '17'
+
 
       # 3. Configura o Flutter
       - name: Set up Flutter
@@ -32,20 +37,23 @@ jobs:
           channel: 'stable'
           cache: true # Ativa o cache para acelerar builds futuras
 
+
       # 4. Instala as dependências do projeto
       - name: Install dependencies
         run: flutter pub get
+
 
       # 5. Executa o build do APK em modo Debug
       - name: Build Debug APK
         run: flutter build apk --debug
 
+
               # 5.1. Extrai e exibe a assinatura do APK nos logs
       - name: Check APK Signature
         run: |
-          echo "### APK Signature Info ###"
-          keytool -list -printcert -jarfile build/app/outputs/flutter-apk/app-debug.apk | grep -E "SHA1|SHA256"
-          
+          # O apksigner fica dentro do diretório de build-tools do Android
+          $ANDROID_HOME/build-tools/34.0.0/apksigner verify --print-certs build/app/outputs/flutter-apk/app-debug.apk
+
 
       # 6. Faz o upload do arquivo gerado para que você possa baixá-lo
       - name: Upload APK artifact
