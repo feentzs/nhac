@@ -272,8 +272,14 @@ class _SenhaState extends State<Senha> {
                           focus2.unfocus();
                           Future.delayed(const Duration(milliseconds: 250), () {
                             if (mounted) {
+                              try{
                               register();
-
+                              context.push('Cadastro/nome');
+                              } on FirebaseAuthException catch(e){
+                                 ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Erro ao logar: $e")),
+    );
+                              }
 
                             }
                           });
@@ -316,11 +322,13 @@ class _SenhaState extends State<Senha> {
   void register() async{
     try{
     await authService.value.createAccount(email: widget.email, password: text.text);
-                                  context.go('cadastro/nome');
+    
 
 
 } on FirebaseAuthException catch(e){
-  print(e.message);
+   ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Erro ao criar conta: $e")),
+    );
 }
   }
 }

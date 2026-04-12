@@ -130,6 +130,4 @@ class AuthService with ChangeNotifier{
   }
 }
 
-
-
 }
