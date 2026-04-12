@@ -95,7 +95,7 @@ class _EmailClienteState extends State<EmailCliente> {
                   color: Color(0xFF5D201C),
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.w600,
-                  shadows: const [
+                  shadows: [
                     Shadow(offset: Offset(0.0, 0.0), color: Color(0xFFEC1212)),
                   ],
                 ),
@@ -206,6 +206,7 @@ class _EmailClienteState extends State<EmailCliente> {
                             if(emailExiste){
                               context.push('/continuar_senha/$emailEncodado');
                             }
+                            
 
                         
                         

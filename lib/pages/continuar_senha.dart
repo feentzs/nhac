@@ -45,6 +45,8 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
 
     try{
       await authService.value.signIn(email: widget.email, password: text1.text);
+
+      
     } on FirebaseAuthException catch(e){
       print(e.message);
     }
@@ -173,7 +175,18 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                 child: ElevatedButton(
                   onPressed: _senhaValida
                       ? () {
-                          GoRouter.of(context).go('/home-page');
+                        try{
+                          logar();
+                           ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Logado com sucesso!!")),
+                              );
+                          context.push('home-page');
+                
+                        } on FirebaseAuthException catch(e){
+                           ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Erro ao logar: $e")),
+                          );
+                        }
                         }
                       : null,
                   style: ButtonStyle(
