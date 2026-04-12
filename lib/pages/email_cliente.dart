@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
-import 'package:nhac/pages/dados_globais.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 import 'package:email_validator/email_validator.dart';
 
 @NowaGenerated()
@@ -279,7 +277,7 @@ class _EmailClienteState extends State<EmailCliente> {
               child: ElevatedButton(
                 onPressed: () async {
   try {
-    await authService.value.signInWithGoogle(); 
+    await authService.value.signInWithGoogle(context); 
     
     if (authService.value.currentUser != null) {
       if (context.mounted) context.go('/home-page');

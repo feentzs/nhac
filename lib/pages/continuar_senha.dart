@@ -41,16 +41,38 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
     super.dispose();
   }
 
-   void logar() async {
+  void logar() async {
+  try {
 
-    try{
-      await authService.value.signIn(email: widget.email, password: text1.text);
+    await authService.value.signIn(email: widget.email, password: text1.text);
 
-      
-    } on FirebaseAuthException catch(e){
-      print(e.message);
-    }
-   }
+    
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),
+    );
+    
+    context.go('/home-page'); 
+
+  } on FirebaseAuthException catch (e) {
+    if (!mounted) return;
+    
+    // Tratando mensagens amigáveis
+    String erro = "Erro ao entrar";
+    if (e.code == 'user-not-found') erro = "Usuário não encontrado.";
+    if (e.code == 'wrong-password') erro = "Senha incorreta.";
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(erro), backgroundColor: Colors.redAccent),
+    );
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Erro inesperado: $e")),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -173,22 +195,11 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                 height: 49.0,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _senhaValida
-                      ? () {
-                        try{
-                          logar();
-                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Logado com sucesso!!")),
-                              );
-                          context.push('home-page');
-                
-                        } on FirebaseAuthException catch(e){
-                           ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Erro ao logar: $e")),
-                          );
-                        }
-                        }
-                      : null,
+                 onPressed: _senhaValida 
+  ? () => logar() 
+  : null,
+
+
                   style: ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll<Color>(
                       _senhaValida

@@ -12,33 +12,47 @@ class AuthService with ChangeNotifier{
 
   User? get currentUser => _auth.currentUser;
 
-  Future<void> signInWithGoogle() async {
-    _setLoading(true);
+ Future<void> signInWithGoogle(BuildContext context) async {
+  _setLoading(true);
 
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
-      if (googleUser == null) {
-        _setLoading(false);
-        return; 
-      }
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await _auth.signInWithCredential(credential);
-
-    } catch (e) {
-      //snackbar aqui sem ser a barra de chocolate
-      print("Erro no login com Google: $e");
-    } finally {
+  try {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    
+    if (googleUser == null) {
       _setLoading(false);
+      return; 
     }
+
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    await _auth.signInWithCredential(credential);
+
+  } on FirebaseAuthException catch (e) {
+    if (!context.mounted) return; // <--- Proteção aqui
+
+    String message = "Erro ao entrar com Google.";
+    if (e.code == 'account-exists-with-different-credential') {
+      message = "Este e-mail já está associado a outra conta.";
+    } else if (e.code == 'invalid-credential') {
+      message = "Credenciais inválidas. Tente novamente.";
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
+    );
+  } catch(e) {
+    if (!context.mounted) return; // <--- Proteção aqui também
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Erro inesperado: $e")),
+    );
+  } finally {
+    _setLoading(false);
   }
+}
 
   Future<void> signOutGoogle() async {
     await _googleSignIn.signOut();

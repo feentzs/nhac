@@ -266,25 +266,8 @@ class _SenhaState extends State<Senha> {
                 height: 49.0,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _senhaValida
-                      ? () {
-                          focus1.unfocus();
-                          focus2.unfocus();
-                          Future.delayed(const Duration(milliseconds: 250), () {
-                            if (mounted) {
-                              try{
-                              register();
-                              context.push('Cadastro/nome');
-                              } on FirebaseAuthException catch(e){
-                                 ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Erro ao logar: $e")),
-    );
-                              }
+onPressed: _senhaValida ? () => cadastrar() : null,
 
-                            }
-                          });
-                        }
-                      : null,
                   style: ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll<Color>(
                       _senhaValida
@@ -319,16 +302,45 @@ class _SenhaState extends State<Senha> {
     );
   }
   
-  void register() async{
-    try{
-    await authService.value.createAccount(email: widget.email, password: text.text);
-    
-
-
-} on FirebaseAuthException catch(e){
-   ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Erro ao criar conta: $e")),
+ void cadastrar() async {
+  try {
+    // 1. Chama o método de criar conta do seu AuthService
+    await authService.value.createAccount(
+      email: widget.email, 
+      password: text.text, // Usando o campo de senha validado
     );
-}
+
+    if (!mounted) return;
+
+    // 2. Feedback de sucesso
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Conta criada com sucesso!"),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // 3. Navega para a Home ou para uma tela de boas-vindas
+    context.go('/home-page');
+
+  } on FirebaseAuthException catch (e) {
+    if (!mounted) return;
+
+    String mensagem = "Erro ao criar conta";
+    if (e.code == 'email-already-in-use') {
+      mensagem = "Este e-mail já está em uso.";
+    } else if (e.code == 'weak-password') {
+      mensagem = "A senha é muito fraca.";
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(mensagem), backgroundColor: Colors.redAccent),
+    );
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Erro inesperado: $e")),
+    );
   }
+}
 }
