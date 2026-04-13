@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nhac/components/home_content.dart';
+import 'package:nhac/components/profile_content.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -40,7 +41,7 @@ class _HomePageState extends State<HomePage> {
           const HomeContent(),
           _buildPlaceholderContent(1),
           _buildPlaceholderContent(2),
-          _buildPlaceholderContent(3),
+          const ProfileContent(),
         ],
       ),
       bottomNavigationBar: _buildFloatingNavBar(),
