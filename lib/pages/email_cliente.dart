@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:nhac/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -64,7 +65,7 @@ class _EmailClienteState extends State<EmailCliente> {
           fit: StackFit.expand,
           alignment: const Alignment(0.0, 0.0),
           children: [
-            const Positioned(
+             Positioned(
               top: 55.0,
               left: 18.0,
               width: 323.0,
@@ -80,8 +81,8 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 105.0,
-              left: 18.0,
+              top: 165.0,
+              left: 20.0,
               width: 337.0,
               child: TextFormField(
                 controller: text,
@@ -115,7 +116,7 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 169.0,
+              top: 229.0,
               left: 18.0,
               right: 0.0,
               height: 40.0,
@@ -153,7 +154,7 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 240.0,
+              top: 290.0,
               left: 18.0,
               width: 337.0,
               child: Row(
@@ -270,26 +271,14 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
             ),
             Positioned(
-              top: 275.0,
+              top: 325.0,
               left: 21.0,
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
                 onPressed: () async {
-  try {
-    await authService.value.signInWithGoogle(context); 
-    
-    if (authService.value.currentUser != null) {
-      if (context.mounted) context.go('/home-page');
-    }
-  } catch (e) {
-    if (context.mounted) {
-       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(content: Text("Erro no Google: $e")),
-       );
-    }
-  }
-},
+                  await context.read<AuthService>().signInWithGoogle(context);
+                },
                 style: ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll<Color?>(
                     Theme.of(context).colorScheme.surface,
@@ -330,11 +319,10 @@ class _EmailClienteState extends State<EmailCliente> {
                     const SizedBox(width: 36.0),
                   ],
                 ),
-                
               ),
             ),
             Positioned(
-              top: 345.0,
+              top: 395.0,
               left: 21.0,
               height: 49.0,
               width: 351.0,
@@ -381,6 +369,21 @@ class _EmailClienteState extends State<EmailCliente> {
                     ),
                     const SizedBox(width: 36.0),
                   ],
+                ),
+              ),
+            ),
+            const Positioned(
+              top: 99.0,
+              left: 19.5,
+              width: 354.0,
+              height: 60.0,
+              child: Text(
+                'Precisamos dele para iniciar o seu cadastro ou acessar o aplicativo.',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Color(0xFF5D201C),
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),

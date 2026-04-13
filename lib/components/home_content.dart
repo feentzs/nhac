@@ -28,7 +28,7 @@ class _HomeContentState extends State<HomeContent> {
     
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      setState(() => _currentAddress = 'GPS desativado');
+      if (mounted) setState(() => _currentAddress = 'GPS desativado');
       return;
     }
 
@@ -37,13 +37,15 @@ class _HomeContentState extends State<HomeContent> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        setState(() => _currentAddress = 'Permissão negada');
+        if (mounted) setState(() => _currentAddress = 'Permissão negada');
         return;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      setState(() => _currentAddress = 'Permissão negada permanentemente');
+      if (mounted) {
+        setState(() => _currentAddress = 'Permissão negada permanentemente');
+      }
       return;
     }
 
@@ -58,13 +60,15 @@ class _HomeContentState extends State<HomeContent> {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-        setState(() {
-          
-          _currentAddress = '${place.street}, ${place.subLocality}';
-        });
+        if (mounted) {
+          setState(() {
+            
+            _currentAddress = '${place.street}, ${place.subLocality}';
+          });
+        }
       }
     } catch (e) {
-      setState(() => _currentAddress = 'Erro ao buscar endereço');
+      if (mounted) setState(() => _currentAddress = 'Erro ao buscar endereço');
     }
   }
 
@@ -122,10 +126,10 @@ class _HomeContentState extends State<HomeContent> {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(50.0),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.05),
@@ -134,7 +138,20 @@ class _HomeContentState extends State<HomeContent> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.close, color: Colors.grey, size: 20.0),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Mudar',
+                      style: TextStyle(
+                        color: Color(0xFFFF6961),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, color:Color(0xFFFF6961), size: 18.0),
+                  ],
+                ),
               ),
             ],
           ),
