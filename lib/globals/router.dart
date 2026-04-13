@@ -22,6 +22,7 @@ CustomTransitionPage _buildSlideRightToLeftPage({
     child: child,
     transitionDuration: const Duration(milliseconds: 400),
     reverseTransitionDuration: const Duration(milliseconds: 400),
+    opaque: false, // Fundamental para a tela antiga não desaparecer instantaneamente
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var curvedAnimation = CurvedAnimation(
         parent: animation,
@@ -35,11 +36,23 @@ CustomTransitionPage _buildSlideRightToLeftPage({
       );
       var enterTween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero);
       var exitTween = Tween(begin: Offset.zero, end: const Offset(-0.3, 0.0));
+      
       return SlideTransition(
         position: exitTween.animate(curvedSecondaryAnimation),
         child: SlideTransition(
           position: enterTween.animate(curvedAnimation),
-          child: child,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: child,
+          ),
         ),
       );
     },
