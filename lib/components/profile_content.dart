@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileContent extends StatelessWidget {
   const ProfileContent({super.key});
@@ -77,9 +78,9 @@ class ProfileContent extends StatelessWidget {
                             );
                           },
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(0.0, 1.0); // Vem de baixo para cima
+                            const begin = Offset(0.0, 1.0);
                             const end = Offset.zero;
-                            const curve = Curves.fastOutSlowIn; // Mesma curva usada nas páginas principais
+                            const curve = Curves.fastOutSlowIn;
 
                             var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
@@ -356,6 +357,9 @@ class ProfileContent extends StatelessWidget {
                       iconColor: const Color(0xFFFF6961),
                       title: 'Dados Pessoais',
                       subtitle: 'Nome, e-mail, telefone...',
+                      onTap: () {
+                        context.push('/dados-pessoais');
+                      },
                     ),
                     Divider(height: 1, color: Colors.grey.shade100, indent: 64),
                     _buildAccountRow(
@@ -479,8 +483,11 @@ class ProfileContent extends StatelessWidget {
     required Color iconColor,
     required String title,
     required String subtitle,
+    VoidCallback? onTap,
   }) {
-    return Padding(
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
@@ -518,6 +525,7 @@ class ProfileContent extends StatelessWidget {
           const Icon(Icons.chevron_right, color: Colors.grey),
         ],
       ),
+    ),
     );
   }
 
