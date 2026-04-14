@@ -13,50 +13,87 @@ import 'package:nhac/pages/Cadastro/senha.dart';
 import 'package:nhac/services/auth_check.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 
-CustomTransitionPage _buildSlideRightToLeftPage({
+class _SlideRightToLeftPageRoute<T> extends PageRoute<T> with MaterialRouteTransitionMixin<T> {
+  _SlideRightToLeftPageRoute({
+    required this.child,
+    required super.settings,
+  });
+
+  final Widget child;
+
+  @override
+  Widget buildContent(BuildContext context) => child;
+
+  @override
+  bool get maintainState => true;
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 400);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 400);
+
+  @override
+  Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    var curvedAnimation = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutQuart,
+      reverseCurve: Curves.easeInQuart,
+    );
+    var curvedSecondaryAnimation = CurvedAnimation(
+      parent: secondaryAnimation,
+      curve: Curves.easeOutQuart,
+      reverseCurve: Curves.easeInQuart,
+    );
+    
+    var enterTween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero);
+    var exitTween = Tween(begin: Offset.zero, end: const Offset(-0.3, 0.0));
+    
+    Widget page = SlideTransition(
+      position: enterTween.animate(curvedAnimation),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: child,
+      ),
+    );
+
+    return SlideTransition(
+      position: exitTween.animate(curvedSecondaryAnimation),
+      child: page,
+    );
+  }
+}
+
+class SlideRightToLeftPage<T> extends Page<T> {
+  const SlideRightToLeftPage({
+    required super.key,
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Route<T> createRoute(BuildContext context) {
+    return _SlideRightToLeftPageRoute<T>(
+      child: child,
+      settings: this,
+    );
+  }
+}
+
+Page _buildSlideRightToLeftPage({
   required LocalKey key,
   required Widget child,
 }) {
-  return CustomTransitionPage(
-    key: key,
-    child: child,
-    transitionDuration: const Duration(milliseconds: 400),
-    reverseTransitionDuration: const Duration(milliseconds: 400),
-    opaque: false, // Fundamental para a tela antiga não desaparecer instantaneamente
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      var curvedAnimation = CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeOutQuart,
-        reverseCurve: Curves.easeInQuart,
-      );
-      var curvedSecondaryAnimation = CurvedAnimation(
-        parent: secondaryAnimation,
-        curve: Curves.easeOutQuart,
-        reverseCurve: Curves.easeInQuart,
-      );
-      var enterTween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero);
-      var exitTween = Tween(begin: Offset.zero, end: const Offset(-0.3, 0.0));
-      
-      return SlideTransition(
-        position: exitTween.animate(curvedSecondaryAnimation),
-        child: SlideTransition(
-          position: enterTween.animate(curvedAnimation),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: child,
-          ),
-        ),
-      );
-    },
-  );
+  return SlideRightToLeftPage(key: key, child: child);
 }
 
 @NowaGenerated()
@@ -137,6 +174,13 @@ final GoRouter appRouter = GoRouter(
           child: ContinuarSenha(email: email),
         );
       },
+    ),
+    GoRoute(
+      path: '/dados-pessoais',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const InsiraTelefone(),
+      ),
     ),
   ],
 );
