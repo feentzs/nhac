@@ -266,7 +266,7 @@ class _SenhaState extends State<Senha> {
                 height: 49.0,
                 width: double.infinity,
                 child: ElevatedButton(
-onPressed: _senhaValida ? () => cadastrar() : null,
+              onPressed: _senhaValida ? () => cadastrar() : null,
 
                   style: ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll<Color>(
@@ -304,15 +304,13 @@ onPressed: _senhaValida ? () => cadastrar() : null,
   
  void cadastrar() async {
   try {
-    // 1. Chama o método de criar conta do seu AuthService
     await authService.value.createAccount(
       email: widget.email, 
-      password: text.text, // Usando o campo de senha validado
+      password: text.text,
     );
 
     if (!mounted) return;
 
-    // 2. Feedback de sucesso
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("Conta criada com sucesso!"),
@@ -320,8 +318,7 @@ onPressed: _senhaValida ? () => cadastrar() : null,
       ),
     );
 
-    // 3. Navega para a Home ou para uma tela de boas-vindas
-    context.go('/home-page');
+    context.go('/Cadastro/nome');
 
   } on FirebaseAuthException catch (e) {
     if (!mounted) return;
