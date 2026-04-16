@@ -14,7 +14,6 @@ class AuthCheck extends StatelessWidget {
         
         if (snapshot.connectionState == ConnectionState.waiting) {
 
-          //Aqui pode ficar uma tela de loading
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );

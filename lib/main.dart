@@ -8,25 +8,20 @@ import 'package:nhac/globals/router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import './firebase_options.dart';
 
+
 @NowaGenerated()
 late final SharedPreferences sharedPrefs;
 
 @NowaGenerated()
 main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
 
   sharedPrefs = await SharedPreferences.getInstance();
 
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => AuthService(),
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 @NowaGenerated({'visibleInNowa': false})
@@ -37,9 +32,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      
       providers: [
         ChangeNotifierProvider<AppState>(create: (context) => AppState()),
+        
+        
+        Provider<AuthService>(create: (context) => AuthService()), 
       ],
       builder: (context, child) => MaterialApp.router(
         theme: AppState.of(context).theme,
