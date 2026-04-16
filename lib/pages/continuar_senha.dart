@@ -58,7 +58,6 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
   } on FirebaseAuthException catch (e) {
     if (!mounted) return;
     
-    // Tratando mensagens amigáveis
     String erro = "Erro ao entrar";
     if (e.code == 'user-not-found') erro = "Usuário não encontrado.";
     if (e.code == 'wrong-password') erro = "Senha incorreta.";

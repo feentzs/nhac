@@ -307,6 +307,7 @@ class _SenhaState extends State<Senha> {
     await authService.value.createAccount(
       email: widget.email, 
       password: text.text,
+      
     );
 
     if (!mounted) return;
