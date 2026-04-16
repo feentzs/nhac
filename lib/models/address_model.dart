@@ -1,4 +1,5 @@
-class AddressModel{
+class AddressModel {
+  final String idDocumento;
   final String bairro;
   final String cep;
   final String cidade;
@@ -9,6 +10,7 @@ class AddressModel{
   final String rua;
 
   AddressModel({
+    required this.idDocumento,
     required this.bairro,
     required this.cep,
     required this.cidade,
@@ -19,8 +21,9 @@ class AddressModel{
     required this.rua,
   });
 
-  factory AddressModel.fromMap(Map<String, dynamic> map){
+  factory AddressModel.fromMap(Map<String, dynamic> map, String docId) {
     return AddressModel(
+      idDocumento: docId,
       bairro: map['bairro'] ?? '',
       cep: map['cep'] ?? '',
       cidade: map['cidade'] ?? '',
@@ -32,7 +35,31 @@ class AddressModel{
     );
   }
 
-  Map<String, dynamic> toMap(){
+  AddressModel copyWith({
+    String? idDocumento,
+    String? bairro,
+    String? cep,
+    String? cidade,
+    String? complemento,
+    String? estado,
+    String? numero,
+    bool? padrao,
+    String? rua,
+  }) =>
+      AddressModel(
+        idDocumento: idDocumento ?? this.idDocumento,
+        bairro: bairro ?? this.bairro,
+        cep: cep ?? this.cep,
+        cidade: cidade ?? this.cidade,
+        complemento: complemento ?? this.complemento,
+        estado: estado ?? this.estado,
+        numero: numero ?? this.numero,
+        padrao: padrao ?? this.padrao,
+        rua: rua ?? this.rua,
+      );
+
+
+  Map<String, dynamic> toMap() {
     return {
       'bairro': bairro,
       'cep': cep,

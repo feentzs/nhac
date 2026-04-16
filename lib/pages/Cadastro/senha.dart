@@ -1,15 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class Senha extends StatefulWidget {
-  final String email;
   @NowaGenerated({'loader': 'auto-constructor'})
-  const Senha({super.key, required this.email});
+  const Senha({super.key});
 
   @override
   State<Senha> createState() {
@@ -304,13 +305,25 @@ class _SenhaState extends State<Senha> {
   
  void cadastrar() async {
   try {
-    await authService.value.createAccount(
-      email: widget.email, 
+    final authService = context.read<AuthService>();
+    final cadastroData = context.read<CadastroController>();
+
+
+
+    await authService.createAccount(
+      email: cadastroData.email, 
       password: text.text,
-      
+      nome:cadastroData.nome,
     );
 
+      
+    
+
     if (!mounted) return;
+
+    
+    cadastroData.limparDados();
+
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -319,7 +332,7 @@ class _SenhaState extends State<Senha> {
       ),
     );
 
-    context.go('/Cadastro/nome');
+    context.go('/home_page');
 
   } on FirebaseAuthException catch (e) {
     if (!mounted) return;

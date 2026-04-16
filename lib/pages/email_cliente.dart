@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -197,23 +198,7 @@ class _EmailClienteState extends State<EmailCliente> {
               child: ElevatedButton(
                onPressed: text.text.isNotEmpty
     ? () async {
-        final emailDoUsuario = text.text.trim();
-        final emailEncodado = Uri.encodeComponent(emailDoUsuario);
-
-        
-        bool emailExiste = await authService.value.checarEmail(emailDoUsuario);
-
-        if (!context.mounted) return; 
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(emailExiste ? "Bem-vindo de volta!" : "Criando sua conta...")),
-        );
-
-        if (emailExiste) {
-          context.push('/continuar_senha/$emailEncodado');
-        } else {
-          context.push('/Cadastro/senha/$emailEncodado');
-        }
+       redirecionadorEmail();
       }
     : null,
                 style: ButtonStyle(
@@ -392,4 +377,39 @@ class _EmailClienteState extends State<EmailCliente> {
       ),
     );
   }
+
+Future<void> redirecionadorEmail() async {
+  final authService = context.read<AuthService>();
+  final cadastroData = context.read<CadastroController>(); 
+
+  final emailDoUsuario = text.text.trim();
+
+  try {
+    bool emailExiste = await authService.checarEmail(emailDoUsuario);
+
+    if (!mounted) return; 
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(emailExiste ? "Bem-vindo de volta!" : "Criando sua conta..."),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    cadastroData.setEmail(emailDoUsuario);
+
+    if (emailExiste) {
+      context.push('/continuar_senha'); 
+    } else {
+      context.push('/Cadastro/nome'); 
+    }
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Erro ao verificar e-mail: $e"), backgroundColor: Colors.red),
+    );
+  }
 }
+
+}
+

@@ -1,15 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class ContinuarSenha extends StatefulWidget {
-  final String email;
   
   @NowaGenerated({'loader': 'auto-constructor'})
-  const ContinuarSenha({super.key, required this.email});
+  const ContinuarSenha({super.key  });
 
   @override
   State<ContinuarSenha> createState() {
@@ -19,6 +20,8 @@ class ContinuarSenha extends StatefulWidget {
 
 @NowaGenerated()
 class _ContinuarSenhaState extends State<ContinuarSenha> {
+
+  
   bool _senhaValida = false;
 
   TextEditingController text = TextEditingController();
@@ -43,11 +46,17 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
 
   void logar() async {
   try {
+            final authService = context.read<AuthService>();
+            final cadastroData = context.read<CadastroController>();
 
-    await authService.value.signIn(email: widget.email, password: text1.text);
+
+
+    await authService.signIn(email: cadastroData.email, password: text1.text.trim());
 
     
     if (!mounted) return;
+
+    cadastroData.limparDados();
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class Nome extends StatefulWidget {
@@ -142,7 +144,11 @@ class _NomeState extends State<Nome> {
                   child: ElevatedButton(
                     onPressed: _nomeValido
                         ? () {
-                            context.push('/insira_telefone');
+                            final cadastroData =
+                                context.read<CadastroController>();
+                            cadastroData.setNome(text.text);
+                            context.push('/Cadastro/senha');
+
                           }
                         : null,
                     style: ButtonStyle(

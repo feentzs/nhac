@@ -131,13 +131,11 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
    GoRoute(
-      path: '/Cadastro/senha/:email',
+      path: '/Cadastro/senha',
       pageBuilder: (context, state) {
-        final email = state.pathParameters['email']!;
         
         return _buildSlideRightToLeftPage(
-          key: state.pageKey, 
-          child: Senha(email: email), 
+          key: state.pageKey, child: const Senha(),
         );
       },
    ),
@@ -165,13 +163,12 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/continuar_senha/:email',
+      path: '/continuar_senha/',
       pageBuilder: (context, state) {
-        final email = state.pathParameters['email']!; 
 
         return _buildSlideRightToLeftPage(
           key: state.pageKey, 
-          child: ContinuarSenha(email: email),
+          child: const ContinuarSenha(),
         );
       },
     ),

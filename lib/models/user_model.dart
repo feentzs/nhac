@@ -9,6 +9,7 @@ class UserModel{
   final String telefone;
   final Timestamp? criadoEm;
   final Timestamp? ultimoLogin;
+  final bool ativo;
 
   UserModel({
     required this.uid,
@@ -19,7 +20,31 @@ class UserModel{
     this.telefone = '',
     this.criadoEm,
     this.ultimoLogin,
+    this.ativo = true,
   });
+
+  UserModel copyWith({
+    String? uid,
+    String? nome,
+    String? email,
+    String? fotoUrl,
+    String? cpf,
+    String? telefone,
+    Timestamp? criadoEm,
+    Timestamp? ultimoLogin,
+  }) => UserModel(
+    uid: uid ?? this.uid,
+    nome: nome ?? this.nome,
+    email: email ?? this.email,
+    fotoUrl: fotoUrl ?? this.fotoUrl,
+    cpf: cpf ?? this.cpf,
+    telefone: telefone ?? this.telefone,
+    criadoEm: criadoEm ?? this.criadoEm,
+    ultimoLogin: ultimoLogin ?? this.ultimoLogin,
+    
+  );
+
+
 
   factory UserModel.fromMap(Map<String, dynamic> map, String id){
     return UserModel(
@@ -31,6 +56,7 @@ class UserModel{
       telefone: map['telefone'] ?? '',
       criadoEm: map['criado_em'],
       ultimoLogin: map['ultimo_login'],
+      ativo: map['ativo'] ?? true,
     );
   }
 
@@ -43,6 +69,7 @@ class UserModel{
       'telefone': telefone,
       'criado_em': criadoEm ?? FieldValue.serverTimestamp(),
       'ultimo_login': ultimoLogin ?? FieldValue.serverTimestamp(),
+      'ativo': ativo,
     };
   }
 }
