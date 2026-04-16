@@ -163,7 +163,7 @@ final GoRouter appRouter = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/continuar_senha/',
+      path: '/continuar_senha',
       pageBuilder: (context, state) {
 
         return _buildSlideRightToLeftPage(
