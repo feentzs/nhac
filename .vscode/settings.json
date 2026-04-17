@@ -1,0 +1,7 @@
+{
+  "terminal.integrated.env.windows": {
+    "PATH": "C:\\Users\\25163072\\Desktop\\platform-tools;${env:PATH}",
+    "JAVA_HOME": "L:\\Apps\\jdk-21.0.10+7",
+    "ANDROID_HOME": "C:\\Android"
+  }
+}
