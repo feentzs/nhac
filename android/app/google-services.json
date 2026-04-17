@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "261563193700-7r36tacsh91pciq4624fip7g8220p1he.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.feentzs.nhac",
+            "certificate_hash": "5cbec065ec1ab769735fac47c157094d4b4d9aae"
+          }
+        },
+        {
           "client_id": "261563193700-j6opr2sih19ejvutug0nlg3ho991gulq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -37,6 +45,13 @@
             {
               "client_id": "261563193700-snhkp8paeqme3ilopc22unio3b1g7a3o.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "261563193700-45fcvn0u38f7pt0lkl3ne68idbdqte96.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.feentzs.nhac"
+              }
             }
           ]
         }

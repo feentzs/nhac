@@ -263,6 +263,7 @@ class _EmailClienteState extends State<EmailCliente> {
               child: ElevatedButton(
                 onPressed: () async {
                   await context.read<AuthService>().signInWithGoogle(context);
+                      context.go('/home-page'); 
                 },
                 style: ButtonStyle(
                   backgroundColor: WidgetStatePropertyAll<Color?>(
