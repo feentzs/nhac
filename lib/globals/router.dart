@@ -8,9 +8,12 @@ import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/bem_vindo_motoca.dart';
 import 'package:nhac/pages/verificacao_numero.dart';
 import 'package:nhac/pages/home_page.dart';
+import 'package:nhac/services/auth_check.dart';
 import 'package:nhac/pages/Cadastro/nome.dart';
 import 'package:nhac/pages/Cadastro/senha.dart';
-import 'package:nhac/services/auth_check.dart';
+import 'package:nhac/pages/dados_pessoais_page.dart';
+import 'package:nhac/pages/editar_perfil/editar_nome_preferencia_page.dart';
+import 'package:nhac/pages/editar_perfil/editar_email_page.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 
 class _SlideRightToLeftPageRoute<T> extends PageRoute<T> with MaterialRouteTransitionMixin<T> {
@@ -176,7 +179,21 @@ final GoRouter appRouter = GoRouter(
       path: '/dados-pessoais',
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
-        child: const InsiraTelefone(),
+        child: const DadosPessoaisPage(),
+      ),
+    ),
+    GoRoute(
+      path: '/editar-nome-preferencia',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const EditarNomePreferenciaPage(),
+      ),
+    ),
+    GoRoute(
+      path: '/editar-email',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const EditarEmailPage(),
       ),
     ),
   ],

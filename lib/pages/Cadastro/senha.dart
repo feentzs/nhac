@@ -1,3 +1,4 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
@@ -316,6 +317,10 @@ class _SenhaState extends State<Senha> {
       nome:cadastroData.nome,
     );
 
+        
+       print('✅ Objeto Cadastro: ${cadastroData.email}');
+    
+    
       
     
 
@@ -325,12 +330,10 @@ class _SenhaState extends State<Senha> {
     cadastroData.limparDados();
 
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Conta criada com sucesso!"),
-        backgroundColor: Colors.green,
-      ),
-    );
+
+    
+    
+
 
     context.go('/home-page');
 

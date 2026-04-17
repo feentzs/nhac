@@ -1,3 +1,5 @@
+import 'package:nhac/controllers/cadastro_controller.dart';
+import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,9 +36,13 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AppState>(create: (context) => AppState()),
-        
-        
-        Provider<AuthService>(create: (context) => AuthService()), 
+        ChangeNotifierProvider<AuthService>(create: (context) => AuthService()), 
+              ChangeNotifierProvider<CadastroController>(create: (context) => CadastroController()),
+            ChangeNotifierProvider<UserProvider>(create: (context) => UserProvider()),
+
+              
+
+
       ],
       builder: (context, child) => MaterialApp.router(
         theme: AppState.of(context).theme,
