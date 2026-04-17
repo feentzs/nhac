@@ -46,3 +46,61 @@ app.*.map.json
 
 # Nowa related
 .nowa/temp
+
+# Certificados e chaves de segurança
+*.jks
+*.keystore
+*.pem
+*.key
+*.crt
+google-services.json
+GoogleService-Info.plist
+.env
+.env.local
+.env.*.local
+
+# iOS/macOS
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/.DS_Store
+**/ios/**/.flutter-plugins
+**/ios/**/.flutter-plugins-dependencies
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/macos/**/.DS_Store
+**/macos/**/*.pbxuser
+**/macos/**/*.perspectivev3
+
+# Android específico
+**/android/.gradle/
+**/android/local.properties
+**/android/key.properties
+**/android/gradlew
+**/android/gradlew.bat
+**/android/gradle/
+**/android/.idea/
+**/android/captures/
+**/android/build/
+**/android/app/google-services.json
+
+# Windows/Linux/Web
+**/windows/flutter/generated*
+**/linux/flutter/generated*
+/web/packages/
+/web/generated_plugins.dart
+
+# Editor
+.vscode/launch.json
+.vscode/tasks.json
+*.swp
+*.swo
+*~
+
+# Temp files
+*.bak
+*.tmp
+*.temp
+
+# Arquivos do emulador
+.android/
+avd.ini
