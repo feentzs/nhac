@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nhac/controllers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfileContent extends StatelessWidget {
+  
   const ProfileContent({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+  final usuario = userProvider.usuario;
+
+  // if (usuario == null) {
+  //   return const Center(child: CircularProgressIndicator());
+  // }
+
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFFFFE7E5),
@@ -238,6 +248,12 @@ class ProfileContent extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
+                          image: (usuario != null && usuario.fotoUrl.isNotEmpty)
+                              ? DecorationImage(
+                                  image: NetworkImage(usuario.fotoUrl),
+                                  fit: BoxFit.cover, 
+                                )
+                              : null,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.1),
@@ -246,11 +262,13 @@ class ProfileContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Icon(
-                          Icons.person,
-                          size: 48,
-                          color: Colors.grey.shade400,
-                        ),
+                        child: (usuario != null && usuario.fotoUrl.isNotEmpty)
+                            ? null
+                            : Icon(
+                                Icons.person,
+                                size: 48,
+                                color: Colors.grey.shade400,
+                              ),
                       ),
                       Positioned(
                         bottom: 0,
@@ -274,26 +292,22 @@ class ProfileContent extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 16.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          text: const TextSpan(
-                            style: TextStyle(color: Colors.black, fontSize: 20),
-                            children: [
-                              TextSpan(
-                                  text: 'Tuxedo Guaraná ',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(
-                                  text: '(Você)',
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 14)),
-                            ],
-                          ),
-                        ),
+                 const SizedBox(width: 16.0),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan( 
+                  // text: usuario.nome,
+                  style: const TextStyle(
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF5D201C),
+                    fontFamily: 'Roboto', 
+                  ),
+                ),
+              ),
                         const SizedBox(height: 4.0),
                         Row(
                           children: [

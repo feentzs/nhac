@@ -45,12 +45,13 @@ class AuthService with ChangeNotifier{
           fotoUrl: userCredencial.user!.photoURL ?? '', 
         );
 
-        // Salva ele no banco para ele poder ter endereço e carrinho
         await _firestore
             .collection('usuarios')
             .doc(userCredencial.user!.uid)
             .set(novoUsuarioGoogle.toMap());
       }
+
+      
 
     } on FirebaseAuthException catch (e) {
       if (!context.mounted) return;
