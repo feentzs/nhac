@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nhac/components/home_content.dart';
 import 'package:nhac/components/profile_content.dart';
+import 'package:nhac/controllers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    context.read<UserProvider>().carregarDadosUsuario();
     _pageController = PageController(initialPage: _selectedIndex);
   }
 
