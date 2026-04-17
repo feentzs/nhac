@@ -12,9 +12,9 @@ class ProfileContent extends StatelessWidget {
     final userProvider = context.watch<UserProvider>();
   final usuario = userProvider.usuario;
 
-  if (usuario == null) {
-    return const Center(child: CircularProgressIndicator());
-  }
+  // if (usuario == null) {
+  //   return const Center(child: CircularProgressIndicator());
+  // }
 
     return Container(
       decoration: const BoxDecoration(
@@ -290,13 +290,13 @@ class ProfileContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RichText(
-                text: TextSpan( // RichText usa TextSpan
-                  text: usuario.nome,
+                text: TextSpan( 
+                  // text: usuario.nome,
                   style: const TextStyle(
                     fontSize: 22.0,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF5D201C),
-                    fontFamily: 'Roboto', // Garante a fonte do seu projeto
+                    fontFamily: 'Roboto', 
                   ),
                 ),
               ),
