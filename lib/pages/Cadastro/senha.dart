@@ -332,7 +332,7 @@ class _SenhaState extends State<Senha> {
       ),
     );
 
-    context.go('/home_page');
+    context.go('/home-page');
 
   } on FirebaseAuthException catch (e) {
     if (!mounted) return;

@@ -196,7 +196,7 @@ class _EmailClienteState extends State<EmailCliente> {
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
-               onPressed: text.text.isNotEmpty
+               onPressed: _emailValido
     ? () async {
        redirecionadorEmail();
       }
