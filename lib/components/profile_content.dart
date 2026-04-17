@@ -248,6 +248,12 @@ class ProfileContent extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
+                          image: (usuario != null && usuario.fotoUrl.isNotEmpty)
+                              ? DecorationImage(
+                                  image: NetworkImage(usuario.fotoUrl),
+                                  fit: BoxFit.cover, 
+                                )
+                              : null,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.1),
@@ -256,11 +262,13 @@ class ProfileContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Icon(
-                          Icons.person,
-                          size: 48,
-                          color: Colors.grey.shade400,
-                        ),
+                        child: (usuario != null && usuario.fotoUrl.isNotEmpty)
+                            ? null
+                            : Icon(
+                                Icons.person,
+                                size: 48,
+                                color: Colors.grey.shade400,
+                              ),
                       ),
                       Positioned(
                         bottom: 0,
