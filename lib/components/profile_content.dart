@@ -12,9 +12,9 @@ class ProfileContent extends StatelessWidget {
     final userProvider = context.watch<UserProvider>();
   final usuario = userProvider.usuario;
 
-  // if (usuario == null) {
-  //   return const Center(child: CircularProgressIndicator());
-  // }
+   if (usuario == null) {
+     return const Center(child: CircularProgressIndicator());
+   }
 
     return Container(
       decoration: const BoxDecoration(
