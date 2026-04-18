@@ -17,6 +17,20 @@ class ProfileContent extends StatelessWidget {
      return const Center(child: CircularProgressIndicator());
    }
 
+
+   void logoutUsuario() async  {
+  final authService = context.read<AuthService>();
+                                    final userProvider = context.read<UserProvider>();
+
+                                    Navigator.pop(context);
+
+                                    userProvider.limparUsuario();
+
+                                    await authService.signOut();
+
+}
+
+
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFFFFE7E5),
@@ -170,19 +184,13 @@ class ProfileContent extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 16),
                                 InkWell(
-                                  onTap: () async { 
-                                    final authService = context.read<AuthService>();
-                                    final userProvider = context.read<UserProvider>();
-
-                                    Navigator.pop(context);
-
-                                    userProvider.limparUsuario();
-
-                                    await authService.signOut();
-
-                                 
-                                  },
-                                  child: Padding(
+                                  onTap: () {
+                            logoutUsuario();
+                            context.push('/bem-vindo');
+                          }
+                               
+                            ,
+                                child: Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -241,7 +249,7 @@ class ProfileContent extends StatelessWidget {
                       child: const Icon(Icons.more_horiz, color: Colors.black87),
                     ),
                   ),
-                ],
+            ],
               ),
               const SizedBox(height: 32.0),
 
@@ -269,13 +277,22 @@ class ProfileContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: (usuario.fotoUrl.isNotEmpty)
-                            ? null
+                        child: ClipOval(
+                          child: (usuario.fotoUrl.isNotEmpty) ? Image.network(usuario.fotoUrl, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) {
+                            debugPrint("ERRO AO CARREGAR FOTO DE PERFIL: $error");
+                            return Icon(Icons.person, size: 48, color: Colors.grey.shade400);
+                          }
+                        )
+                           
                             : Icon(
                                 Icons.person,
                                 size: 48,
                                 color: Colors.grey.shade400,
                               ),
+                              
+                              
+                      
+                        ),
                       ),
                       Positioned(
                         bottom: 0,
@@ -306,7 +323,7 @@ class ProfileContent extends StatelessWidget {
             children: [
               RichText(
                 text: TextSpan( 
-                  // text: usuario.nome,
+                  text: usuario.nome,
                   style: const TextStyle(
                     fontSize: 22.0,
                     fontWeight: FontWeight.bold,
@@ -589,3 +606,4 @@ class ProfileContent extends StatelessWidget {
     );
   }
 }
+
