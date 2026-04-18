@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
 class ProfileContent extends StatelessWidget {
@@ -12,9 +13,9 @@ class ProfileContent extends StatelessWidget {
     final userProvider = context.watch<UserProvider>();
   final usuario = userProvider.usuario;
 
-  // if (usuario == null) {
-  //   return const Center(child: CircularProgressIndicator());
-  // }
+   if (usuario == null) {
+     return const Center(child: CircularProgressIndicator());
+   }
 
     return Container(
       decoration: const BoxDecoration(
@@ -169,11 +170,17 @@ class ProfileContent extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 16),
                                 InkWell(
-                                  onTap: () {
+                                  onTap: () async { 
+                                    final authService = context.read<AuthService>();
+                                    final userProvider = context.read<UserProvider>();
+
                                     Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Saindo...')),
-                                    );
+
+                                    userProvider.limparUsuario();
+
+                                    await authService.signOut();
+
+                                 
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -248,7 +255,7 @@ class ProfileContent extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
-                          image: (usuario != null && usuario.fotoUrl.isNotEmpty)
+                          image: (usuario.fotoUrl.isNotEmpty)
                               ? DecorationImage(
                                   image: NetworkImage(usuario.fotoUrl),
                                   fit: BoxFit.cover, 
@@ -262,7 +269,7 @@ class ProfileContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: (usuario != null && usuario.fotoUrl.isNotEmpty)
+                        child: (usuario.fotoUrl.isNotEmpty)
                             ? null
                             : Icon(
                                 Icons.person,
