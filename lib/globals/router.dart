@@ -14,6 +14,7 @@ import 'package:nhac/pages/Cadastro/senha.dart';
 import 'package:nhac/pages/dados_pessoais_page.dart';
 import 'package:nhac/pages/editar_perfil/editar_nome_preferencia_page.dart';
 import 'package:nhac/pages/editar_perfil/editar_email_page.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 
 class _SlideRightToLeftPageRoute<T> extends PageRoute<T> with MaterialRouteTransitionMixin<T> {
@@ -99,9 +100,41 @@ Page _buildSlideRightToLeftPage({
   return SlideRightToLeftPage(key: key, child: child);
 }
 
+
+
+final authServiceRoteador = AuthService();
+
 @NowaGenerated()
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
+  
+  refreshListenable: authServiceRoteador,
+  
+  redirect: (BuildContext context, GoRouterState state) {
+    final bool estaLogado = authServiceRoteador.currentUser != null;
+
+    final bool telaPublica = 
+        state.matchedLocation == '/splash' ||
+        state.matchedLocation == '/' ||
+        state.matchedLocation == '/bem-vindo' ||
+        state.matchedLocation == '/bem-vindo-motoca' ||
+        state.matchedLocation == '/email-cliente' ||
+        state.matchedLocation == '/insira_telefone' ||
+        state.matchedLocation == '/verificacao_numero' ||
+        state.matchedLocation == '/continuar_senha' ||
+        state.matchedLocation.startsWith('/Cadastro');
+
+    if (!estaLogado && !telaPublica) {
+      return '/bem-vindo'; 
+    }
+
+    if (estaLogado && telaPublica && state.matchedLocation != '/splash') {
+      return '/home-page';
+    }
+
+    return null;
+  },
+
   routes: [
     GoRoute(path: '/', builder: (context, state) => const AuthCheck()),
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
@@ -136,7 +169,6 @@ final GoRouter appRouter = GoRouter(
    GoRoute(
       path: '/Cadastro/senha',
       pageBuilder: (context, state) {
-        
         return _buildSlideRightToLeftPage(
           key: state.pageKey, child: const Senha(),
         );
@@ -144,10 +176,10 @@ final GoRouter appRouter = GoRouter(
    ),
     GoRoute(
       path: '/Cadastro/nome',
-      pageBuilder: (context, state) =>
-          _buildSlideRightToLeftPage(key: state.pageKey, child: const Nome()),
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey, child: const Nome(),
+      ),
     ),
-    
     GoRoute(
       path: '/verificacao_numero',
       pageBuilder: (context, state) {
@@ -168,7 +200,6 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/continuar_senha',
       pageBuilder: (context, state) {
-
         return _buildSlideRightToLeftPage(
           key: state.pageKey, 
           child: const ContinuarSenha(),
