@@ -23,15 +23,16 @@ class ProfileContent extends StatelessWidget {
 
 
    void logoutUsuario() async  {
-  final authService = context.read<AuthService>();
-                                    final userProvider = context.read<UserProvider>();
+    final authService = context.read<AuthService>();
+    final userProvider = context.read<UserProvider>();
 
-                                    Navigator.pop(context);
+    Navigator.pop(context);
 
-                                    userProvider.limparUsuario();
+    userProvider.limparUsuario();
 
-                                    await authService.signOut();
+    await authService.signOut();
 
+    context.go('/bem-vindo');
 }
 
 
@@ -190,7 +191,6 @@ class ProfileContent extends StatelessWidget {
                                 InkWell(
                                   onTap: () {
                             logoutUsuario();
-                            context.push('/bem-vindo');
                           }
                                
                             ,
