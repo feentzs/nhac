@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:nhac/controllers/cadastro_controller.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'dart:async';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class VerificacaoNumero extends StatefulWidget {
@@ -154,16 +157,31 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                     fieldHeight: 55.0,
                   ),
                   onChanged: (value) {},
-                  onCompleted: (value) {
+                 onCompleted: (value) async {
                     final router = GoRouter.of(context);
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      if (!mounted) {
-                        return;
-                      }
-                     else {
-                        router.go('/home-page');
-                      }
-                    });
+                    final authService = context.read<AuthService>();
+                    final cadastroData = context.read<CadastroController>();
+
+                    try {
+                      await authService.loginComSms(
+                        verificationId: cadastroData.verificationId, 
+                        smsCode: value, 
+                      );
+
+                      if (!mounted) return;
+                      
+                      cadastroData.limparDados();
+                      router.go('/home-page');
+
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Código SMS inválido!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                   autoFocus: true,
                   enableActiveFill: true,

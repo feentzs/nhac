@@ -43,6 +43,8 @@ class AuthService with ChangeNotifier{
           nome: userCredencial.user!.displayName ?? 'Usuário Google', 
           email: userCredencial.user!.email ?? '', 
           fotoUrl: userCredencial.user!.photoURL ?? '', 
+          telefone: userCredencial.user!.phoneNumber ?? '',
+
         );
         await _firestore
             .collection('usuarios')
@@ -127,6 +129,7 @@ class AuthService with ChangeNotifier{
     required String email,
     required String password,
     required String nome,
+    required String telefone,
   }) async {
     try {
      
@@ -140,6 +143,7 @@ class AuthService with ChangeNotifier{
         nome: nome,
         email: email,
         fotoUrl: '',
+        telefone: telefone,
       );
 
       await _firestore
@@ -255,6 +259,40 @@ class AuthService with ChangeNotifier{
     }
 
 
+  }
+
+
+  Future<void> enviarSmsDeVerificacao({
+    required String telefone,
+    required Function(String verificationId) onCodeSent,
+    required Function(String erro) onFailed,
+  }) async {
+    String numeroCompleto = '+55$telefone';
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: numeroCompleto,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        onFailed(e.message ?? 'Erro desconhecido');
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        onCodeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+
+  Future<void> loginComSms({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+    await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
 }

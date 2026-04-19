@@ -314,6 +314,7 @@ class _SenhaState extends State<Senha> {
       email: cadastroData.email, 
       password: text.text,
       nome:cadastroData.nome,
+      telefone: cadastroData.telefone
     );
 
         
