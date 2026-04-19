@@ -13,9 +13,7 @@ class ProfileContent extends StatelessWidget {
     final userProvider = context.watch<UserProvider>();
   final usuario = userProvider.usuario;
 
-    print("====================================");
-    print("URL QUE VEIO DO BANCO: '${usuario?.fotoUrl}'");
-    print("====================================");
+  
 
    if (usuario == null) {
      return const Center(child: CircularProgressIndicator());
@@ -31,6 +29,7 @@ class ProfileContent extends StatelessWidget {
     userProvider.limparUsuario();
 
     await authService.signOut();
+    if (!context.mounted) return;
 
     context.go('/bem-vindo');
 }
@@ -478,23 +477,6 @@ class ProfileContent extends StatelessWidget {
     );
   }
 
-  Widget _buildTag(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 10.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
 
   Widget _buildStatItem(String value, String label) {
     return Column(

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nhac/controllers/user_provider.dart';
+import 'package:nhac/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class EditarEmailPage extends StatefulWidget {
   const EditarEmailPage({super.key});
@@ -16,6 +19,33 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
     _emailController.dispose();
     super.dispose();
   }
+
+  
+
+  void renewEmail() async {try {
+    final authService = context.read<AuthService>();
+    
+   
+    
+    await authService.uptadeEmail(newEmail: _emailController.text);
+
+    await context.read<UserProvider>().carregarDadosUsuario();
+
+                if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('E-mail atualizado! Verifique a sua nova caixa de entrada.')),
+    );
+
+    context.pop();
+  } catch (e) {
+                if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro: $e')),
+    );
+  }}
+  
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +114,9 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                   child: ElevatedButton(
                     onPressed: _emailController.text.trim().isNotEmpty
                         ? () {
+
+                              //TODO verificação da senha antes de  renovar de verdade depois
+                              renewEmail();
                           }
                         : null,
                     style: ButtonStyle(

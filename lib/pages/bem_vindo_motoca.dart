@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nhac/botao_nhac.dart';
+import 'package:nhac/components/botao_nhac.dart';
 
 @NowaGenerated()
 class BemVindoMotoca extends StatelessWidget {

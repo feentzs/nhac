@@ -88,10 +88,8 @@ class _VerificacaoState extends State<Verificacao> {
                       GoRouter.of(context).go('/home-page');
                     }
                   },
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                    origin: const Offset(0.0, 0.0),
+                 child: Transform.scale(
+                    scaleX: -1.0,
                     child: const SizedBox(
                       width: 21.0,
                       height: 21.0,
@@ -101,7 +99,7 @@ class _VerificacaoState extends State<Verificacao> {
                       ),
                     ),
                   ),
-                ),
+                  ),
                 const SizedBox(height: 18.0),
                 const Text(
                   'Verifique seu email',

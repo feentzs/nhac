@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nhac/controllers/user_provider.dart';
+import 'package:nhac/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class EditarNomePreferenciaPage extends StatefulWidget {
   const EditarNomePreferenciaPage({super.key});
@@ -15,6 +18,31 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  void renameName() async {
+    try {
+            final authService = context.read<AuthService>();
+
+            await authService.updateUserName(userName: _nameController.text);
+
+
+            await context.read<UserProvider>().carregarDadosUsuario();
+
+                                      if (!context.mounted) return;
+
+            ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Nome atualizado com sucesso! ')),
+    );
+
+      context.pop();
+    } catch (e){
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro: $e')),
+    );
+
+    }
   }
 
   @override
@@ -89,6 +117,7 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                   child: ElevatedButton(
                     onPressed: _nameController.text.trim().isNotEmpty
                         ? () {
+                              renameName();
                           }
                         : null,
                     style: ButtonStyle(

@@ -237,4 +237,24 @@ class AuthService with ChangeNotifier{
   }
 }
 
+
+  Future<void> uptadeEmail({required String newEmail}) async {
+
+    try{
+    await currentUser?.verifyBeforeUpdateEmail(newEmail);
+
+    await _firestore.collection('usuarios')
+                    .doc(currentUser?.uid)
+                    .update({'email' : newEmail});
+
+    notifyListeners();
+    } catch (e) {
+      print("Erro ao atualizar e-mail: $e");
+      rethrow;
+
+    }
+
+
+  }
+
 }
