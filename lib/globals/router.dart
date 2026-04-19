@@ -119,7 +119,7 @@ final GoRouter appRouter = GoRouter(
         state.matchedLocation == '/insira_telefone' ||
         state.matchedLocation == '/verificacao_numero' ||
         state.matchedLocation == '/continuar_senha' ||
-        state.matchedLocation.startsWith('/Cadastro');
+        state.matchedLocation.startsWith('/cadastro');
 
     if (!estaLogado && !telaPublica) {
       return '/bem-vindo';
