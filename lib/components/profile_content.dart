@@ -1,11 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nhac/controllers/user_provider.dart';
+import 'package:nhac/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class ProfileContent extends StatelessWidget {
+  
   const ProfileContent({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+  final usuario = userProvider.usuario;
+
+  
+
+   if (usuario == null) {
+     return const Center(child: CircularProgressIndicator());
+   }
+
+
+   void logoutUsuario() async  {
+    final authService = context.read<AuthService>();
+    final userProvider = context.read<UserProvider>();
+
+    Navigator.pop(context);
+
+    userProvider.limparUsuario();
+
+    await authService.signOut();
+    if (!context.mounted) return;
+
+    context.go('/bem-vindo');
+}
+
+
     return Container(
       decoration: const BoxDecoration(
         color: Color(0xFFFFE7E5),
@@ -160,12 +189,11 @@ class ProfileContent extends StatelessWidget {
                                 const SizedBox(height: 16),
                                 InkWell(
                                   onTap: () {
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Saindo...')),
-                                    );
-                                  },
-                                  child: Padding(
+                            logoutUsuario();
+                          }
+                               
+                            ,
+                                child: Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -224,7 +252,7 @@ class ProfileContent extends StatelessWidget {
                       child: const Icon(Icons.more_horiz, color: Colors.black87),
                     ),
                   ),
-                ],
+            ],
               ),
               const SizedBox(height: 32.0),
 
@@ -238,6 +266,12 @@ class ProfileContent extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
+                          image: (usuario.fotoUrl.isNotEmpty)
+                              ? DecorationImage(
+                                  image: NetworkImage(usuario.fotoUrl),
+                                  fit: BoxFit.cover, 
+                                )
+                              : null,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.1),
@@ -246,10 +280,21 @@ class ProfileContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Icon(
-                          Icons.person,
-                          size: 48,
-                          color: Colors.grey.shade400,
+                        child: ClipOval(
+                          child: (usuario.fotoUrl.isNotEmpty) ? Image.network(usuario.fotoUrl, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) {
+                            debugPrint("ERRO AO CARREGAR FOTO DE PERFIL: $error");
+                            return Icon(Icons.person, size: 48, color: Colors.grey.shade400);
+                          }
+                        )
+                           
+                            : Icon(
+                                Icons.person,
+                                size: 48,
+                                color: Colors.grey.shade400,
+                              ),
+                              
+                              
+                      
                         ),
                       ),
                       Positioned(
@@ -274,26 +319,22 @@ class ProfileContent extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 16.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        RichText(
-                          text: const TextSpan(
-                            style: TextStyle(color: Colors.black, fontSize: 20),
-                            children: [
-                              TextSpan(
-                                  text: 'Tuxedo Guaraná ',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(
-                                  text: '(Você)',
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 14)),
-                            ],
-                          ),
-                        ),
+                 const SizedBox(width: 16.0),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan( 
+                  text: usuario.nome,
+                  style: const TextStyle(
+                    fontSize: 22.0,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF5D201C),
+                    fontFamily: 'Roboto', 
+                  ),
+                ),
+              ),
                         const SizedBox(height: 4.0),
                         Row(
                           children: [
@@ -315,7 +356,6 @@ class ProfileContent extends StatelessWidget {
               ),
               const SizedBox(height: 32.0),
 
-              // Stats
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -436,23 +476,6 @@ class ProfileContent extends StatelessWidget {
     );
   }
 
-  Widget _buildTag(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 10.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
 
   Widget _buildStatItem(String value, String label) {
     return Column(
@@ -568,3 +591,4 @@ class ProfileContent extends StatelessWidget {
     );
   }
 }
+

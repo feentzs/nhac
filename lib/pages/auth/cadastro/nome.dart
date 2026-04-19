@@ -19,16 +19,16 @@ class Nome extends StatefulWidget {
 class _NomeState extends State<Nome> {
   bool _nomeValido = false;
 
-  TextEditingController text = TextEditingController();
+  final TextEditingController _nomeController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    text.addListener(_verificarNome);
+    _nomeController.addListener(_verificarNome);
   }
 
   void _verificarNome() {
-    final ehValido = text.text.trim().length >= 2;
+    final ehValido = _nomeController.text.trim().length >= 2;
     if (_nomeValido != ehValido) {
       setState(() {
         _nomeValido = ehValido;
@@ -38,8 +38,8 @@ class _NomeState extends State<Nome> {
 
   @override
   void dispose() {
-    text.removeListener(_verificarNome);
-    text.dispose();
+    _nomeController.removeListener(_verificarNome);
+    _nomeController.dispose();
     super.dispose();
   }
 
@@ -50,13 +50,12 @@ class _NomeState extends State<Nome> {
       body: SafeArea(
         child: Column(
           children: [
-            FlexSizedBox(
-              height: 427.0,
-              width: 393.0,
+
+            Expanded(
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 18.0,
+                    horizontal: 24.0, 
                     vertical: 16.0,
                   ),
                   child: Column(
@@ -70,10 +69,8 @@ class _NomeState extends State<Nome> {
                             GoRouter.of(context).go('/home-page');
                           }
                         },
-                        child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                          origin: const Offset(0.0, 0.0),
+                        child: Transform.scale(
+                          scaleX: -1.0,
                           child: const SizedBox(
                             width: 21.0,
                             height: 21.0,
@@ -84,7 +81,7 @@ class _NomeState extends State<Nome> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 18.0),
+                      const SizedBox(height: 24.0),  
                       const Text(
                         'Qual o seu nome?',
                         style: TextStyle(
@@ -96,10 +93,12 @@ class _NomeState extends State<Nome> {
                       ),
                       const SizedBox(height: 16.0),
                       TextFormField(
+                        controller: _nomeController,
                         enabled: true,
-                        autofocus: true,
+                        autofocus: true, 
                         showCursor: true,
                         cursorColor: const Color(0xFFFF6961),
+                        textCapitalization: TextCapitalization.words,
                         style: const TextStyle(
                           color: Color(0xFF5D201C),
                           fontFamily: 'Roboto',
@@ -121,67 +120,51 @@ class _NomeState extends State<Nome> {
                           hintText: 'Nome',
                           hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
                         ),
-                        controller: text,
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            FlexSizedBox(
-              width: 393.0,
-              height: 81.0,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 21.0,
-                  right: 21.0,
-                  bottom: 24.0,
-                  top: 8.0,
-                ),
-                child: SizedBox(
-                  height: 49.0,
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _nomeValido
-                        ? () {
-                            final cadastroData =
-                                context.read<CadastroController>();
-                            cadastroData.setNome(text.text);
-                            context.push('/Cadastro/senha');
-
-                          }
-                        : null,
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.resolveWith<Color>((
-                        states,
-                      ) {
-                        if (states.contains(WidgetState.disabled)) {
-                          return Colors.grey.shade400;
+            
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 24.0,
+                right: 24.0,
+                bottom: 24.0,
+                top: 8.0,
+              ),
+              child: SizedBox(
+                height: 49.0,
+                width: double.infinity, 
+                child: ElevatedButton(
+                  onPressed: _nomeValido
+                      ? () {
+                          final cadastroData = context.read<CadastroController>();
+                          cadastroData.setNome(_nomeController.text.trim());
+                          context.push('/cadastro/senha');
                         }
-                        return const Color(0xFFFE645C);
-                      }),
-                      foregroundColor: const WidgetStatePropertyAll<Color?>(
-                        null,
-                      ),
-                      shadowColor: const WidgetStatePropertyAll<Color?>(null),
-                      elevation: const WidgetStatePropertyAll<double?>(null),
-                      side: const WidgetStatePropertyAll<BorderSide?>(null),
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0),
-                        ),
+                      : null,
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+                      if (states.contains(WidgetState.disabled)) {
+                        return Colors.grey.shade400; 
+                      }
+                      return const Color(0xFFFE645C); 
+                    }),
+                    shape: WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0),
                       ),
                     ),
-                    child: const Text(
-                      'Continuar',
-                      style: TextStyle(
-                        color: Color(0xFFFEE3E1),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.1,
-                      ),
-                      textAlign: TextAlign.start,
-                      textDirection: TextDirection.rtl,
+                  ),
+                  child: const Text(
+                    'Continuar',
+                    style: TextStyle(
+                      color: Color(0xFFFEE3E1),
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.1,
                     ),
                   ),
                 ),
