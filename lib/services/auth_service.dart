@@ -37,19 +37,29 @@ class AuthService with ChangeNotifier{
       final docUsuario = await _firestore.collection('usuarios').doc(userCredencial.user!.uid).get();
 
       
-      if (!docUsuario.exists) {
+            if (!docUsuario.exists) {
         UserModel novoUsuarioGoogle = UserModel(
           uid: userCredencial.user!.uid,
           nome: userCredencial.user!.displayName ?? 'Usuário Google', 
           email: userCredencial.user!.email ?? '', 
           fotoUrl: userCredencial.user!.photoURL ?? '', 
         );
-
         await _firestore
             .collection('usuarios')
             .doc(userCredencial.user!.uid)
             .set(novoUsuarioGoogle.toMap());
+      } else {
+        
+        if (userCredencial.user!.photoURL != null) {
+          await _firestore
+              .collection('usuarios')
+              .doc(userCredencial.user!.uid)
+              .update({
+                'foto_url': userCredencial.user!.photoURL, 
+              });
+        }
       }
+
 
       
 
