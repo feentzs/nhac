@@ -1,33 +1,49 @@
 import 'package:flutter/material.dart';
 
 class CadastroController extends ChangeNotifier {
-  String nome = '';
-  String email = '';
-  String senha = '';
-  String telefone = '';
+  String _email = '';
+  String _nome = '';
+  String _telefone = '';
+  String _verificationId = ''; 
+  String _senha = ''; 
 
+  String get email => _email;
+  String get nome => _nome;
+  String get telefone => _telefone;
+  String get verificationId => _verificationId;
+  String get senha => _senha; 
 
   void setNome(String novoNome) {
-    nome = novoNome;
-    
+    _nome = novoNome;
     notifyListeners(); 
   }
 
   void setEmail(String novoEmail) {
-    email = novoEmail;
+    _email = novoEmail;
     notifyListeners();
   }
 
   void setSenha(String novaSenha) {
-    senha = novaSenha;
+    _senha = novaSenha;
+    notifyListeners();
+  }
+
+  void setTelefone(String novoTelefone) {
+    _telefone = novoTelefone; 
+    notifyListeners();
+  }
+
+  void setVerificationId(String value) {
+    _verificationId = value;
     notifyListeners();
   }
 
   void limparDados() {
-    nome = '';
-    telefone = '';
-    email = '';
-    senha = '';
+    _email = '';
+    _nome = '';
+    _telefone = '';
+    _verificationId = '';
+    _senha = '';
     notifyListeners();
   }
 }
