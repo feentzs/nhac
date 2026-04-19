@@ -70,7 +70,7 @@ class _NomeState extends State<Nome> {
                             GoRouter.of(context).go('/home-page');
                           }
                         },
-                       child: Transform.scale(
+                        child: Transform.scale(
                           scaleX: -1.0,
                           child: const SizedBox(
                             width: 21.0,
@@ -145,8 +145,7 @@ class _NomeState extends State<Nome> {
                             final cadastroData =
                                 context.read<CadastroController>();
                             cadastroData.setNome(text.text);
-                            context.push('/Cadastro/senha');
-
+                            context.push('/cadastro/senha');
                           }
                         : null,
                     style: ButtonStyle(
