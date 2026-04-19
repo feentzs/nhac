@@ -63,9 +63,8 @@ class _VerificacaoState extends State<Verificacao> {
 
   @override
   Widget build(BuildContext context) {
-    final corAtual = _podeReenviar
-        ? const Color(0xFFFF6961)
-        : const Color(0xFF5D201C);
+    final corAtual =
+        _podeReenviar ? const Color(0xFFFF6961) : const Color(0xFF5D201C);
     final textoAtual = _podeReenviar
         ? 'Remandar código por email'
         : 'Reenviar código em 00:${_tempoRestante.toString().padLeft(2, '0')}';
@@ -88,7 +87,7 @@ class _VerificacaoState extends State<Verificacao> {
                       GoRouter.of(context).go('/home-page');
                     }
                   },
-                 child: Transform.scale(
+                  child: Transform.scale(
                     scaleX: -1.0,
                     child: const SizedBox(
                       width: 21.0,
@@ -99,7 +98,7 @@ class _VerificacaoState extends State<Verificacao> {
                       ),
                     ),
                   ),
-                  ),
+                ),
                 const SizedBox(height: 18.0),
                 const Text(
                   'Verifique seu email',
@@ -162,7 +161,7 @@ class _VerificacaoState extends State<Verificacao> {
                         return;
                       }
                       if (shouldGoToCadastro) {
-                        router.push('/Cadastro/nome');
+                        router.push('/cadastro/nome');
                       } else {
                         router.go('/home-page');
                       }
@@ -202,22 +201,21 @@ class _VerificacaoState extends State<Verificacao> {
                         ),
                       ),
                     ),
-                    const Spacer(), 
-                   GestureDetector(
-                    onTap: () {
-                      
-                      GoRouter.of(context).push('/continuar_senha');
-                    },
-                    child: const Text(
-                      'Entrar com a senha',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Color(0xFFFF6961),
-                        fontWeight: FontWeight.w600,
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        GoRouter.of(context).push('/continuar_senha');
+                      },
+                      child: const Text(
+                        'Entrar com a senha',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Color(0xFFFF6961),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8.0),
+                    const SizedBox(width: 8.0),
                   ],
                 ),
               ],

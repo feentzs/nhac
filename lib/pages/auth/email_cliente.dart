@@ -20,9 +20,7 @@ class EmailCliente extends StatefulWidget {
 
 @NowaGenerated()
 class _EmailClienteState extends State<EmailCliente> {
-  TextEditingController text = TextEditingController();
-  
-
+  final TextEditingController _emailController = TextEditingController();
 
   bool _emailValido = false;
 
@@ -37,11 +35,11 @@ class _EmailClienteState extends State<EmailCliente> {
   @override
   void initState() {
     super.initState();
-    text.addListener(_verificarEmail);
+    _emailController.addListener(_verificarEmail);
   }
 
   void _verificarEmail() {
-     String  emailUsuario = text.text;
+    String emailUsuario = _emailController.text;
 
     final bool ehValido = EmailValidator.validate(emailUsuario);
     if (_emailValido != ehValido) {
@@ -53,25 +51,44 @@ class _EmailClienteState extends State<EmailCliente> {
 
   @override
   void dispose() {
-    text.removeListener(_verificarEmail);
-    text.dispose();
+    _emailController.removeListener(_verificarEmail);
+    _emailController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Stack(
-          fit: StackFit.expand,
-          alignment: const Alignment(0.0, 0.0),
-          children: [
-             Positioned(
-              top: 55.0,
-              left: 18.0,
-              width: 323.0,
-              height: 34.0,
-              child: Text(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  if (GoRouter.of(context).canPop()) {
+                    GoRouter.of(context).pop();
+                  } else {
+                    GoRouter.of(context).go('/home-page');
+                  }
+                },
+                child: Transform.scale(
+                  scaleX: -1.0,
+                  child: const SizedBox(
+                    width: 21.0,
+                    height: 21.0,
+                    child: Image(
+                      image: AssetImage('assets/Arrow right (3).png'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24.0),
+
+              const Text(
                 'Qual o seu email?',
                 style: TextStyle(
                   fontSize: 24.0,
@@ -80,26 +97,30 @@ class _EmailClienteState extends State<EmailCliente> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-            Positioned(
-              top: 165.0,
-              left: 20.0,
-              width: 337.0,
-              child: TextFormField(
-                controller: text,
+              const SizedBox(height: 8.0),
+              const Text(
+                'Precisamos dele para iniciar o seu cadastro ou aceder ao aplicativo.',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: Color(0xFF5D201C),
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 32.0),
+
+              TextFormField(
+                controller: _emailController,
                 enabled: true,
                 autofocus: true,
                 showCursor: true,
                 cursorColor: const Color(0xFFFF6961),
+                keyboardType: TextInputType.emailAddress,
                 style: const TextStyle(
                   color: Color(0xFF5D201C),
                   fontFamily: 'Roboto',
                   fontWeight: FontWeight.w600,
-                  shadows: [
-                    Shadow(offset: Offset(0.0, 0.0), color: Color(0xFFEC1212)),
-                  ],
                 ),
-                obscureText: false,
                 decoration: const InputDecoration(
                   filled: false,
                   enabledBorder: UnderlineInputBorder(
@@ -115,58 +136,50 @@ class _EmailClienteState extends State<EmailCliente> {
                   hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
                 ),
               ),
-            ),
-            Positioned(
-              top: 229.0,
-              left: 18.0,
-              right: 0.0,
-              height: 40.0,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _dominios.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(width: 10.0),
-                itemBuilder: (context, index) => ActionChip(
-                  label: Text(_dominios[index]),
-                  backgroundColor: const Color.fromARGB(255, 248, 234, 234),
-                  labelStyle: const TextStyle(
-                    color: Color(0xFF5D201C),
-                    fontWeight: FontWeight.w800,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                    side: const BorderSide(
-                      color: Color.fromARGB(255, 248, 234, 234),
-                      width: 1.0,
+              const SizedBox(height: 16.0),
+
+              SizedBox(
+                height: 40.0,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _dominios.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 10.0),
+                  itemBuilder: (context, index) => ActionChip(
+                    label: Text(_dominios[index]),
+                    backgroundColor: const Color.fromARGB(255, 248, 234, 234),
+                    labelStyle: const TextStyle(
+                      color: Color(0xFF5D201C),
+                      fontWeight: FontWeight.w800,
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                      side: const BorderSide(
+                        color: Color.fromARGB(255, 248, 234, 234),
+                        width: 1.0,
+                      ),
+                    ),
+                    onPressed: () {
+                      String currentText = _emailController.text;
+                      if (currentText.contains('@')) {
+                        currentText = currentText.split('@')[0];
+                      }
+                      _emailController.text = currentText + _dominios[index];
+                      _emailController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: _emailController.text.length),
+                      );
+                    },
                   ),
-                  onPressed: () {
-                    String currentText = text.text;
-                    if (currentText.contains('@')) {
-                      currentText = currentText.split('@')[0];
-                    }
-                    text.text = currentText + _dominios[index];
-                    text.selection = TextSelection.fromPosition(
-                      TextPosition(offset: text.text.length),
-                    );
-                  },
+                  physics: const BouncingScrollPhysics(),
                 ),
-                physics: const ClampingScrollPhysics(),
               ),
-            ),
-            Positioned(
-              top: 290.0,
-              left: 18.0,
-              width: 337.0,
-              child: Row(
+              const SizedBox(height: 32.0),
+
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: Divider(
-                      color: Colors.grey[300],
-                      thickness: 1.0,
-                      height: 1.0,
-                    ),
+                    child: Divider(color: Colors.grey[300], thickness: 1.0),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -176,240 +189,181 @@ class _EmailClienteState extends State<EmailCliente> {
                         color: Colors.grey[600],
                         fontSize: 14.0,
                         fontWeight: FontWeight.w600,
-                        height: 1.0,
                       ),
                     ),
                   ),
                   Expanded(
-                    child: Divider(
-                      color: Colors.grey[300],
-                      thickness: 1.0,
-                      height: 1.0,
-                    ),
+                    child: Divider(color: Colors.grey[300], thickness: 1.0),
                   ),
                 ],
               ),
-            ),
-            Positioned(
-              bottom: 24.0,
-              left: 21.0,
-              height: 49.0,
-              width: 351.0,
-              child: ElevatedButton(
-               onPressed: _emailValido
-    ? () async {
-       await redirecionadorEmail();
-      }
-    : null,
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.resolveWith<Color>((
-                    states,
-                  ) {
-                    if (states.contains(WidgetState.disabled)) {
-                      return const Color(0xFFC9BCBC);
-                    }
-                    return const Color(0xFFFE645C);
-                  }),
-                  foregroundColor: const WidgetStatePropertyAll<Color?>(null),
-                  shadowColor: const WidgetStatePropertyAll<Color?>(null),
-                  elevation: const WidgetStatePropertyAll<double?>(null),
-                  side: const WidgetStatePropertyAll<BorderSide?>(null),
-                  shape: const WidgetStatePropertyAll<RoundedRectangleBorder?>(
-                    null,
-                  ),
-                ),
-                child: const Text(
-                  'Continuar',
-                  style: TextStyle(
-                    color: Color(0xFFFEE3E1),
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.1,
-                  ),
-                  textAlign: TextAlign.start,
-                  textDirection: TextDirection.rtl,
-                ),
-              ),
-            ),
-            Positioned(
-              top: 16.0,
-              left: 18.0,
-              height: 21.0,
-              width: 21.0,
-              child: GestureDetector(
-                onTap: () {
-                  if (GoRouter.of(context).canPop()) {
-                    GoRouter.of(context).pop();
-                  } else {
-                    GoRouter.of(context).go('/home-page');
-                  }
-                },
-                child: Transform.scale(
-                  scaleX: -1.0,
-                  child: const Image(
-                    image: AssetImage('assets/Arrow right (3).png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 325.0,
-              left: 21.0,
-              height: 49.0,
-              width: 351.0,
-              child: ElevatedButton(
-                onPressed: () async {
-                  await context.read<AuthService>().signInWithGoogle(context);
-                  if (!context.mounted) return;
-                      context.go('/home-page'); 
-                },
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll<Color?>(
-                    Theme.of(context).colorScheme.surface,
-                  ),
-                  foregroundColor: const WidgetStatePropertyAll<Color?>(null),
-                  shadowColor: const WidgetStatePropertyAll<Color?>(null),
-                  elevation: const WidgetStatePropertyAll<double?>(0.0),
-                  side: const WidgetStatePropertyAll<BorderSide>(
-                    BorderSide(color: Color(0xFF5D201C), width: 1.5),
-                  ),
-                  shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50.0),
+              const SizedBox(height: 32.0),
+
+              SizedBox(
+                width: double.infinity,
+                height: 49.0,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await context.read<AuthService>().signInWithGoogle(context);
+                    if (!context.mounted) return;
+                    context.go('/home-page');
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll<Color?>(
+                      Theme.of(context).colorScheme.surface,
                     ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(width: 12.0),
-                    SvgPicture.asset(
-                      'assets/google-logo.svg',
-                      height: 24.0,
-                      width: 24.0,
+                    elevation: const WidgetStatePropertyAll<double?>(0.0),
+                    side: const WidgetStatePropertyAll<BorderSide>(
+                      BorderSide(color: Color(0xFF5D201C), width: 1.5),
                     ),
-                    const Expanded(
-                      child: Text(
-                        'Continuar com o Google',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF5D201C),
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.1,
-                        ),
+                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0),
                       ),
                     ),
-                    const SizedBox(width: 36.0),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: 395.0,
-              left: 21.0,
-              height: 49.0,
-              width: 351.0,
-              child: ElevatedButton(
-                onPressed: () {
-                  context.push('/insira_telefone');
-                },
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll<Color?>(
-                    Theme.of(context).colorScheme.surface,
                   ),
-                  foregroundColor: const WidgetStatePropertyAll<Color?>(null),
-                  shadowColor: const WidgetStatePropertyAll<Color?>(null),
-                  elevation: const WidgetStatePropertyAll<double?>(0.0),
-                  side: const WidgetStatePropertyAll<BorderSide>(
-                    BorderSide(color: Color(0xFF5D201C), width: 1.5),
-                  ),
-                  shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50.0),
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(width: 12.0),
-                    const Icon(
-                      Icons.phone,
-                      size: 24.0,
-                      color: Color(0xFF5D201C),
-                    ),
-                    const Expanded(
-                      child: Text(
-                        'Continuar com o telefone',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Color(0xFF5D201C),
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.1,
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        'assets/google-logo.svg',
+                        height: 24.0,
+                        width: 24.0,
+                      ),
+                      const Expanded(
+                        child: Text(
+                          'Continuar com o Google',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF5D201C),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 24.0),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+
+              SizedBox(
+                width: double.infinity,
+                height: 49.0,
+                child: ElevatedButton(
+                  onPressed: () {
+                    context.push('/insira_telefone');
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll<Color?>(
+                      Theme.of(context).colorScheme.surface,
                     ),
-                    const SizedBox(width: 36.0),
-                  ],
+                    elevation: const WidgetStatePropertyAll<double?>(0.0),
+                    side: const WidgetStatePropertyAll<BorderSide>(
+                      BorderSide(color: Color(0xFF5D201C), width: 1.5),
+                    ),
+                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0),
+                      ),
+                    ),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.phone, size: 24.0, color: Color(0xFF5D201C)),
+                      Expanded(
+                        child: Text(
+                          'Continuar com o telefone',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Color(0xFF5D201C),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 24.0),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const Positioned(
-              top: 99.0,
-              left: 19.5,
-              width: 354.0,
-              height: 60.0,
-              child: Text(
-                'Precisamos dele para iniciar o seu cadastro ou acessar o aplicativo.',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: Color(0xFF5D201C),
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w400,
+
+              const Spacer(),
+
+              SizedBox(
+                width: double.infinity,
+                height: 49.0,
+                child: ElevatedButton(
+                  onPressed: _emailValido
+                      ? () async {
+                          await redirecionadorEmail();
+                        }
+                      : null,
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.resolveWith<Color>((states) {
+                      if (states.contains(WidgetState.disabled)) {
+                        return const Color(0xFFC9BCBC);
+                      }
+                      return const Color(0xFFFE645C);
+                    }),
+                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0),
+                      ),
+                    ),
+                  ),
+                  child: const Text(
+                    'Continuar',
+                    style: TextStyle(
+                      color: Color(0xFFFEE3E1),
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16.0), // Respiro com a borda de baixo
+            ],
+          ),
         ),
       ),
     );
   }
 
-Future<void> redirecionadorEmail() async {
-  final authService = context.read<AuthService>();
-  final cadastroData = context.read<CadastroController>(); 
+  Future<void> redirecionadorEmail() async {
+    final authService = context.read<AuthService>();
+    final cadastroData = context.read<CadastroController>();
 
-  final emailDoUsuario = text.text.trim();
+    final emailDoUsuario = _emailController.text.trim();
 
-  try {
-    bool emailExiste = await authService.checarEmail(emailDoUsuario);
+    try {
+      bool emailExiste = await authService.checarEmail(emailDoUsuario);
 
-    if (!mounted) return; 
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(emailExiste ? "Bem-vindo de volta!" : "Criando sua conta..."),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              emailExiste ? "Bem-vindo de volta!" : "A criar a sua conta..."),
+          duration: const Duration(seconds: 2),
+        ),
+      );
 
-    cadastroData.setEmail(emailDoUsuario);
+      cadastroData.setEmail(emailDoUsuario);
 
-    if (emailExiste) {
-      context.push('/continuar_senha'); 
-    } else {
-      context.push('/Cadastro/nome'); 
+      if (emailExiste) {
+        context.push('/continuar_senha');
+      } else {
+        context.push('/cadastro/nome');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text("Erro ao verificar email: $e"),
+            backgroundColor: Colors.red),
+      );
     }
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Erro ao verificar e-mail: $e"), backgroundColor: Colors.red),
-    );
   }
 }
-
-}
-
