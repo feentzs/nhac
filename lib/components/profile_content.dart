@@ -13,6 +13,10 @@ class ProfileContent extends StatelessWidget {
     final userProvider = context.watch<UserProvider>();
   final usuario = userProvider.usuario;
 
+    print("====================================");
+    print("URL QUE VEIO DO BANCO: '${usuario?.fotoUrl}'");
+    print("====================================");
+
    if (usuario == null) {
      return const Center(child: CircularProgressIndicator());
    }
