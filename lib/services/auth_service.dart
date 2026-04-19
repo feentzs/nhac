@@ -37,20 +37,33 @@ class AuthService with ChangeNotifier{
       final docUsuario = await _firestore.collection('usuarios').doc(userCredencial.user!.uid).get();
 
       
-      if (!docUsuario.exists) {
+            if (!docUsuario.exists) {
         UserModel novoUsuarioGoogle = UserModel(
           uid: userCredencial.user!.uid,
           nome: userCredencial.user!.displayName ?? 'Usuário Google', 
           email: userCredencial.user!.email ?? '', 
           fotoUrl: userCredencial.user!.photoURL ?? '', 
-        );
+          telefone: userCredencial.user!.phoneNumber ?? '',
 
-        // Salva ele no banco para ele poder ter endereço e carrinho
+        );
         await _firestore
             .collection('usuarios')
             .doc(userCredencial.user!.uid)
             .set(novoUsuarioGoogle.toMap());
+      } else {
+        
+        if (userCredencial.user!.photoURL != null) {
+          await _firestore
+              .collection('usuarios')
+              .doc(userCredencial.user!.uid)
+              .update({
+                'foto_url': userCredencial.user!.photoURL, 
+              });
+        }
       }
+
+
+      
 
     } on FirebaseAuthException catch (e) {
       if (!context.mounted) return;
@@ -116,6 +129,7 @@ class AuthService with ChangeNotifier{
     required String email,
     required String password,
     required String nome,
+    required String telefone,
   }) async {
     try {
      
@@ -129,6 +143,7 @@ class AuthService with ChangeNotifier{
         nome: nome,
         email: email,
         fotoUrl: '',
+        telefone: telefone,
       );
 
       await _firestore
@@ -149,7 +164,9 @@ class AuthService with ChangeNotifier{
   
    Future<void> signOut() async {
     await _auth.signOut();
-    notifyListeners();
+    notifyListeners(); 
+    
+
   }
 
   Future<void> resetPassword({
@@ -223,5 +240,59 @@ class AuthService with ChangeNotifier{
     return false;
   }
 }
+
+
+  Future<void> uptadeEmail({required String newEmail}) async {
+
+    try{
+    await currentUser?.verifyBeforeUpdateEmail(newEmail);
+
+    await _firestore.collection('usuarios')
+                    .doc(currentUser?.uid)
+                    .update({'email' : newEmail});
+
+    notifyListeners();
+    } catch (e) {
+      print("Erro ao atualizar e-mail: $e");
+      rethrow;
+
+    }
+
+
+  }
+
+
+  Future<void> enviarSmsDeVerificacao({
+    required String telefone,
+    required Function(String verificationId) onCodeSent,
+    required Function(String erro) onFailed,
+  }) async {
+    String numeroCompleto = '+55$telefone';
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: numeroCompleto,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        onFailed(e.message ?? 'Erro desconhecido');
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        onCodeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+
+  Future<void> loginComSms({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+    await FirebaseAuth.instance.signInWithCredential(credential);
+  }
 
 }

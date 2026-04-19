@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:nhac/controllers/cadastro_controller.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'dart:async';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 @NowaGenerated()
-class Verificacao extends StatefulWidget {
+class VerificacaoNumero extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
-  const Verificacao({super.key, required this.email});
+  const VerificacaoNumero({super.key, required this.numero, this.email});
 
-  final String email;
+  final String numero;
+
+  final String? email;
 
   @override
-  State<Verificacao> createState() {
-    return _VerificacaoState();
+  State<VerificacaoNumero> createState() {
+    return _VerificacaoNumeroState();
   }
 }
 
 @NowaGenerated()
-class _VerificacaoState extends State<Verificacao> {
+class _VerificacaoNumeroState extends State<VerificacaoNumero> {
   int _tempoRestante = 60;
 
   bool _podeReenviar = false;
@@ -67,7 +72,7 @@ class _VerificacaoState extends State<Verificacao> {
         ? const Color(0xFFFF6961)
         : const Color(0xFF5D201C);
     final textoAtual = _podeReenviar
-        ? 'Remandar código por email'
+        ? 'Reenviar código por SMS'
         : 'Reenviar código em 00:${_tempoRestante.toString().padLeft(2, '0')}';
     return Scaffold(
       body: SafeArea(
@@ -88,10 +93,8 @@ class _VerificacaoState extends State<Verificacao> {
                       GoRouter.of(context).go('/home-page');
                     }
                   },
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                    origin: const Offset(0.0, 0.0),
+                 child: Transform.scale(
+                    scaleX: -1.0,
                     child: const SizedBox(
                       width: 21.0,
                       height: 21.0,
@@ -104,7 +107,7 @@ class _VerificacaoState extends State<Verificacao> {
                 ),
                 const SizedBox(height: 18.0),
                 const Text(
-                  'Verifique seu email',
+                  'Verifique seu número',
                   style: TextStyle(
                     fontSize: 24.0,
                     color: Color(0xFF5D201C),
@@ -122,7 +125,7 @@ class _VerificacaoState extends State<Verificacao> {
                     ),
                     children: [
                       TextSpan(
-                        text: widget.email,
+                        text: widget.numero,
                         style: const TextStyle(
                           color: Color(0xFF5D201C),
                           fontWeight: FontWeight.w900,
@@ -131,11 +134,10 @@ class _VerificacaoState extends State<Verificacao> {
                       ),
                       const TextSpan(
                         text:
-                            '. O email pode demorar até 1 minuto para chegar.',
+                            '. O código pode demorar até 1 minuto para chegar.',
                       ),
                     ],
                   ),
-                  textAlign: TextAlign.start,
                 ),
                 const SizedBox(height: 32.0),
                 PinCodeTextField(
@@ -155,20 +157,31 @@ class _VerificacaoState extends State<Verificacao> {
                     fieldHeight: 55.0,
                   ),
                   onChanged: (value) {},
-                  onCompleted: (value) {
+                 onCompleted: (value) async {
                     final router = GoRouter.of(context);
-                    final shouldGoToCadastro =
-                        widget.email.trim() == 'quemeessemano@gmail.com';
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      if (!mounted) {
-                        return;
-                      }
-                      if (shouldGoToCadastro) {
-                        router.push('/Cadastro/nome');
-                      } else {
-                        router.go('/home-page');
-                      }
-                    });
+                    final authService = context.read<AuthService>();
+                    final cadastroData = context.read<CadastroController>();
+
+                    try {
+                      await authService.loginComSms(
+                        verificationId: cadastroData.verificationId, 
+                        smsCode: value, 
+                      );
+
+                      if (!mounted) return;
+                      
+                      cadastroData.limparDados();
+                      router.go('/home-page');
+
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Código SMS inválido!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   },
                   autoFocus: true,
                   enableActiveFill: true,
@@ -204,22 +217,6 @@ class _VerificacaoState extends State<Verificacao> {
                         ),
                       ),
                     ),
-                    const Spacer(), 
-                   GestureDetector(
-                    onTap: () {
-                      
-                      GoRouter.of(context).push('/continuar_senha');
-                    },
-                    child: const Text(
-                      'Entrar com a senha',
-                      style: TextStyle(
-                        fontSize: 14.0,
-                        color: Color(0xFFFF6961),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8.0),
                   ],
                 ),
               ],

@@ -3,26 +3,23 @@ import 'dart:async';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:nhac/pages/dados_globais.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 @NowaGenerated()
-class VerificacaoNumero extends StatefulWidget {
+class Verificacao extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
-  const VerificacaoNumero({super.key, required this.numero, this.email});
+  const Verificacao({super.key, required this.email});
 
-  final String numero;
-
-  final String? email;
+  final String email;
 
   @override
-  State<VerificacaoNumero> createState() {
-    return _VerificacaoNumeroState();
+  State<Verificacao> createState() {
+    return _VerificacaoState();
   }
 }
 
 @NowaGenerated()
-class _VerificacaoNumeroState extends State<VerificacaoNumero> {
+class _VerificacaoState extends State<Verificacao> {
   int _tempoRestante = 60;
 
   bool _podeReenviar = false;
@@ -66,11 +63,10 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
 
   @override
   Widget build(BuildContext context) {
-    final corAtual = _podeReenviar
-        ? const Color(0xFFFF6961)
-        : const Color(0xFF5D201C);
+    final corAtual =
+        _podeReenviar ? const Color(0xFFFF6961) : const Color(0xFF5D201C);
     final textoAtual = _podeReenviar
-        ? 'Reenviar código por SMS'
+        ? 'Remandar código por email'
         : 'Reenviar código em 00:${_tempoRestante.toString().padLeft(2, '0')}';
     return Scaffold(
       body: SafeArea(
@@ -91,9 +87,8 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       GoRouter.of(context).go('/home-page');
                     }
                   },
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
+                  child: Transform.scale(
+                    scaleX: -1.0,
                     child: const SizedBox(
                       width: 21.0,
                       height: 21.0,
@@ -106,7 +101,7 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                 ),
                 const SizedBox(height: 18.0),
                 const Text(
-                  'Verifique seu número',
+                  'Verifique seu email',
                   style: TextStyle(
                     fontSize: 24.0,
                     color: Color(0xFF5D201C),
@@ -124,7 +119,7 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                     ),
                     children: [
                       TextSpan(
-                        text: widget.numero,
+                        text: widget.email,
                         style: const TextStyle(
                           color: Color(0xFF5D201C),
                           fontWeight: FontWeight.w900,
@@ -133,10 +128,11 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       ),
                       const TextSpan(
                         text:
-                            '. O código pode demorar até 1 minuto para chegar.',
+                            '. O email pode demorar até 1 minuto para chegar.',
                       ),
                     ],
                   ),
+                  textAlign: TextAlign.start,
                 ),
                 const SizedBox(height: 32.0),
                 PinCodeTextField(
@@ -158,12 +154,14 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                   onChanged: (value) {},
                   onCompleted: (value) {
                     final router = GoRouter.of(context);
+                    final shouldGoToCadastro =
+                        widget.email.trim() == 'quemeessemano@gmail.com';
                     Future.delayed(const Duration(milliseconds: 300), () {
                       if (!mounted) {
                         return;
                       }
-                      if (emailDoUsuario.trim() == 'quemeessemano@gmail.com') {
-                        router.push('/Cadastro/senha');
+                      if (shouldGoToCadastro) {
+                        router.push('/cadastro/nome');
                       } else {
                         router.go('/home-page');
                       }
@@ -203,6 +201,21 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                         ),
                       ),
                     ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        GoRouter.of(context).push('/continuar_senha');
+                      },
+                      child: const Text(
+                        'Entrar com a senha',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Color(0xFFFF6961),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
                   ],
                 ),
               ],
