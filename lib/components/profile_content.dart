@@ -356,7 +356,6 @@ class ProfileContent extends StatelessWidget {
               ),
               const SizedBox(height: 32.0),
 
-              // Stats
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

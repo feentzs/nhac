@@ -55,7 +55,6 @@ class _BemVindoState extends State<BemVindo> {
                           ),
                         ),
                       ),
-                      // A setinha agora faz parte do botão nativamente
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -86,7 +85,7 @@ class _BemVindoState extends State<BemVindo> {
                   child: Center(
                     child: Image.asset(
                       'assets/lanche-bem-vindo.png',
-                      fit: BoxFit.contain, // Contain evita que a imagem corte
+                      fit: BoxFit.contain, 
                     ),
                   ),
                 ),
