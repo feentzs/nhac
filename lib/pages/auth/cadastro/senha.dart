@@ -104,9 +104,8 @@ class _SenhaState extends State<Senha> {
                             GoRouter.of(context).go('/home-page');
                           }
                         },
-                        child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
+                        child: Transform.scale(
+                          scaleX: -1.0, 
                           child: const SizedBox(
                             width: 21.0,
                             height: 21.0,

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:nhac/pages/dados_globais.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 @NowaGenerated()
@@ -91,9 +90,8 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       GoRouter.of(context).go('/home-page');
                     }
                   },
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
+                 child: Transform.scale(
+                    scaleX: -1.0,
                     child: const SizedBox(
                       width: 21.0,
                       height: 21.0,
@@ -162,9 +160,7 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       if (!mounted) {
                         return;
                       }
-                      if (emailDoUsuario.trim() == 'quemeessemano@gmail.com') {
-                        router.push('/Cadastro/senha');
-                      } else {
+                     else {
                         router.go('/home-page');
                       }
                     });

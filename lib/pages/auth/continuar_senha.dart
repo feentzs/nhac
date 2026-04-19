@@ -60,6 +60,7 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
     await context.read<UserProvider>().carregarDadosUsuario();
 
     cadastroData.limparDados();
+    if (!context.mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),
@@ -110,10 +111,8 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                             GoRouter.of(context).go('/home-page');
                           }
                         },
-                        child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                          origin: const Offset(0.0, 0.0),
+                       child: Transform.scale(
+                          scaleX: -1.0,
                           child: const SizedBox(
                             width: 21.0,
                             height: 21.0,

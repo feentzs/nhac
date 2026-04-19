@@ -244,10 +244,8 @@ class _EmailClienteState extends State<EmailCliente> {
                     GoRouter.of(context).go('/home-page');
                   }
                 },
-                child: Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                  origin: const Offset(0.0, 0.0),
+                child: Transform.scale(
+                  scaleX: -1.0,
                   child: const Image(
                     image: AssetImage('assets/Arrow right (3).png'),
                     fit: BoxFit.cover,
@@ -263,6 +261,7 @@ class _EmailClienteState extends State<EmailCliente> {
               child: ElevatedButton(
                 onPressed: () async {
                   await context.read<AuthService>().signInWithGoogle(context);
+                  if (!context.mounted) return;
                       context.go('/home-page'); 
                 },
                 style: ButtonStyle(
