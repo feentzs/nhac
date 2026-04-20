@@ -16,6 +16,7 @@ import 'package:nhac/pages/editar_perfil/editar_nome_preferencia_page.dart';
 import 'package:nhac/pages/editar_perfil/editar_email_page.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
+import 'package:nhac/pages/auth/cadastro/telefone_cadastro.dart';
 
 class _SlideRightToLeftPageRoute<T> extends PageRoute<T>
     with MaterialRouteTransitionMixin<T> {
@@ -177,6 +178,10 @@ final GoRouter appRouter = GoRouter(
         key: state.pageKey,
         child: const Nome(),
       ),
+    ),
+    GoRoute(
+      path: '/cadastro/telefone',
+      builder: (context, state) => const TelefoneCadastro(),
     ),
     GoRoute(
       path: '/verificacao_numero',
