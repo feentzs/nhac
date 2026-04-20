@@ -1,85 +1,108 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ProductsModel{
+class LojasModel{
   final String uid;
+  final bool aberta;
   final String categoria;
+  final String cep;
+  final String cidade;
   final Timestamp? criadoEm;
   final String descricao;
-  final bool disponivel;
+  final String estado;
+  final Map<String, String> horarios;
   final String imagemUrl;
-  final String lojaId;
   final double mediaAvaliacao;
   final String nome;
-  final double preco;
+  final String numero;
+  final String rua;
   final int totalAvaliacoes;
 
-  ProductsModel({
+  LojasModel({
     required this.uid,
+    required this.aberta,
     required this.categoria,
+    required this.cep,
+    required this.cidade,
     this.criadoEm,
     this.descricao = '',
-    required this.disponivel,
+    required this.estado,
+    required this.horarios,
     this.imagemUrl = '',
-    required this.lojaId,
     this.mediaAvaliacao = 0.0,
     required this.nome,
-    required this.preco,
+    required this.numero,
+    required this.rua,
     this.totalAvaliacoes = 0,
   });
 
-  ProductsModel copyWith({
+  LojasModel copyWith({
     String? uid,
+    bool? aberta,
     String? categoria,
+    String? cep,
+    String? cidade,
     Timestamp? criadoEm,
     String? descricao,
-    bool? disponivel,
+    String? estado,
+    Map<String, String>? horarios,
     String? imagemUrl,
-    String? lojaId,
     double? mediaAvaliacao,
     String? nome,
-    double? preco,
+    String? numero,
+    String? rua,
     int? totalAvaliacoes,
-  }) => ProductsModel(
+  }) => LojasModel(
     uid: uid ?? this.uid,
+    aberta: aberta ?? this.aberta,
     categoria: categoria ?? this.categoria,
-    criadoEm: criadoEm ?? this.criadoEm,
+    cep: cep ?? this.cep,
+    cidade: cidade ?? this.cidade,
     descricao: descricao ?? this.descricao,
-    disponivel: disponivel ?? this.disponivel,
+    estado: estado ?? this.estado,
+    horarios: horarios ?? this.horarios,
     imagemUrl: imagemUrl ?? this.imagemUrl,
-    lojaId: lojaId ?? this.lojaId,
     mediaAvaliacao: mediaAvaliacao ?? this.mediaAvaliacao,
     nome: nome ?? this.nome,
-    preco: preco ?? this.preco,
+    numero: numero ?? this.numero,
+    rua: rua ?? this.rua,
     totalAvaliacoes: totalAvaliacoes ?? this.totalAvaliacoes,
   );
 
-  factory ProductsModel.fromMap(Map<String, dynamic> map, String id){
-    return ProductsModel(
-      uid: id,
+  factory LojasModel.fromMap(Map<String, dynamic> map, String uid){
+    return LojasModel(
+      uid: uid,
+      aberta: map['aberta'] ?? false,
       categoria: map['categoria'] ?? '',
+      cep: map['cep'] ?? '',
+      cidade: map['cidade'] ?? '',
       criadoEm: map['criado_em'] as Timestamp?,
       descricao: map['descricao'] ?? '',
-      disponivel: map['disponivel'] ?? false,
+      estado: map['estado'] ?? '',
+      horarios: Map<String, String>.from(map['horarios'] ?? {}),
       imagemUrl: map['imagem_url'] ?? '',
-      lojaId: map['loja_id'] ?? '',
       mediaAvaliacao: (map['media_avaliacao'] ?? 0).toDouble(),
       nome: map['nome'] ?? '',
-      preco: (map['preco'] ?? 0.0).toDouble(),
+      numero: map['numero'] ?? '',
+      rua: map['rua'] ?? '',
       totalAvaliacoes: (map['total_avaliacoes'] ?? 0).toInt(),
     );
   }
 
   Map<String, dynamic> toMap(){
     return {
+      'aberta': aberta,
       'categoria': categoria,
+      'cep': cep,
+      'cidade': cidade,
       'criado_em': criadoEm ?? FieldValue.serverTimestamp(),
       'descricao': descricao,
-      'disponivel': disponivel,
+      'estado': estado,
+      'horarios': horarios,
       'imagem_url': imagemUrl,
-      'loja_id': lojaId,
       'media_avaliacao': mediaAvaliacao,
       'nome': nome,
-      'preco': preco,
+      'numero': numero,
+      'rua': rua,
       'total_avaliacoes': totalAvaliacoes,
     };
   }
