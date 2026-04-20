@@ -32,6 +32,7 @@ class UserModel{
     String? telefone,
     Timestamp? criadoEm,
     Timestamp? ultimoLogin,
+    bool? ativo,
   }) => UserModel(
     uid: uid ?? this.uid,
     nome: nome ?? this.nome,
@@ -41,7 +42,7 @@ class UserModel{
     telefone: telefone ?? this.telefone,
     criadoEm: criadoEm ?? this.criadoEm,
     ultimoLogin: ultimoLogin ?? this.ultimoLogin,
-    
+    ativo: ativo ?? this.ativo
   );
 
 
@@ -52,10 +53,10 @@ class UserModel{
       nome: map['nome'] ?? '',
       email: map['email'] ?? '',
       fotoUrl: map['foto_url'] ?? '',
-            telefone: map['telefone'] ?? '',
+      telefone: map['telefone'] ?? '',
       cpf: map['cpf'] ?? '',
-      criadoEm: map['criado_em'],
-      ultimoLogin: map['ultimo_login'],
+      criadoEm: map['criado_em'] as Timestamp?,
+      ultimoLogin: map['ultimo_login'] as Timestamp?,
       ativo: map['ativo'] ?? true,
     );
   }
