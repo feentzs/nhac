@@ -109,7 +109,7 @@ final authServiceRoteador = AuthService();
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
   refreshListenable: authServiceRoteador,
-  redirect: (BuildContext context, GoRouterState state) {
+ redirect: (BuildContext context, GoRouterState state) {
     final bool estaLogado = authServiceRoteador.currentUser != null;
 
     final bool telaPublica = state.matchedLocation == '/splash' ||
@@ -122,15 +122,18 @@ final GoRouter appRouter = GoRouter(
         state.matchedLocation == '/continuar_senha' ||
         state.matchedLocation.startsWith('/cadastro');
 
+    final bool noMeioDoCadastro = state.matchedLocation == '/verificacao_numero' || 
+                                  state.matchedLocation.startsWith('/cadastro');
+
     if (!estaLogado && !telaPublica) {
       return '/bem-vindo';
     }
 
-    if (estaLogado && telaPublica && state.matchedLocation != '/splash') {
+    if (estaLogado && telaPublica && state.matchedLocation != '/splash' && !noMeioDoCadastro) {
       return '/home-page';
     }
 
-    return null;
+    return null; 
   },
   routes: [
     GoRoute(path: '/', builder: (context, state) => const AuthCheck()),
