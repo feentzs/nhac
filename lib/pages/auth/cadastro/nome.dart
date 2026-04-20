@@ -120,10 +120,10 @@ class _NomeState extends State<Nome> {
                         final cadastroData = context.read<CadastroController>();
                         cadastroData.setNome(_nomeController.text.trim());
 
-                        if (cadastroData.email.isNotEmpty) {
-                          context.push('/cadastro/senha');
+                      if (cadastroData.email.isNotEmpty) {
+                          context.push('/cadastro/telefone'); 
                         } else {
-                           final authService = context.read<AuthService>();
+                           final authService = context.read<AuthService>(); 
                            
                            ScaffoldMessenger.of(context).showSnackBar(
                              const SnackBar(content: Text('A finalizar cadastro...')),

@@ -25,9 +25,12 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
       final authService = context.read<AuthService>();
 
       await authService.updateUserName(userName: _nameController.text);
-      await context.read<UserProvider>().carregarDadosUsuario();
 
-      if (!context.mounted) return;
+      if (!mounted) return;
+      await context.read<UserProvider>().carregarDadosUsuario();
+            if (!mounted) return;
+
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nome atualizado com sucesso! ')),
