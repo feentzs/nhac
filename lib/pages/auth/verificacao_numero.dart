@@ -140,7 +140,7 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                     fieldHeight: 55.0,
                   ),
                   onChanged: (value) {},
-                 onCompleted: (value) async {
+                  onCompleted: (value) async {
                     final router = GoRouter.of(context);
                     final authService = context.read<AuthService>();
                     final cadastroData = context.read<CadastroController>();
@@ -153,20 +153,22 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
 
                       if (!mounted) return;
                       
-                      bool isNovoUsuario = credencial.additionalUserInfo?.isNewUser ?? false;
+                      final docUsuario = await FirebaseFirestore.instance
+                          .collection('usuarios')
+                          .doc(credencial.user!.uid)
+                          .get();
 
-                      if (isNovoUsuario) {
-                        
-                        router.push('/cadastro/nome'); 
-                      } else {
+                      if (!mounted) return;
+
+                      if (docUsuario.exists) {
                         cadastroData.limparDados();
                         router.go('/home-page');
+                      } else {
+                        router.push('/cadastro/nome'); 
                       }
 
                     } catch (e) {
-                      if (!context.mounted) return;
-
-
+                      if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Código SMS inválido!'),
@@ -175,6 +177,9 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       );
                     }
                   },
+                      
+                
+                  
                    autoFocus: true,
                   enableActiveFill: true,
                   cursorColor: const Color(0xFFFF6961),
