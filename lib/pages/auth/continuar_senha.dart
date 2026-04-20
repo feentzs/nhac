@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nhac/components/botao_largo_nhac.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
@@ -9,9 +10,8 @@ import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class ContinuarSenha extends StatefulWidget {
-  
   @NowaGenerated({'loader': 'auto-constructor'})
-  const ContinuarSenha({super.key  });
+  const ContinuarSenha({super.key});
 
   @override
   State<ContinuarSenha> createState() {
@@ -21,70 +21,65 @@ class ContinuarSenha extends StatefulWidget {
 
 @NowaGenerated()
 class _ContinuarSenhaState extends State<ContinuarSenha> {
-
-  
   bool _senhaValida = false;
 
-  TextEditingController text = TextEditingController();
-
-  TextEditingController text1 = TextEditingController();
+  final TextEditingController _senhaController = TextEditingController();
 
   void _verificarSenha() {
     if (!mounted) {
       return;
     }
     setState(() {
-      _senhaValida = text1.text.isNotEmpty;
+      _senhaValida = _senhaController.text.isNotEmpty;
     });
   }
 
   @override
   void dispose() {
-    text.dispose();
-    text1.dispose();
+    _senhaController.dispose();
     super.dispose();
   }
 
   void logar() async {
-  try {
+    try {
       final authService = context.read<AuthService>();
       final cadastroData = context.read<CadastroController>();
 
+      await authService.signIn(
+        email: cadastroData.email, 
+        password: _senhaController.text.trim() 
+      );
+      
+      if (!mounted) return;
 
+      await context.read<UserProvider>().carregarDadosUsuario();
+      cadastroData.limparDados();
+      
+      if (!context.mounted) return;
 
-    await authService.signIn(email: cadastroData.email, password: text1.text.trim());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),
+      );
+      
+      context.go('/home-page'); 
 
-    
-    if (!mounted) return;
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+      
+      String erro = "Erro ao entrar";
+      if (e.code == 'user-not-found') erro = "Usuário não encontrado.";
+      if (e.code == 'wrong-password') erro = "Senha incorreta.";
 
-    await context.read<UserProvider>().carregarDadosUsuario();
-
-    cadastroData.limparDados();
-    if (!context.mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),
-    );
-    
-    context.go('/home-page'); 
-
-  } on FirebaseAuthException catch (e) {
-    if (!mounted) return;
-    
-    String erro = "Erro ao entrar";
-    if (e.code == 'user-not-found') erro = "Usuário não encontrado.";
-    if (e.code == 'wrong-password') erro = "Senha incorreta.";
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(erro), backgroundColor: Colors.redAccent),
-    );
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Erro inesperado: $e")),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(erro), backgroundColor: Colors.redAccent),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro inesperado: $e")),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +159,7 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                             hintText: 'Senha',
                             hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
                           ),
-                          controller: text1,
+                          controller: _senhaController, 
                           onChanged: (value) => _verificarSenha(),
                         ),
                       ),
@@ -194,51 +189,13 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 21.0,
-                right: 21.0,
-                bottom: 24.0,
-                top: 8.0,
+          Padding(
+              padding: const EdgeInsets.only(left: 21.0, right: 21.0, bottom: 24.0, top: 8.0),
+              child: BotaoLargoNhac(
+                texto: 'Continuar',
+                onPressed: _senhaValida ? () => logar() : null,
               ),
-              child: SizedBox(
-                height: 49.0,
-                width: double.infinity,
-                child: ElevatedButton(
-                 onPressed: _senhaValida 
-  ? () => logar() 
-  : null,
-
-
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll<Color>(
-                      _senhaValida
-                          ? const Color(0xFFFF6961)
-                          : Colors.grey.shade400,
-                    ),
-                    foregroundColor: const WidgetStatePropertyAll<Color?>(null),
-                    shadowColor: const WidgetStatePropertyAll<Color?>(null),
-                    elevation: const WidgetStatePropertyAll<double?>(null),
-                    side: const WidgetStatePropertyAll<BorderSide?>(null),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Color(0xFFFEE3E1),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+            ),],
         ),
       ),
     );

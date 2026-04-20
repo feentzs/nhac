@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nhac/components/seta_voltar.dart';
 import 'dart:async';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
@@ -79,27 +80,8 @@ class _VerificacaoState extends State<Verificacao> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    if (GoRouter.of(context).canPop()) {
-                      GoRouter.of(context).pop();
-                    } else {
-                      GoRouter.of(context).go('/home-page');
-                    }
-                  },
-                  child: Transform.scale(
-                    scaleX: -1.0,
-                    child: const SizedBox(
-                      width: 21.0,
-                      height: 21.0,
-                      child: Image(
-                        image: AssetImage('assets/Arrow right (3).png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18.0),
+              const SetaVoltar(),
+              const SizedBox(height: 18.0),
                 const Text(
                   'Verifique seu email',
                   style: TextStyle(
