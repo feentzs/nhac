@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:nhac/components/botao_largo_nhac.dart'; // Nosso Lego!
 
 class EditarEmailPage extends StatefulWidget {
   const EditarEmailPage({super.key});
@@ -14,6 +15,15 @@ class EditarEmailPage extends StatefulWidget {
 
 class _EditarEmailPageState extends State<EditarEmailPage> {
   final TextEditingController _emailController = TextEditingController();
+  bool _emailValido = false;
+  String? _erroEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    // Ouve o teclado em tempo real para validar o email
+    _emailController.addListener(_validarNovoEmail);
+  }
 
   @override
   void dispose() {
@@ -21,14 +31,38 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
     super.dispose();
   }
 
+  // 1. A MÁGICA DA VALIDAÇÃO (Impede usar o mesmo e-mail)
+  void _validarNovoEmail() {
+    final novoEmail = _emailController.text.trim();
+    final usuarioLogado = FirebaseAuth.instance.currentUser;
+    final emailAtual = usuarioLogado?.email ?? '';
 
+    setState(() {
+      if (novoEmail.isEmpty) {
+        _erroEmail = null;
+        _emailValido = false;
+      } else if (novoEmail.toLowerCase() == emailAtual.toLowerCase()) {
+        _erroEmail = 'Este já é o seu e-mail atual'; // O ERRO APARECE AQUI!
+        _emailValido = false;
+      } else if (!novoEmail.contains('@') || !novoEmail.contains('.')) {
+        _erroEmail = 'Insira um e-mail válido';
+        _emailValido = false;
+      } else {
+        _erroEmail = null;
+        _emailValido = true; // Só ativa o botão se tudo estiver perfeito!
+      }
+    });
+  }
+
+  // 2. O POP-UP SEGURO
   Future<void> _mostrarDialogoConfirmacaoSenha() async {
     final TextEditingController senhaController = TextEditingController();
     bool carregando = false;
+    String? erroSenha;
 
     showDialog(
       context: context,
-      barrierDismissible: false, 
+      barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
@@ -51,8 +85,10 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                     controller: senhaController,
                     obscureText: true,
                     cursorColor: const Color(0xFFFF6961),
+                    onChanged: (_) => setStateDialog(() => erroSenha = null),
                     decoration: InputDecoration(
                       labelText: 'Senha atual',
+                      errorText: erroSenha, // Mostra se a senha estiver errada
                       labelStyle: TextStyle(color: Colors.grey.shade600),
                       focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Color(0xFFFF6961), width: 2),
@@ -73,53 +109,58 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                   onPressed: carregando
                       ? null
                       : () async {
-                          if (senhaController.text.isEmpty) return;
+                          if (senhaController.text.isEmpty) {
+                            setStateDialog(() => erroSenha = 'A senha não pode ser vazia');
+                            return;
+                          }
 
-                          setStateDialog(() => carregando = true);
+                          setStateDialog(() {
+                            carregando = true;
+                            erroSenha = null;
+                          });
 
                           try {
                             final user = FirebaseAuth.instance.currentUser;
-                            
                             if (user != null && user.email != null) {
+                              
+                              // 1. Cria a credencial com a senha que o utilizador digitou
                               final credential = EmailAuthProvider.credential(
                                 email: user.email!,
                                 password: senhaController.text,
                               );
                               
+                              // 2. Reautentica no Firebase
                               await user.reauthenticateWithCredential(credential);
 
                               if (!context.mounted) return;
                               final authService = context.read<AuthService>();
-                              await authService.uptadeEmail(newEmail: _emailController.text.trim());
-
-                              if(!context.mounted) return;
                               
+                              // 3. AGORA SIM MUDA O E-MAIL
+                              await authService.uptadeEmail(newEmail: _emailController.text.trim());
                               await context.read<UserProvider>().carregarDadosUsuario();
 
                               if (!context.mounted) return;
-                              Navigator.pop(context); 
-                              Navigator.pop(context); 
+                              Navigator.pop(context); // Fecha pop-up
+                              Navigator.pop(context); // Volta ao perfil
 
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('E-mail atualizado com sucesso!'),
-                                  backgroundColor: Colors.green,
-                                ),
+                                const SnackBar(content: Text('E-mail atualizado com sucesso!'), backgroundColor: Colors.green),
                               );
                             }
                           } on FirebaseAuthException catch (e) {
-                            setStateDialog(() => carregando = false);
-                            String erro = 'Erro na verificação';
-                            if (e.code == 'wrong-password') erro = 'Senha incorreta!';
-                            
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(erro), backgroundColor: Colors.red),
-                            );
+                            setStateDialog(() {
+                              carregando = false;
+                              if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+                                erroSenha = 'Senha incorreta!';
+                              } else {
+                                erroSenha = 'Erro: ${e.message}';
+                              }
+                            });
                           } catch (e) {
-                            setStateDialog(() => carregando = false);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
-                            );
+                            setStateDialog(() {
+                              carregando = false;
+                              erroSenha = 'Erro inesperado. Tente novamente.';
+                            });
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -127,11 +168,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: carregando
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                        )
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : const Text('Confirmar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ],
@@ -141,7 +178,6 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -189,10 +225,9 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                       const SizedBox(height: 28.0),
                       TextField(
                         controller: _emailController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
+                          errorText: _erroEmail, // <- O aviso do "mesmo e-mail" aparece aqui!
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey.shade300),
                           ),
@@ -205,7 +240,6 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                           fontSize: 18.0,
                           color: Colors.black87,
                         ),
-                        keyboardType: TextInputType.emailAddress,
                       ),
                     ],
                   ),
@@ -214,36 +248,10 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0, top: 16.0),
-              child: SizedBox(
-                width: double.infinity,
-                height: 49.0,
-                child: ElevatedButton(
-                  onPressed: _emailController.text.trim().isNotEmpty
-                      ? () => _mostrarDialogoConfirmacaoSenha()
-                      : null,
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return const Color(0xFFC9BCBC);
-                      }
-                      return const Color(0xFFFE645C);
-                    }),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Color(0xFFFEE3E1),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                ),
+              child: BotaoLargoNhac(
+                texto: 'Continuar',
+                // Só abre o pop-up se o email for válido (e diferente do atual)
+                onPressed: _emailValido ? () => _mostrarDialogoConfirmacaoSenha() : null,
               ),
             ),
           ],
