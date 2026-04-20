@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nhac/models/cart_model.dart';
+import 'package:nhac/models/usuario/carrinho_model.dart';
 
 void main() {
   group('CartModel Tests', () {
@@ -12,7 +12,7 @@ void main() {
         'quantidade': 2,
       };
 
-      final itemCarrinho = CartModel.fromMap(mockMap, 'doc-carrinho-789');
+      final itemCarrinho = CarrinhoModel.fromMap(mockMap, 'doc-carrinho-789');
 
       expect(itemCarrinho.idDocumento, 'doc-carrinho-789');
       expect(itemCarrinho.idProduto, 'produto-456');
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('Deve usar valores por defeito quando faltarem dados', () {
-      final itemVazio = CartModel.fromMap(const {}, 'doc-vazio');
+      final itemVazio = CarrinhoModel.fromMap(const {}, 'doc-vazio');
 
       expect(itemVazio.idProduto, '');
       expect(itemVazio.quantidade, 0);
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('Deve converter CartModel para Map (para gravar no Firebase)', () {
-      final itemCarrinho = CartModel(
+      final itemCarrinho = CarrinhoModel(
         idDocumento: 'doc-carrinho-789',
         idProduto: 'produto-456',
         imagemUrl: 'url.jpg',

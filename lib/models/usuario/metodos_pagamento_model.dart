@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PaymentMethodsModel {
+class MetodosPagamentoModel {
   final String idDocumento;
   final String bandeira;
   final Timestamp? criadoEm;
@@ -9,7 +9,7 @@ class PaymentMethodsModel {
   final String tipo;
   final String ultimosDigitos;
 
-  PaymentMethodsModel({
+  MetodosPagamentoModel({
     required this.idDocumento,
     required this.bandeira,
     this.criadoEm,
@@ -19,8 +19,8 @@ class PaymentMethodsModel {
     required this.ultimosDigitos,
   });
 
-  factory PaymentMethodsModel.fromMap(Map<String, dynamic> map, String docId) {
-    return PaymentMethodsModel(
+  factory MetodosPagamentoModel.fromMap(Map<String, dynamic> map, String docId) {
+    return MetodosPagamentoModel(
       idDocumento: docId,
       bandeira: map['bandeira'] ?? '',
       criadoEm: map['criado_em'] as Timestamp?, 
@@ -31,7 +31,7 @@ class PaymentMethodsModel {
     );
   }
 
-  PaymentMethodsModel copyWith({
+  MetodosPagamentoModel copyWith({
     String? idDocumento,
     String? bandeira,
     Timestamp? criadoEm,
@@ -40,7 +40,7 @@ class PaymentMethodsModel {
     String? tipo,
     String? ultimosDigitos,
   }) =>
-      PaymentMethodsModel(
+      MetodosPagamentoModel(
         idDocumento: idDocumento ?? this.idDocumento,
         bandeira: bandeira ?? this.bandeira,
         criadoEm: criadoEm ?? this.criadoEm,

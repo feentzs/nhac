@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nhac/models/products.dart';
+import 'package:nhac/models/produto/produtos.dart';
 
 void main() {
   group('ProductsModel Tests', () {
@@ -16,7 +16,7 @@ void main() {
         'total_avaliacoes': 150,
       };
 
-      final produto = ProductsModel.fromMap(mockMap, 'produto-456');
+      final produto = ProdutosModel.fromMap(mockMap, 'produto-456');
 
       expect(produto.uid, 'produto-456');
       expect(produto.nome, 'Super Nhac Bacon');
@@ -26,7 +26,7 @@ void main() {
     });
 
     test('Deve usar valores por defeito quando o Map estiver incompleto', () {
-      final produtoVazio = ProductsModel.fromMap(const {}, 'id-vazio');
+      final produtoVazio = ProdutosModel.fromMap(const {}, 'id-vazio');
 
       expect(produtoVazio.nome, '');
       expect(produtoVazio.preco, 0.0);
@@ -35,7 +35,7 @@ void main() {
     });
 
     test('Deve converter ProductsModel para Map corretamente', () {
-      final produto = ProductsModel(
+      final produto = ProdutosModel(
         uid: 'produto-456',
         categoria: 'Hambúrguer',
         disponivel: true,

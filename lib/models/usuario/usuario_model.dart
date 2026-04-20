@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserModel{
+class UsuarioModel{
   final String uid;
   final String nome;
   final String email;
@@ -11,7 +11,7 @@ class UserModel{
   final Timestamp? ultimoLogin;
   final bool ativo;
 
-  UserModel({
+  UsuarioModel({
     required this.uid,
     required this.nome,
     required this.email,
@@ -23,7 +23,7 @@ class UserModel{
     this.ativo = true,
   });
 
-  UserModel copyWith({
+  UsuarioModel copyWith({
     String? uid,
     String? nome,
     String? email,
@@ -33,7 +33,7 @@ class UserModel{
     Timestamp? criadoEm,
     Timestamp? ultimoLogin,
     bool? ativo,
-  }) => UserModel(
+  }) => UsuarioModel(
     uid: uid ?? this.uid,
     nome: nome ?? this.nome,
     email: email ?? this.email,
@@ -47,8 +47,8 @@ class UserModel{
 
 
 
-  factory UserModel.fromMap(Map<String, dynamic> map, String id){
-    return UserModel(
+  factory UsuarioModel.fromMap(Map<String, dynamic> map, String id){
+    return UsuarioModel(
       uid: id,
       nome: map['nome'] ?? '',
       email: map['email'] ?? '',
