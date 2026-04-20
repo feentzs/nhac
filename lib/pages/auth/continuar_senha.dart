@@ -55,7 +55,7 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
       await context.read<UserProvider>().carregarDadosUsuario();
       cadastroData.limparDados();
       
-      if (!context.mounted) return;
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),

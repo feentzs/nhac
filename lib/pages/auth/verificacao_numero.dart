@@ -164,7 +164,9 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       }
 
                     } catch (e) {
-                      if (!mounted) return;
+                      if (!context.mounted) return;
+
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Código SMS inválido!'),

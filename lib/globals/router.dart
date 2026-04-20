@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nhac/pages/bem_vindo.dart';
 import 'package:nhac/pages/auth/continuar_senha.dart';
 import 'package:nhac/pages/auth/email_cliente.dart';
-import 'package:nhac/pages/insira_telefone.dart';
+import 'package:nhac/pages/auth/insira_telefone.dart';
 import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/pages/bem_vindo_motoca.dart';
 import 'package:nhac/pages/auth/verificacao_numero.dart';

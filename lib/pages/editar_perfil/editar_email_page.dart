@@ -91,6 +91,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                               if (!context.mounted) return;
                               final authService = context.read<AuthService>();
                               await authService.uptadeEmail(newEmail: _emailController.text.trim());
+
+                              if(!context.mounted) return;
                               
                               await context.read<UserProvider>().carregarDadosUsuario();
 
