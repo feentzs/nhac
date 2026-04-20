@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:nhac/components/botao_largo_nhac.dart';
+import 'package:nhac/components/seta_voltar.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -61,26 +64,7 @@ class _NomeState extends State<Nome> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (GoRouter.of(context).canPop()) {
-                            GoRouter.of(context).pop();
-                          } else {
-                            GoRouter.of(context).go('/home-page');
-                          }
-                        },
-                        child: Transform.scale(
-                          scaleX: -1.0,
-                          child: const SizedBox(
-                            width: 21.0,
-                            height: 21.0,
-                            child: Image(
-                              image: AssetImage('assets/Arrow right (3).png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
+                      const SetaVoltar(),
                       const SizedBox(height: 24.0),  
                       const Text(
                         'Qual o seu nome?',
@@ -127,47 +111,43 @@ class _NomeState extends State<Nome> {
               ),
             ),
             
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 24.0,
-                right: 24.0,
-                bottom: 24.0,
-                top: 8.0,
-              ),
-              child: SizedBox(
-                height: 49.0,
-                width: double.infinity, 
-                child: ElevatedButton(
-                  onPressed: _nomeValido
-                      ? () {
-                          final cadastroData = context.read<CadastroController>();
-                          cadastroData.setNome(_nomeController.text.trim());
+            Padding( 
+              padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0, top: 8.0),
+              child: BotaoLargoNhac(
+                texto: 'Continuar',
+                onPressed: _nomeValido
+                    ? () async {
+                        final cadastroData = context.read<CadastroController>();
+                        cadastroData.setNome(_nomeController.text.trim());
+
+                        if (cadastroData.email.isNotEmpty) {
                           context.push('/cadastro/senha');
+                        } else {
+                           final authService = context.read<AuthService>();
+                           
+                           ScaffoldMessenger.of(context).showSnackBar(
+                             const SnackBar(content: Text('A finalizar cadastro...')),
+                           );
+
+                           try {
+                             await authService.finalizarCadastroTelefone(
+                               nome: cadastroData.nome,
+                               telefone: cadastroData.telefone,
+                             );
+                             
+                             cadastroData.limparDados();
+                             if (context.mounted) context.go('/home-page');
+                             
+                           } catch (e) {
+                             if (context.mounted) {
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                 SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
+                               );
+                             }
+                           }
                         }
-                      : null,
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return Colors.grey.shade400; 
                       }
-                      return const Color(0xFFFE645C); 
-                    }),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Color(0xFFFEE3E1),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                ),
+                    : null,
               ),
             ),
           ],

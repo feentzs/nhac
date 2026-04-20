@@ -1,6 +1,6 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nhac/components/botao_largo_nhac.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
@@ -22,31 +22,26 @@ class Senha extends StatefulWidget {
 @NowaGenerated()
 class _SenhaState extends State<Senha> {
   bool _senhaValida = false;
-
   String? _erroSenha;
-
   String? _erroConfirmacao;
-
   bool _senhaVisivel = false;
-
   bool _confirmacaoVisivel = false;
 
-  TextEditingController text = TextEditingController();
-
-  TextEditingController text1 = TextEditingController();
-
-  FocusNode focus1 = FocusNode();
-
-  FocusNode focus2 = FocusNode();
+  final TextEditingController _senhaController = TextEditingController();
+  final TextEditingController _confirmarSenhaController = TextEditingController();
+  final FocusNode _senhaFocus = FocusNode();
+  final FocusNode _confirmarSenhaFocus = FocusNode();
 
   void _verificarSenha() {
     if (!mounted) {
       return;
     }
-    final senha = text.text;
-    final confirmacao = text1.text;
+    final senha = _senhaController.text;
+    final confirmacao = _confirmarSenhaController.text;
+    
     String? erroSenhaTemp;
     String? erroConfirmacaoTemp;
+    
     if (senha.isNotEmpty) {
       if (senha.length < 8) {
         erroSenhaTemp = 'Mínimo de 8 caracteres';
@@ -70,10 +65,10 @@ class _SenhaState extends State<Senha> {
 
   @override
   void dispose() {
-    focus1.dispose();
-    focus2.dispose();
-    text.dispose();
-    text1.dispose();
+    _senhaFocus.dispose();
+    _confirmarSenhaFocus.dispose();
+    _senhaController.dispose();
+    _confirmarSenhaController.dispose();
     super.dispose();
   }
 
@@ -96,8 +91,8 @@ class _SenhaState extends State<Senha> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          focus1.unfocus();
-                          focus2.unfocus();
+                          _senhaFocus.unfocus();
+                          _confirmarSenhaFocus.unfocus();
                           if (GoRouter.of(context).canPop()) {
                             GoRouter.of(context).pop();
                           } else {
@@ -138,8 +133,8 @@ class _SenhaState extends State<Senha> {
                       ),
                       const SizedBox(height: 24.0),
                       TextFormField(
-                        controller: text,
-                        focusNode: focus1,
+                        controller: _senhaController,  
+                        focusNode: _senhaFocus, 
                         onChanged: (value) => _verificarSenha(),
                         obscureText: !_senhaVisivel,
                         obscuringCharacter: '⬤',
@@ -196,8 +191,8 @@ class _SenhaState extends State<Senha> {
                       ),
                       const SizedBox(height: 24.0),
                       TextFormField(
-                        controller: text1,
-                        focusNode: focus2,
+                        controller: _confirmarSenhaController, 
+                        focusNode: _confirmarSenhaFocus, 
                         onChanged: (value) => _verificarSenha(),
                         obscureText: !_confirmacaoVisivel,
                         obscuringCharacter: '⬤',
@@ -263,98 +258,52 @@ class _SenhaState extends State<Senha> {
                 bottom: 24.0,
                 top: 8.0,
               ),
-              child: SizedBox(
-                height: 49.0,
-                width: double.infinity,
-                child: ElevatedButton(
-              onPressed: _senhaValida ? () => cadastrar() : null,
-
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll<Color>(
-                      _senhaValida
-                          ? const Color(0xFFFE645C)
-                          : Colors.grey.shade400,
-                    ),
-                    foregroundColor: const WidgetStatePropertyAll<Color?>(null),
-                    shadowColor: const WidgetStatePropertyAll<Color?>(null),
-                    elevation: const WidgetStatePropertyAll<double?>(null),
-                    side: const WidgetStatePropertyAll<BorderSide?>(null),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Color(0xFFFEE3E1),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                ),
+              child: BotaoLargoNhac(
+                texto: 'Cadastrar', 
+                onPressed: _senhaValida ? () => cadastrar() : null, 
               ),
             ),
-          ],
+            ],
         ),
       ),
     );
   }
   
- void cadastrar() async {
-  try {
-    final authService = context.read<AuthService>();
-    final cadastroData = context.read<CadastroController>();
+  void cadastrar() async {
+    try {
+      final authService = context.read<AuthService>();
+      final cadastroData = context.read<CadastroController>();
 
+      await authService.createAccount(
+        email: cadastroData.email, 
+        password: _senhaController.text, 
+        nome: cadastroData.nome,
+        telefone: cadastroData.telefone
+      );
 
+      if (!mounted) return;
 
-    await authService.createAccount(
-      email: cadastroData.email, 
-      password: text.text,
-      nome:cadastroData.nome,
-      telefone: cadastroData.telefone
-    );
+      cadastroData.limparDados();
+      context.go('/home-page');
 
-        
-       print('✅ Objeto Cadastro: ${cadastroData.email}');
-    
-    
-      
-    
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
 
-    if (!mounted) return;
+      String mensagem = "Erro ao criar conta";
+      if (e.code == 'email-already-in-use') {
+        mensagem = "Este e-mail já está em uso.";
+      } else if (e.code == 'weak-password') {
+        mensagem = "A senha é muito fraca.";
+      }
 
-    
-    cadastroData.limparDados();
-
-
-
-    
-    
-
-
-    context.go('/home-page');
-
-  } on FirebaseAuthException catch (e) {
-    if (!mounted) return;
-
-    String mensagem = "Erro ao criar conta";
-    if (e.code == 'email-already-in-use') {
-      mensagem = "Este e-mail já está em uso.";
-    } else if (e.code == 'weak-password') {
-      mensagem = "A senha é muito fraca.";
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(mensagem), backgroundColor: Colors.redAccent),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro inesperado: $e")),
+      );
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem), backgroundColor: Colors.redAccent),
-    );
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Erro inesperado: $e")),
-    );
   }
-}
 }

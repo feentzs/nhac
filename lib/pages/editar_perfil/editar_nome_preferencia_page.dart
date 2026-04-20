@@ -22,26 +22,23 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
 
   void renameName() async {
     try {
-            final authService = context.read<AuthService>();
+      final authService = context.read<AuthService>();
 
-            await authService.updateUserName(userName: _nameController.text);
+      await authService.updateUserName(userName: _nameController.text);
+      await context.read<UserProvider>().carregarDadosUsuario();
 
+      if (!context.mounted) return;
 
-            await context.read<UserProvider>().carregarDadosUsuario();
-
-                                      if (!context.mounted) return;
-
-            ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Nome atualizado com sucesso! ')),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nome atualizado com sucesso! ')),
+      );
 
       context.pop();
     } catch (e){
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro: $e')),
-    );
-
+        SnackBar(content: Text('Erro: $e')),
+      );
     }
   }
 
@@ -58,99 +55,105 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16.0),
-              const Text(
-                'Editar Nome',
-                style: TextStyle(
-                  fontSize: 26.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                  height: 1.2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16.0),
+                      const Text(
+                        'Editar Nome',
+                        style: TextStyle(
+                          fontSize: 26.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 12.0),
+                      Text(
+                        'O nome é muito utilizado em nossas comunicações e em nosso atendimento.',
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.grey.shade800,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 28.0),
+                      TextField(
+                        controller: _nameController,
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                        textCapitalization: TextCapitalization.words, 
+                        decoration: InputDecoration(
+                          labelText: 'Nome',
+                          labelStyle: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16.0,
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black87),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                        ),
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-             
-              const SizedBox(height: 12.0),
-              Text(
-                'O nome é muito utilizado em nossas comunicações e em nosso atendimento.',
-                style: TextStyle(
-                  fontSize: 15.0,
-                  color: Colors.grey.shade800,
-                  height: 1.5,
-                ),
-              ),
-               const SizedBox(height: 28.0),
-              TextField(
-                controller: _nameController,
-                onChanged: (value) {
-                  setState(() {});
-                },
-                decoration: InputDecoration(
-                  labelText: 'Nome',
-                  labelStyle: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 16.0,
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black87),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                ),
-                style: const TextStyle(
-                  fontSize: 18.0,
-                  color: Colors.black87,
-                ),
-              ),
-              const Spacer(),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 32.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 49.0,
-                  child: ElevatedButton(
-                    onPressed: _nameController.text.trim().isNotEmpty
-                        ? () {
-                              renameName();
-                          }
-                        : null,
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.resolveWith<Color>((
-                        states,
-                      ) {
-                        if (states.contains(WidgetState.disabled)) {
-                          return const Color(0xFFC9BCBC);
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0, top: 16.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: 49.0,
+                child: ElevatedButton(
+                  onPressed: _nameController.text.trim().isNotEmpty
+                      ? () {
+                            renameName();
                         }
-                        return const Color(0xFFFE645C);
-                      }),
-                      foregroundColor: const WidgetStatePropertyAll<Color?>(null),
-                      shadowColor: const WidgetStatePropertyAll<Color?>(null),
-                      elevation: const WidgetStatePropertyAll<double?>(null),
-                      side: const WidgetStatePropertyAll<BorderSide?>(null),
-                      shape: const WidgetStatePropertyAll<RoundedRectangleBorder?>(
-                        null,
+                      : null,
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+                      if (states.contains(WidgetState.disabled)) {
+                        return const Color(0xFFC9BCBC);
+                      }
+                      return const Color(0xFFFE645C);
+                    }),
+                    shape: WidgetStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.0), 
                       ),
                     ),
-                    child: const Text(
-                      'Salvar alterações',
-                      style: TextStyle(
-                        color: Color(0xFFFEE3E1),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.1,
-                      ),
+                  ),
+                  child: const Text(
+                    'Salvar alterações',
+                    style: TextStyle(
+                      color: Color(0xFFFEE3E1),
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.1,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

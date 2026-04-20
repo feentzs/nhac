@@ -101,7 +101,7 @@ class DadosPessoaisPage extends StatelessWidget {
             const SizedBox(height: 16.0),
             _buildListItem('Nome', value: usuario.nome, onTap: () => context.push('/editar-nome-preferencia')),
             _buildListItem('E-mail', value: usuario.email, onTap: () => context.push('/editar-email')),
-            _buildListItem('Telefone', value: '*******0759'),
+            _buildListItem('Telefone', value: usuario.telefone),
             _buildListItem('Senha', value: '**************'),
   
           ],

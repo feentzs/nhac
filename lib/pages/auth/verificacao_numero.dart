@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:nhac/components/seta_voltar.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'dart:async';
@@ -85,27 +87,8 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                GestureDetector(
-                  onTap: () {
-                    if (GoRouter.of(context).canPop()) {
-                      GoRouter.of(context).pop();
-                    } else {
-                      GoRouter.of(context).go('/home-page');
-                    }
-                  },
-                 child: Transform.scale(
-                    scaleX: -1.0,
-                    child: const SizedBox(
-                      width: 21.0,
-                      height: 21.0,
-                      child: Image(
-                        image: AssetImage('assets/Arrow right (3).png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 18.0),
+             const SetaVoltar(),
+             const SizedBox(height: 18.0),
                 const Text(
                   'Verifique seu número',
                   style: TextStyle(
@@ -163,15 +146,22 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                     final cadastroData = context.read<CadastroController>();
 
                     try {
-                      await authService.loginComSms(
-                        verificationId: cadastroData.verificationId, 
-                        smsCode: value, 
+                      UserCredential credencial = await authService.loginComSms(
+                        verificationId: cadastroData.verificationId,
+                        smsCode: value,
                       );
 
                       if (!mounted) return;
                       
-                      cadastroData.limparDados();
-                      router.go('/home-page');
+                      bool isNovoUsuario = credencial.additionalUserInfo?.isNewUser ?? false;
+
+                      if (isNovoUsuario) {
+                        
+                        router.push('/cadastro/nome'); 
+                      } else {
+                        cadastroData.limparDados();
+                        router.go('/home-page');
+                      }
 
                     } catch (e) {
                       if (!mounted) return;
@@ -183,7 +173,7 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       );
                     }
                   },
-                  autoFocus: true,
+                   autoFocus: true,
                   enableActiveFill: true,
                   cursorColor: const Color(0xFFFF6961),
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,

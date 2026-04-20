@@ -284,7 +284,7 @@ class AuthService with ChangeNotifier{
     );
   }
 
-  Future<void> loginComSms({
+  Future<UserCredential> loginComSms({
     required String verificationId,
     required String smsCode,
   }) async {
@@ -292,7 +292,23 @@ class AuthService with ChangeNotifier{
       verificationId: verificationId,
       smsCode: smsCode,
     );
-    await FirebaseAuth.instance.signInWithCredential(credential);
+      return await FirebaseAuth.instance.signInWithCredential(credential);  }
+
+Future<void> finalizarCadastroTelefone({
+  required String nome,
+  required String telefone,
+}) async {
+  User? usuarioAtual = FirebaseAuth.instance.currentUser;
+
+  if (usuarioAtual != null) {
+    
+    await FirebaseFirestore.instance.collection('usuarios').doc(usuarioAtual.uid).set({
+      'nome': nome,
+      'telefone': telefone,
+      'email': '', 
+      'criado_em': FieldValue.serverTimestamp(),
+    });
+  }
+}
   }
 
-}

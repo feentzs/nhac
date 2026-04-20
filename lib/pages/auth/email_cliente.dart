@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nhac/components/botao_largo_nhac.dart';
+import 'package:nhac/components/seta_voltar.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
@@ -66,28 +68,8 @@ class _EmailClienteState extends State<EmailCliente> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                onTap: () {
-                  if (GoRouter.of(context).canPop()) {
-                    GoRouter.of(context).pop();
-                  } else {
-                    GoRouter.of(context).go('/home-page');
-                  }
-                },
-                child: Transform.scale(
-                  scaleX: -1.0,
-                  child: const SizedBox(
-                    width: 21.0,
-                    height: 21.0,
-                    child: Image(
-                      image: AssetImage('assets/Arrow right (3).png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24.0),
-
+             const SetaVoltar(),
+             const SizedBox(height: 24.0),
               const Text(
                 'Qual o seu email?',
                 style: TextStyle(
@@ -293,35 +275,10 @@ class _EmailClienteState extends State<EmailCliente> {
               SizedBox(
                 width: double.infinity,
                 height: 49.0,
-                child: ElevatedButton(
-                  onPressed: _emailValido
-                      ? () async {
-                          await redirecionadorEmail();
-                        }
-                      : null,
-                  style: ButtonStyle(
-                    backgroundColor:
-                        WidgetStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return const Color(0xFFC9BCBC);
-                      }
-                      return const Color(0xFFFE645C);
-                    }),
-                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Color(0xFFFEE3E1),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+                child:BotaoLargoNhac(
+                texto: 'Continuar',
+                onPressed: _emailValido ? () async { await redirecionadorEmail(); } : null,
+              ),
               ),
               const SizedBox(height: 16.0),  
             ],
