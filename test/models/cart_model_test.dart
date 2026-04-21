@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nhac/models/cart_model.dart';
+import 'package:nhac/models/usuarios/cart_model.dart';
 
 void main() {
   group('CartModel Tests', () {

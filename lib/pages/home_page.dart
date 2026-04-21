@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nhac/components/home_content.dart';
 import 'package:nhac/components/profile_content.dart';
+import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -46,6 +47,25 @@ class _HomePageState extends State<HomePage> {
           _buildPlaceholderContent(2),
           const ProfileContent(),
         ],
+      ),
+      floatingActionButton: Builder(
+        builder: (context) {
+          final quantidadeNoCarrinho = context.watch<CartProvider>().totalDeUnidades;
+
+          if (quantidadeNoCarrinho == 0) return const SizedBox.shrink();
+
+          return FloatingActionButton(
+            onPressed: () {
+              // context.push('/carrinho');
+            },
+            backgroundColor: Colors.black, 
+            child: Badge(
+              label: Text(quantidadeNoCarrinho.toString()),
+              backgroundColor: Colors.red,
+              child: const Icon(Icons.shopping_cart, color: Colors.white),
+            ),
+          );
+        }
       ),
       bottomNavigationBar: _buildFloatingNavBar(),
     );

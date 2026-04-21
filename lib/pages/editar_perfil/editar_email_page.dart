@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:nhac/components/botao_largo_nhac.dart'; // Nosso Lego!
+import 'package:nhac/components/botao_largo_nhac.dart'; 
 
 class EditarEmailPage extends StatefulWidget {
   const EditarEmailPage({super.key});
@@ -21,7 +21,6 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   @override
   void initState() {
     super.initState();
-    // Ouve o teclado em tempo real para validar o email
     _emailController.addListener(_validarNovoEmail);
   }
 
@@ -31,7 +30,6 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
     super.dispose();
   }
 
-  // 1. A MÁGICA DA VALIDAÇÃO (Impede usar o mesmo e-mail)
   void _validarNovoEmail() {
     final novoEmail = _emailController.text.trim();
     final usuarioLogado = FirebaseAuth.instance.currentUser;
@@ -42,19 +40,18 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
         _erroEmail = null;
         _emailValido = false;
       } else if (novoEmail.toLowerCase() == emailAtual.toLowerCase()) {
-        _erroEmail = 'Este já é o seu e-mail atual'; // O ERRO APARECE AQUI!
+        _erroEmail = 'Este já é o seu e-mail atual';
         _emailValido = false;
       } else if (!novoEmail.contains('@') || !novoEmail.contains('.')) {
         _erroEmail = 'Insira um e-mail válido';
         _emailValido = false;
       } else {
         _erroEmail = null;
-        _emailValido = true; // Só ativa o botão se tudo estiver perfeito!
+        _emailValido = true; 
       }
     });
   }
 
-  // 2. O POP-UP SEGURO
   Future<void> _mostrarDialogoConfirmacaoSenha() async {
     final TextEditingController senhaController = TextEditingController();
     bool carregando = false;
@@ -88,7 +85,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                     onChanged: (_) => setStateDialog(() => erroSenha = null),
                     decoration: InputDecoration(
                       labelText: 'Senha atual',
-                      errorText: erroSenha, // Mostra se a senha estiver errada
+                      errorText: erroSenha,
                       labelStyle: TextStyle(color: Colors.grey.shade600),
                       focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Color(0xFFFF6961), width: 2),
@@ -123,25 +120,22 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                             final user = FirebaseAuth.instance.currentUser;
                             if (user != null && user.email != null) {
                               
-                              // 1. Cria a credencial com a senha que o utilizador digitou
                               final credential = EmailAuthProvider.credential(
                                 email: user.email!,
                                 password: senhaController.text,
                               );
                               
-                              // 2. Reautentica no Firebase
                               await user.reauthenticateWithCredential(credential);
 
                               if (!context.mounted) return;
                               final authService = context.read<AuthService>();
                               
-                              // 3. AGORA SIM MUDA O E-MAIL
                               await authService.uptadeEmail(newEmail: _emailController.text.trim());
                               await context.read<UserProvider>().carregarDadosUsuario();
 
                               if (!context.mounted) return;
-                              Navigator.pop(context); // Fecha pop-up
-                              Navigator.pop(context); // Volta ao perfil
+                              Navigator.pop(context); 
+                              Navigator.pop(context); 
 
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('E-mail atualizado com sucesso!'), backgroundColor: Colors.green),
@@ -227,7 +221,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          errorText: _erroEmail, // <- O aviso do "mesmo e-mail" aparece aqui!
+                          errorText: _erroEmail,
                           enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: Colors.grey.shade300),
                           ),
@@ -250,7 +244,6 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0, top: 16.0),
               child: BotaoLargoNhac(
                 texto: 'Continuar',
-                // Só abre o pop-up se o email for válido (e diferente do atual)
                 onPressed: _emailValido ? () => _mostrarDialogoConfirmacaoSenha() : null,
               ),
             ),

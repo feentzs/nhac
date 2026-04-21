@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nhac/models/user_model.dart';
+import 'package:nhac/models/usuarios/user_model.dart';
 
 void main() {
   test('Deve converter UserModel para Map (Formato Firebase) sem erros', () {
