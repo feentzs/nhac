@@ -27,7 +27,7 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
       await authService.updateUserName(userName: _nameController.text);
 
       if (!mounted) return;
-      await context.read<UserProvider>().carregarDadosUsuario();
+       context.read<UserProvider>().iniciarEscutaUsuario();
             if (!mounted) return;
 
 

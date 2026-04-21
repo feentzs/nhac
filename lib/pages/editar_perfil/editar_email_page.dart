@@ -131,7 +131,10 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                               final authService = context.read<AuthService>();
                               
                               await authService.uptadeEmail(newEmail: _emailController.text.trim());
-                              await context.read<UserProvider>().carregarDadosUsuario();
+                                                            if (!context.mounted) return;
+
+
+                               context.read<UserProvider>().iniciarEscutaUsuario();
 
                               if (!context.mounted) return;
                               Navigator.pop(context); 
@@ -175,6 +178,19 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final isGoogleUser = currentUser?.providerData.any((info) => info.providerId == 'google.com') ?? false;
+
+    if (isGoogleUser) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuários do Google não podem alterar o e-mail por aqui.')),
+        );
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFE7E5),
       appBar: AppBar(

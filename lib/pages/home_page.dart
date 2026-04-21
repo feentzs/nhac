@@ -19,7 +19,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    context.read<UserProvider>().carregarDadosUsuario();
+    context.read<UserProvider>().iniciarEscutaUsuario();
+    context.read<CartProvider>().iniciarEscutaCarrinho();
     _pageController = PageController(initialPage: _selectedIndex);
   }
 
