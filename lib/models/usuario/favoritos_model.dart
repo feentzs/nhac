@@ -1,11 +1,11 @@
-class FavoritesModel {
+class FavoritosModel {
   final String idDocumento;
   final String idProduto;
   final String imagemUrl;
   final String nome;
   final double preco;
 
-  FavoritesModel({
+  FavoritosModel({
     required this.idDocumento,
     required this.idProduto,
     required this.imagemUrl,
@@ -13,8 +13,8 @@ class FavoritesModel {
     required this.preco,
   });
 
-  factory FavoritesModel.fromMap(Map<String, dynamic> map, String docId){
-    return FavoritesModel(
+  factory FavoritosModel.fromMap(Map<String, dynamic> map, String docId){
+    return FavoritosModel(
       idDocumento: docId,
       idProduto: map['id_produto'] ?? '',
       imagemUrl: map['imagem_url'] ?? '',
@@ -31,13 +31,13 @@ class FavoritesModel {
       'preco': preco,
     };
   }
-  FavoritesModel copyWith({
+  FavoritosModel copyWith({
     String? idDocumento,
     String? idProduto,
     String? imagemUrl,
     String? nome,
     double? preco,
-  }) => FavoritesModel(
+  }) => FavoritosModel(
     idDocumento: idDocumento ?? this.idDocumento,
     idProduto: idProduto ?? this.idProduto,
     imagemUrl: imagemUrl ?? this.imagemUrl,

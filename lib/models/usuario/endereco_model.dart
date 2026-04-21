@@ -1,4 +1,4 @@
-class AddressModel {
+class EnderecoModel {
   final String idDocumento;
   final String bairro;
   final String cep;
@@ -9,7 +9,7 @@ class AddressModel {
   final bool padrao;
   final String rua;
 
-  AddressModel({
+  EnderecoModel({
     required this.idDocumento,
     required this.bairro,
     required this.cep,
@@ -21,8 +21,8 @@ class AddressModel {
     required this.rua,
   });
 
-  factory AddressModel.fromMap(Map<String, dynamic> map, String docId) {
-    return AddressModel(
+  factory EnderecoModel.fromMap(Map<String, dynamic> map, String docId) {
+    return EnderecoModel(
       idDocumento: docId,
       bairro: map['bairro'] ?? '',
       cep: map['cep'] ?? '',
@@ -35,7 +35,7 @@ class AddressModel {
     );
   }
 
-  AddressModel copyWith({
+  EnderecoModel copyWith({
     String? idDocumento,
     String? bairro,
     String? cep,
@@ -46,7 +46,7 @@ class AddressModel {
     bool? padrao,
     String? rua,
   }) =>
-      AddressModel(
+      EnderecoModel(
         idDocumento: idDocumento ?? this.idDocumento,
         bairro: bairro ?? this.bairro,
         cep: cep ?? this.cep,

@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:nhac/models/usuarios/user_model.dart';
+import 'package:nhac/models/usuario/usuario_model.dart';
 
 
 class AuthService with ChangeNotifier{
@@ -38,7 +38,7 @@ class AuthService with ChangeNotifier{
 
       
             if (!docUsuario.exists) {
-        UserModel novoUsuarioGoogle = UserModel(
+        UsuarioModel novoUsuarioGoogle = UsuarioModel(
           uid: userCredencial.user!.uid,
           nome: userCredencial.user!.displayName ?? 'Usuário Google', 
           email: userCredencial.user!.email ?? '', 
@@ -138,7 +138,7 @@ class AuthService with ChangeNotifier{
         password: password
       );
 
-      UserModel novoUsuario = UserModel(
+      UsuarioModel novoUsuario = UsuarioModel(
         uid: credencial.user!.uid,
         nome: nome,
         email: email,

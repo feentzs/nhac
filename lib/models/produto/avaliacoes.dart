@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ReviewsModel{
+class AvaliacoesModel{
   final String comentario;
   final Timestamp? criadoEm;
   final String idDocumento;
@@ -8,7 +8,7 @@ class ReviewsModel{
   final double nota;
   final String userId;
 
-  ReviewsModel({
+  AvaliacoesModel({
     this.comentario = '',
     this.criadoEm,
     required this.idDocumento,
@@ -17,14 +17,14 @@ class ReviewsModel{
     required this.userId,
   });
 
-  ReviewsModel copyWith({
+  AvaliacoesModel copyWith({
     String? comentario,
     Timestamp? criadoEm,
     String? idDocumento,
     String? nomeUsuario,
     double? nota,
     String? userId,
-  }) => ReviewsModel(
+  }) => AvaliacoesModel(
     comentario: comentario ?? this.comentario,
     criadoEm: criadoEm ?? this.criadoEm,
     idDocumento: idDocumento ?? this.idDocumento,
@@ -33,8 +33,8 @@ class ReviewsModel{
     userId: userId ?? this.userId,
   );
 
-  factory ReviewsModel.fromMap(Map<String, dynamic> map, String docId){
-    return ReviewsModel(
+  factory AvaliacoesModel.fromMap(Map<String, dynamic> map, String docId){
+    return AvaliacoesModel(
       comentario: map['comentario'] ?? '',
       criadoEm: map['criado_em'] as Timestamp?,
       idDocumento: docId,
