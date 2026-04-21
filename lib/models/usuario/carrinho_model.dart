@@ -1,4 +1,4 @@
-class CartModel {
+class CarrinhoModel {
   final String idDocumento;
   final String idProduto;
   final String imagemUrl;
@@ -6,7 +6,7 @@ class CartModel {
   final double preco;
   final int quantidade;
 
-  CartModel({
+  CarrinhoModel({
     required this.idDocumento,
     required this.idProduto,
     required this.imagemUrl,
@@ -16,8 +16,8 @@ class CartModel {
   });
 
 
-  factory CartModel.fromMap(Map<String, dynamic> map, String docId){
-    return CartModel(
+  factory CarrinhoModel.fromMap(Map<String, dynamic> map, String docId){
+    return CarrinhoModel(
       idDocumento: docId,
       idProduto: map['id_produto'] ?? '',
       imagemUrl: map['imagem_url'] ?? '',
@@ -27,7 +27,7 @@ class CartModel {
     );
   }
 
-  CartModel copyWith({
+  CarrinhoModel copyWith({
     String? idDocumento,
     String? idProduto,
     String? imagemUrl,
@@ -35,7 +35,7 @@ class CartModel {
     double? preco,
     int? quantidade,
   }) =>
-      CartModel(
+      CarrinhoModel(
         idDocumento: idDocumento ?? this.idDocumento,
         idProduto: idProduto ?? this.idProduto,
         imagemUrl: imagemUrl ?? this.imagemUrl,
