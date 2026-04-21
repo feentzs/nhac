@@ -1,4 +1,5 @@
 import 'package:nhac/controllers/cadastro_controller.dart';
+import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<AuthService>(create: (context) => AuthService()), 
               ChangeNotifierProvider<CadastroController>(create: (context) => CadastroController()),
             ChangeNotifierProvider<UserProvider>(create: (context) => UserProvider()),
+            ChangeNotifierProvider(create: (_) => CartProvider()),
 
               
 
