@@ -52,7 +52,7 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
       
       if (!mounted) return;
 
-      await context.read<UserProvider>().carregarDadosUsuario();
+      context.read<UserProvider>().iniciarEscutaUsuario();
       cadastroData.limparDados();
       
       if (!mounted) return;

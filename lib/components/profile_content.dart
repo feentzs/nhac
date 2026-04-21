@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
@@ -11,10 +12,12 @@ class ProfileContent extends StatelessWidget {
   void _logoutUsuario(BuildContext context) async {
     final authService = context.read<AuthService>();
     final userProvider = context.read<UserProvider>();
+    final carrinho = context.read<CartProvider>();
 
     Navigator.pop(context); 
 
     userProvider.limparUsuario();
+    carrinho.limparCarrinhoLocal();
 
     await authService.signOut();
     if (!context.mounted) return;
@@ -135,7 +138,7 @@ class ProfileContent extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               InkWell(
-                onTap: () => _logoutUsuario(context),  
+                onTap: () => _logoutUsuario(context), 
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: Row(

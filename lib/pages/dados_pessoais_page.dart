@@ -1,21 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class DadosPessoaisPage extends StatelessWidget {
-  const DadosPessoaisPage({super.key});
-  
+  final bool? isGoogleUserOverride;
 
-  
+  const DadosPessoaisPage({super.key, this.isGoogleUserOverride});
 
-  Widget _buildListItem(String title, {String? value, VoidCallback? onTap}) {
-
-    
-
-    
+  Widget _buildListItem(String title, {String? value, VoidCallback? onTap, bool disabled = false}) {
     return InkWell(
-      onTap: onTap ?? () {},
+      onTap: disabled ? null : (onTap ?? () {}),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18.0),
         decoration: BoxDecoration(
@@ -52,7 +48,7 @@ class DadosPessoaisPage extends StatelessWidget {
                   ),
                 if (value != null) const SizedBox(width: 8.0),
                 Icon(
-                  Icons.arrow_forward_ios,
+                  disabled ? Icons.lock_outline : Icons.arrow_forward_ios,
                   size: 14.0,
                   color: Colors.grey.shade400,
                 ),
@@ -67,13 +63,19 @@ class DadosPessoaisPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
-  final usuario = userProvider.usuario;
+    final usuario = userProvider.usuario;
 
-  
+    if (usuario == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-   if (usuario == null) {
-     return const Center(child: CircularProgressIndicator());
-   }
+    final bool isGoogleUser;
+    if (isGoogleUserOverride != null) {
+      isGoogleUser = isGoogleUserOverride!;
+    } else {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      isGoogleUser = currentUser?.providerData.any((info) => info.providerId == 'google.com') ?? false;
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFE7E5),
@@ -100,10 +102,14 @@ class DadosPessoaisPage extends StatelessWidget {
           children: [
             const SizedBox(height: 16.0),
             _buildListItem('Nome', value: usuario.nome, onTap: () => context.push('/editar-nome-preferencia')),
-            _buildListItem('E-mail', value: usuario.email, onTap: () => context.push('/editar-email')),
+            _buildListItem(
+              'E-mail',
+              value: usuario.email,
+              onTap: () => context.push('/editar-email'),
+              disabled: isGoogleUser,
+            ),
             _buildListItem('Telefone', value: usuario.telefone),
-            _buildListItem('Senha', value: '**************'),
-  
+            _buildListItem('Senha', value: '**************', disabled: isGoogleUser),
           ],
         ),
       ),
