@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,9 +8,16 @@ import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/biometric_service.dart';
 import 'package:provider/provider.dart';
 
-class ProfileContent extends StatelessWidget {
+class ProfileContent extends StatefulWidget {
   
   const ProfileContent({super.key});
+
+  @override
+  State<ProfileContent> createState() => _ProfileContentState();
+}
+
+class _ProfileContentState extends State<ProfileContent> {
+  bool _isUploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -290,31 +299,79 @@ class ProfileContent extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: (usuario != null && usuario.fotoUrl.isNotEmpty)
-                            ? null
-                            : Icon(
-                                Icons.person,
-                                size: 48,
-                                color: Colors.grey.shade400,
-                              ),
+                        child: _isUploading
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFFFF6961),
+                                ),
+                              )
+                            : (usuario != null && usuario.fotoUrl.isNotEmpty)
+                                ? null
+                                : Icon(
+                                    Icons.person,
+                                    size: 48,
+                                    color: Colors.grey.shade400,
+                                  ),
                       ),
                       Positioned(
                         bottom: 0,
                         right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(4.0),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
+                        child: GestureDetector(
+                          onTap: _isUploading
+                              ? null
+                              : () async {
+                                  final picker = ImagePicker();
+                                  final pickedFile = await picker.pickImage(
+                                    source: ImageSource.gallery,
+                                    imageQuality: 70, 
+                                  );
+                                  if (pickedFile != null && mounted) {
+                                    setState(() => _isUploading = true);
+                                    try {
+                                      await context
+                                          .read<UserProvider>()
+                                          .atualizarFotoPerfil(
+                                              File(pickedFile.path));
+                                    } catch (e) {
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  'Erro ao carregar imagem: $e')),
+                                        );
+                                      }
+                                    } finally {
+                                      if (mounted) {
+                                        setState(() => _isUploading = false);
+                                      }
+                                    }
+                                  }
+                                },
                           child: Container(
                             padding: const EdgeInsets.all(4.0),
                             decoration: const BoxDecoration(
-                              color: Colors.black87,
+                              color: Colors.white,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.edit,
-                                size: 12, color: Colors.white),
+                            child: Container(
+                              padding: const EdgeInsets.all(4.0),
+                              decoration: const BoxDecoration(
+                                color: Colors.black87,
+                                shape: BoxShape.circle,
+                              ),
+                              child: _isUploading
+                                  ? const SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(Icons.edit,
+                                      size: 12, color: Colors.white),
+                            ),
                           ),
                         ),
                       ),
