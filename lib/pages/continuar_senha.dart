@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/controllers/user_provider.dart';
@@ -10,9 +11,8 @@ import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class ContinuarSenha extends StatefulWidget {
-  
   @NowaGenerated({'loader': 'auto-constructor'})
-  const ContinuarSenha({super.key  });
+  const ContinuarSenha({super.key});
 
   @override
   State<ContinuarSenha> createState() {
@@ -22,10 +22,10 @@ class ContinuarSenha extends StatefulWidget {
 
 @NowaGenerated()
 class _ContinuarSenhaState extends State<ContinuarSenha> {
-
-  
   bool _senhaValida = false;
   bool _isLoading = false;
+  String? _errorMessage;
+  bool _senhaVisivel = false;
 
   TextEditingController text = TextEditingController();
 
@@ -37,6 +37,9 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
     }
     setState(() {
       _senhaValida = text1.text.isNotEmpty;
+      if (_errorMessage != null) {
+        _errorMessage = null;
+      }
     });
   }
 
@@ -48,44 +51,41 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
   }
 
   Future<void> logar() async {
-  try {
+    try {
       final authService = context.read<AuthService>();
       final cadastroData = context.read<CadastroController>();
 
+      await authService.signIn(
+          email: cadastroData.email, password: text1.text.trim());
 
+      if (!mounted) return;
 
-    await authService.signIn(email: cadastroData.email, password: text1.text.trim());
+      setState(() {
+        _errorMessage = null;
+      });
 
-    
-    if (!mounted) return;
+      await context.read<UserProvider>().carregarDadosUsuario();
 
-    await context.read<UserProvider>().carregarDadosUsuario();
+      cadastroData.limparDados();
 
-    cadastroData.limparDados();
+      context.go('/home-page');
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),
-    );
-    
-    context.go('/home-page'); 
+      String erro = "Erro ao entrar";
+      if (e.code == 'user-not-found') erro = "Usuário não encontrado.";
+      if (e.code == 'wrong-password') erro = "Senha incorreta.";
 
-  } on FirebaseAuthException catch (e) {
-    if (!mounted) return;
-    
-    String erro = "Erro ao entrar";
-    if (e.code == 'user-not-found') erro = "Usuário não encontrado.";
-    if (e.code == 'wrong-password') erro = "Senha incorreta.";
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(erro), backgroundColor: Colors.redAccent),
-    );
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Erro inesperado: $e")),
-    );
+      setState(() {
+        _errorMessage = erro;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = "Erro inesperado: $e";
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -112,23 +112,12 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                             GoRouter.of(context).go('/home-page');
                           }
                         },
-                        child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                          origin: const Offset(0.0, 0.0),
-                          child: const SizedBox(
-                            width: 21.0,
-                            height: 21.0,
-                            child: Image(
-                              image: AssetImage('assets/Arrow right (3).png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                        child: const Icon(Icons.arrow_back_ios_new,
+                            color: Colors.black87, size: 20),
                       ),
                       const SizedBox(height: 18.0),
                       const Text(
-                        'Insira sua senha',
+                        'Bem-vindo Novamente!\nInsira sua senha',
                         style: TextStyle(
                           fontSize: 24.0,
                           color: Color(0xFF5D201C),
@@ -138,41 +127,92 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                       ),
                       const SizedBox(height: 8.0),
                       SizedBox(
-                        height: 70.0,
                         width: double.infinity,
                         child: TextFormField(
                           enabled: true,
                           autofocus: true,
                           showCursor: true,
-                          obscureText: true,
+                          obscureText: !_senhaVisivel,
+                          obscuringCharacter: '⬤',
                           cursorColor: const Color(0xFFFF6961),
-                          style: const TextStyle(
-                            color: Color(0xFF5D201C),
+                          style: TextStyle(
+                            color: const Color(0xFF5D201C),
                             fontFamily: 'Roboto',
                             fontWeight: FontWeight.w600,
+                            letterSpacing: _senhaVisivel ? 0.0 : 4.0,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
-                                color: Colors.grey,
+                                color: _errorMessage != null
+                                    ? Colors.red
+                                    : Colors.grey,
                                 width: 1.0,
                               ),
                             ),
                             focusedBorder: UnderlineInputBorder(
                               borderSide: BorderSide(
-                                color: Color(0xFFC9BCBC),
+                                color: _errorMessage != null
+                                    ? Colors.red
+                                    : const Color(0xFFC9BCBC),
                                 width: 2.0,
                               ),
                             ),
                             hintText: 'Senha',
-                            hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
+                            hintStyle: const TextStyle(
+                              color: Color(0xFFC9BCBC),
+                              letterSpacing: 0.0,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: _senhaVisivel
+                                  ? const Icon(
+                                      Icons.visibility,
+                                      color: Color(0xFFFF6961),
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/olho-fechado.svg',
+                                      width: 24.0,
+                                      height: 24.0,
+                                      colorFilter: const ColorFilter.mode(
+                                        Color(0xFFC9BCBC),
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                              onPressed: () {
+                                setState(() {
+                                  _senhaVisivel = !_senhaVisivel;
+                                });
+                              },
+                            ),
                           ),
                           controller: text1,
                           onChanged: (value) => _verificarSenha(),
                         ),
                       ),
+                      if (_errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                color: Colors.red,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _errorMessage!,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       SizedBox(
-                        height: 20.0,
+                        height: 50.0,
                         width: double.infinity,
                         child: Align(
                           alignment: Alignment.centerRight,
@@ -208,19 +248,18 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                 height: 49.0,
                 width: double.infinity,
                 child: ElevatedButton(
-                 onPressed: (_senhaValida && !_isLoading)
-  ? () async {
-    setState(() => _isLoading = true);
-    try {
-      await logar();
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-  : null,
-
-
+                  onPressed: (_senhaValida && !_isLoading)
+                      ? () async {
+                          setState(() => _isLoading = true);
+                          try {
+                            await logar();
+                          } finally {
+                            if (mounted) setState(() => _isLoading = false);
+                          }
+                        }
+                      : null,
                   style: ButtonStyle(
+                    padding: const WidgetStatePropertyAll(EdgeInsets.zero),
                     backgroundColor: WidgetStatePropertyAll<Color>(
                       _senhaValida
                           ? const Color(0xFFFF6961)
@@ -237,20 +276,24 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                     ),
                   ),
                   child: _isLoading
-                      ? Lottie.asset(
-                          'assets/animations/loading_nhac.json',
-                          width: 60,
-                          height: 60,
+                      ? Transform.scale(
+                          scale: 2.5,
+                          child: Lottie.asset(
+                            'assets/animations/botao_loading_nhac.json',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.contain,
+                          ),
                         )
                       : const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Color(0xFFFEE3E1),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
+                          'Continuar',
+                          style: TextStyle(
+                            color: Color(0xFFFEE3E1),
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.1,
+                          ),
+                        ),
                 ),
               ),
             ),

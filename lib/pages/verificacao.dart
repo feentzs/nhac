@@ -88,19 +88,8 @@ class _VerificacaoState extends State<Verificacao> {
                       GoRouter.of(context).go('/home-page');
                     }
                   },
-                  child: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                    origin: const Offset(0.0, 0.0),
-                    child: const SizedBox(
-                      width: 21.0,
-                      height: 21.0,
-                      child: Image(
-                        image: AssetImage('assets/Arrow right (3).png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
+                  child: const Icon(Icons.arrow_back_ios_new,
+                      color: Colors.black87, size: 20),
                 ),
                 const SizedBox(height: 18.0),
                 const Text(

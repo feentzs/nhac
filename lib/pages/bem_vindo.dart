@@ -81,10 +81,8 @@ class _BemVindoState extends State<BemVindo> {
                 left: 346.0,
                 width: 15.0,
                 height: 15.0,
-                child: Image(
-                  image: AssetImage('assets/Arrow right (3).png'),
-                  fit: BoxFit.cover,
-                ),
+                child: const Icon(Icons.arrow_forward_ios,
+                    color: Colors.black87, size: 15),
               ),
               const Positioned(
                 top: 157.0,

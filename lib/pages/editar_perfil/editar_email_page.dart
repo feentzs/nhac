@@ -27,7 +27,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
         backgroundColor: const Color(0xFFFFE7E5),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black87, size: 24),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
           onPressed: () => context.pop(),
         ),
       ),
@@ -45,6 +45,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                   height: 1.2,
+                  
                 ),
               ),
               const SizedBox(height: 12.0),
@@ -66,6 +67,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
+                  hintText: 'Email',
+                  hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
                   focusedBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.black87),
                   ),
@@ -89,13 +92,13 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                         ? () async {
                             setState(() => _isLoading = true);
                             try {
-                              // TODO: Firebase save logic
                             } finally {
                               if (mounted) setState(() => _isLoading = false);
                             }
                           }
                         : null,
                     style: ButtonStyle(
+                      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
                       backgroundColor: WidgetStateProperty.resolveWith<Color>((
                         states,
                       ) {
@@ -115,10 +118,14 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                       ),
                     ),
                     child: _isLoading
-                        ? Lottie.asset(
-                            'assets/animations/loading_nhac.json',
-                            width: 60,
-                            height: 60,
+                        ? Transform.scale(
+                            scale: 2.5,
+                            child: Lottie.asset(
+                              'assets/animations/botao_loading_nhac.json',
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.contain,
+                            ),
                           )
                         : const Text(
                             'Continuar',

@@ -111,15 +111,8 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
                     GoRouter.of(context).go('/home-page');
                   }
                 },
-                child: Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                  origin: const Offset(0.0, 0.0),
-                  child: const Image(
-                    image: AssetImage('assets/Arrow right (3).png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                child: const Icon(Icons.arrow_back_ios_new,
+                    color: Colors.black87, size: 20),
               ),
             ),
             Positioned(

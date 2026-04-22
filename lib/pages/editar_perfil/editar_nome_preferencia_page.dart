@@ -93,13 +93,13 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                         ? () async {
                             setState(() => _isLoading = true);
                             try {
-                              // TODO: Firebase save logic
                             } finally {
                               if (mounted) setState(() => _isLoading = false);
                             }
                           }
                         : null,
                     style: ButtonStyle(
+                      padding: const WidgetStatePropertyAll(EdgeInsets.zero),
                       backgroundColor: WidgetStateProperty.resolveWith<Color>((
                         states,
                       ) {
@@ -117,10 +117,14 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                       ),
                     ),
                     child: _isLoading
-                        ? Lottie.asset(
-                            'assets/animations/loading_nhac.json',
-                            width: 60,
-                            height: 60,
+                        ? Transform.scale(
+                            scale: 2.5,
+                            child: Lottie.asset(
+                              'assets/animations/botao_loading_nhac.json',
+                              width: 60,
+                              height: 60,
+                              fit: BoxFit.contain,
+                            ),
                           )
                         : const Text(
                       'Salvar alterações',

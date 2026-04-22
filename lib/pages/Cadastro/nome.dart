@@ -70,19 +70,8 @@ class _NomeState extends State<Nome> {
                             GoRouter.of(context).go('/home-page');
                           }
                         },
-                        child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                          origin: const Offset(0.0, 0.0),
-                          child: const SizedBox(
-                            width: 21.0,
-                            height: 21.0,
-                            child: Image(
-                              image: AssetImage('assets/Arrow right (3).png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                        child: const Icon(Icons.arrow_back_ios_new,
+                            color: Colors.black87, size: 20),
                       ),
                       const SizedBox(height: 18.0),
                       const Text(
@@ -92,6 +81,15 @@ class _NomeState extends State<Nome> {
                           color: Color(0xFF5D201C),
                           fontFamily: 'Roboto',
                           fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                       const SizedBox(height: 12.0),
+                      Text(
+                        'O nome é muito utilizado em nossas comunicações e em nosso atendimento.',
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.grey.shade800,
+                          height: 1.5,
                         ),
                       ),
                       const SizedBox(height: 16.0),
