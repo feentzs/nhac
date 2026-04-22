@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:go_router/go_router.dart';
 
 class EditarNomePreferenciaPage extends StatefulWidget {
@@ -10,6 +11,7 @@ class EditarNomePreferenciaPage extends StatefulWidget {
 
 class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
   final TextEditingController _nameController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -87,8 +89,14 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                   width: double.infinity,
                   height: 49.0,
                   child: ElevatedButton(
-                    onPressed: _nameController.text.trim().isNotEmpty
-                        ? () {
+                    onPressed: (_nameController.text.trim().isNotEmpty && !_isLoading)
+                        ? () async {
+                            setState(() => _isLoading = true);
+                            try {
+                              // TODO: Firebase save logic
+                            } finally {
+                              if (mounted) setState(() => _isLoading = false);
+                            }
                           }
                         : null,
                     style: ButtonStyle(
@@ -108,7 +116,13 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                         null,
                       ),
                     ),
-                    child: const Text(
+                    child: _isLoading
+                        ? Lottie.asset(
+                            'assets/animations/loading_nhac.json',
+                            width: 60,
+                            height: 60,
+                          )
+                        : const Text(
                       'Salvar alterações',
                       style: TextStyle(
                         color: Color(0xFFFEE3E1),

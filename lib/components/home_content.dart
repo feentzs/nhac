@@ -1,7 +1,11 @@
+import 'package:flutter/cupertino.dart';
+import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:nhac/controllers/user_provider.dart';
+import 'package:provider/provider.dart';
 
 @NowaGenerated()
 class HomeContent extends StatefulWidget {
@@ -72,14 +76,43 @@ class _HomeContentState extends State<HomeContent> {
     }
   }
 
+  Future<void> _onRefresh() async {
+    await Future.wait([
+      _pegarLocalizacaoUsuario(),
+      context.read<UserProvider>().carregarDadosUsuario(),
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      slivers: [
+        CupertinoSliverRefreshControl(
+          refreshIndicatorExtent: 140.0,
+          refreshTriggerPullDistance: 180.0,
+          onRefresh: _onRefresh,
+          builder: (context, refreshState, pulledExtent, refreshTriggerPullDistance, refreshIndicatorExtent) {
+            return Center(
+              child: Opacity(
+                opacity: (pulledExtent / refreshIndicatorExtent).clamp(0.0, 1.0),
+                child: Lottie.asset(
+                  'assets/animations/loading_nhac.json',
+                  width: 240,
+                  height: 240,
+                  animate: refreshState == RefreshIndicatorMode.refresh ||
+                           refreshState == RefreshIndicatorMode.armed,
+                ),
+              ),
+            );
+          },
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.all(24.0),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
           const SizedBox(height: 16.0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -195,9 +228,11 @@ class _HomeContentState extends State<HomeContent> {
           const SizedBox(height: 16.0),
           const SizedBox(height: 32.0),
           const SizedBox(height: 16.0),
-          const SizedBox(height: 100.0),
-        ],
-      ),
+              const SizedBox(height: 100.0),
+            ]),
+          ),
+        ),
+      ],
     );
   }
 }
