@@ -53,8 +53,6 @@ app.*.map.json
 *.pem
 *.key
 *.crt
-google-services.json
-GoogleService-Info.plist
 .env
 .env.local
 .env.*.local
@@ -81,7 +79,6 @@ GoogleService-Info.plist
 **/android/.idea/
 **/android/captures/
 **/android/build/
-**/android/app/google-services.json
 
 # Windows/Linux/Web
 **/windows/flutter/generated*
