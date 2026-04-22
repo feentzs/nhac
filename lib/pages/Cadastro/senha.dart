@@ -106,18 +106,8 @@ class _SenhaState extends State<Senha> {
                             GoRouter.of(context).go('/home-page');
                           }
                         },
-                        child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                          child: const SizedBox(
-                            width: 21.0,
-                            height: 21.0,
-                            child: Image(
-                              image: AssetImage('assets/Arrow right (3).png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                        child: const Icon(Icons.arrow_back_ios_new,
+                            color: Colors.black87, size: 20),
                       ),
                       const SizedBox(height: 18.0),
                       const Text(
@@ -282,6 +272,7 @@ class _SenhaState extends State<Senha> {
                   : null,
 
                   style: ButtonStyle(
+                    padding: const WidgetStatePropertyAll(EdgeInsets.zero),
                     backgroundColor: WidgetStatePropertyAll<Color>(
                       _senhaValida
                           ? const Color(0xFFFE645C)
@@ -298,10 +289,14 @@ class _SenhaState extends State<Senha> {
                     ),
                   ),
                   child: _isLoading
-                      ? Lottie.asset(
-                          'assets/animations/loading_nhac.json',
-                          width: 60,
-                          height: 60,
+                      ? Transform.scale(
+                          scale: 2.5,
+                          child: Lottie.asset(
+                            'assets/animations/botao_loading_nhac.json',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.contain,
+                          ),
                         )
                       : const Text(
                     'Continuar',

@@ -7,6 +7,8 @@
 		<string>Este aplicativo precisa acessar sua localização.</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>Este aplicativo precisa acessar sua localização.</string>
+		<key>NSFaceIDUsageDescription</key>
+		<string>Autenticação necessária para acessar seus dados pessoais.</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

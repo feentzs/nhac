@@ -3,6 +3,7 @@ import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
+import 'package:nhac/services/biometric_service.dart';
 import 'package:provider/provider.dart';
 
 class ProfileContent extends StatelessWidget {
@@ -398,8 +399,11 @@ class ProfileContent extends StatelessWidget {
                       iconColor: const Color(0xFFFF6961),
                       title: 'Dados Pessoais',
                       subtitle: 'Nome, e-mail, telefone...',
-                      onTap: () {
-                        context.push('/dados-pessoais');
+                      onTap: () async {
+                        final autenticado = await BiometricService.authenticate();
+                        if (autenticado && context.mounted) {
+                          context.push('/dados-pessoais');
+                        }
                       },
                     ),
                     Divider(height: 1, color: Colors.grey.shade100, indent: 64),

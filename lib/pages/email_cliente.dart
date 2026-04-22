@@ -199,16 +199,17 @@ class _EmailClienteState extends State<EmailCliente> {
               width: 351.0,
               child: ElevatedButton(
                onPressed: (_emailValido && !_isLoading)
-    ? () async {
-       setState(() => _isLoading = true);
-       try {
-         await redirecionadorEmail();
-       } finally {
-         if (mounted) setState(() => _isLoading = false);
-       }
-      }
-    : null,
+              ? () async {
+                setState(() => _isLoading = true);
+                try {
+                  await redirecionadorEmail();
+                } finally {
+                  if (mounted) setState(() => _isLoading = false);
+                }
+                }
+              : null,
                 style: ButtonStyle(
+                  padding: const WidgetStatePropertyAll(EdgeInsets.zero),
                   backgroundColor: WidgetStateProperty.resolveWith<Color>((
                     states,
                   ) {
@@ -226,10 +227,14 @@ class _EmailClienteState extends State<EmailCliente> {
                   ),
                 ),
                 child: _isLoading
-                    ? Lottie.asset(
-                        'assets/animations/loading_nhac.json',
-                        width: 60,
-                        height: 60,
+                    ? Transform.scale(
+                        scale: 2.5,
+                        child: Lottie.asset(
+                          'assets/animations/botao_loading_nhac.json',
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.contain,
+                        ),
                       )
                     : const Text(
                   'Continuar',
@@ -257,15 +262,8 @@ class _EmailClienteState extends State<EmailCliente> {
                     GoRouter.of(context).go('/home-page');
                   }
                 },
-                child: Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
-                  origin: const Offset(0.0, 0.0),
-                  child: const Image(
-                    image: AssetImage('assets/Arrow right (3).png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                child: const Icon(Icons.arrow_back_ios_new,
+                    color: Colors.black87, size: 20),
               ),
             ),
             Positioned(
