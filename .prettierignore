@@ -1,0 +1,21 @@
+# Pastas geradas pelo Flutter
+.dart_tool/
+build/
+ios/
+android/
+macos/
+linux/
+windows/
+
+# Pastas de dependências
+node_modules/
+.nowa/
+
+# Arquivos de lock
+pubspec.lock
+package-lock.json
+
+# Metadados
+.metadata
+.vscode/
+.idea/

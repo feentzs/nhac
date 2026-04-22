@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:nhac/globals/exceptions.dart';
 import 'package:nhac/models/usuario/usuario_model.dart'; 
 import 'package:nhac/repository/user_repository.dart'; 
 
@@ -13,7 +14,7 @@ class AuthService with ChangeNotifier {
 
   User? get currentUser => _auth.currentUser;
 
-  Future<void> signInWithGoogle(BuildContext context) async {
+  Future<void> signInWithGoogle() async {
     _setLoading(true);
 
     try {
@@ -52,24 +53,8 @@ class AuthService with ChangeNotifier {
         }
       }
 
-    } on FirebaseAuthException catch (e) {
-      if (!context.mounted) return;
-
-      String message = "Erro ao entrar com Google.";
-      if (e.code == 'account-exists-with-different-credential') {
-        message = "Este e-mail já está associado a outra conta.";
-      } else if (e.code == 'invalid-credential') {
-        message = "Credenciais inválidas. Tente novamente.";
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
-      );
     } catch(e) {
-      if (!context.mounted) return; 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro inesperado: $e")),
-      );
+      throw mapException(e);
     } finally {
       _setLoading(false);
     }
@@ -90,19 +75,20 @@ class AuthService with ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    UserCredential credencial = await _auth.signInWithEmailAndPassword(email: email, password: password);
+    try {
+      UserCredential credencial = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
-    final usuario = await _userRepository.buscarUsuario(credencial.user!.uid);
-    
-    if (usuario != null && !usuario.ativo) {
-      await _auth.signOut(); 
-      throw FirebaseAuthException(
-        code: 'user-disabled',
-        message: 'Esta conta foi desativada pelo usuário.',
-      );
+      final usuario = await _userRepository.buscarUsuario(credencial.user!.uid);
+      
+      if (usuario != null && !usuario.ativo) {
+        await _auth.signOut(); 
+        throw AuthException('Esta conta foi desativada pelo usuário.');
+      }
+
+      return credencial;
+    } catch (e) {
+      throw mapException(e);
     }
-
-    return credencial;
   }
 
   Future<UserCredential> createAccount({
@@ -130,8 +116,7 @@ class AuthService with ChangeNotifier {
       return credencial;
 
     } catch (e) {
-      print("Erro ao criar conta: $e");
-      rethrow;
+      throw mapException(e);
     }
   }
   
@@ -141,15 +126,21 @@ class AuthService with ChangeNotifier {
   }
 
   Future<void> resetPassword({required String email}) async {
-    return await _auth.sendPasswordResetEmail(email: email);
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   Future<void> updateUserName({required String userName}) async {
-    await currentUser!.updateDisplayName(userName);
-    
-    await _userRepository.atualizarDadosUsuario(currentUser!.uid, {'nome': userName});
-        
-    notifyListeners();
+    try {
+      await currentUser!.updateDisplayName(userName);
+      await _userRepository.atualizarDadosUsuario(currentUser!.uid, {'nome': userName});
+      notifyListeners();
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   Future<void> desativarConta({
@@ -165,10 +156,10 @@ class AuthService with ChangeNotifier {
       await _auth.signOut();
       notifyListeners();
     } catch (e) {
-      print("Erro ao desativar conta: $e");
-      rethrow;
+      throw mapException(e);
     }
   }
+
 
   Future<void> resetPasswordFromCurrentPassword({
     required String currentPassword,

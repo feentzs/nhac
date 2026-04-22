@@ -8,6 +8,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:nhac/globals/exceptions.dart';
+import 'package:nhac/globals/ui_utils.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -186,9 +188,15 @@ class _EmailClienteState extends State<EmailCliente> {
                 height: 49.0,
                 child: ElevatedButton(
                   onPressed: () async {
-                    await context.read<AuthService>().signInWithGoogle(context);
-                    if (!context.mounted) return;
-                    context.go('/home-page');
+                    try {
+                      await context.read<AuthService>().signInWithGoogle();
+                      if (!context.mounted) return;
+                      context.go('/home-page');
+                    } catch (e) {
+                      if (context.mounted) {
+                        context.showError(e.toString());
+                      }
+                    }
                   },
                   style: ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll<Color?>(
@@ -299,13 +307,7 @@ class _EmailClienteState extends State<EmailCliente> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              emailExiste ? "Bem-vindo de volta!" : "A criar a sua conta..."),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+      context.showInfo(emailExiste ? "Bem-vindo de volta!" : "Criando sua conta...");
 
       cadastroData.setEmail(emailDoUsuario);
 
@@ -316,11 +318,7 @@ class _EmailClienteState extends State<EmailCliente> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Erro ao verificar email: $e"),
-            backgroundColor: Colors.red),
-      );
+      context.showError("Erro ao verificar email: $e");
     }
   }
 }
