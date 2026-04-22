@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
@@ -25,6 +26,7 @@ class _EmailClienteState extends State<EmailCliente> {
 
 
   bool _emailValido = false;
+  bool _isLoading = false;
 
   final List<String> _dominios = [
     '@gmail.com',
@@ -196,9 +198,14 @@ class _EmailClienteState extends State<EmailCliente> {
               height: 49.0,
               width: 351.0,
               child: ElevatedButton(
-               onPressed: _emailValido
+               onPressed: (_emailValido && !_isLoading)
     ? () async {
-       await redirecionadorEmail();
+       setState(() => _isLoading = true);
+       try {
+         await redirecionadorEmail();
+       } finally {
+         if (mounted) setState(() => _isLoading = false);
+       }
       }
     : null,
                 style: ButtonStyle(
@@ -218,7 +225,13 @@ class _EmailClienteState extends State<EmailCliente> {
                     null,
                   ),
                 ),
-                child: const Text(
+                child: _isLoading
+                    ? Lottie.asset(
+                        'assets/animations/loading_nhac.json',
+                        width: 60,
+                        height: 60,
+                      )
+                    : const Text(
                   'Continuar',
                   style: TextStyle(
                     color: Color(0xFFFEE3E1),

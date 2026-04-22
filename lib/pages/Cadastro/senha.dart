@@ -1,6 +1,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
@@ -22,6 +23,7 @@ class Senha extends StatefulWidget {
 @NowaGenerated()
 class _SenhaState extends State<Senha> {
   bool _senhaValida = false;
+  bool _isLoading = false;
 
   String? _erroSenha;
 
@@ -268,7 +270,16 @@ class _SenhaState extends State<Senha> {
                 height: 49.0,
                 width: double.infinity,
                 child: ElevatedButton(
-              onPressed: _senhaValida ? () => cadastrar() : null,
+              onPressed: (_senhaValida && !_isLoading)
+                  ? () async {
+                      setState(() => _isLoading = true);
+                      try {
+                        await cadastrar();
+                      } finally {
+                        if (mounted) setState(() => _isLoading = false);
+                      }
+                    }
+                  : null,
 
                   style: ButtonStyle(
                     backgroundColor: WidgetStatePropertyAll<Color>(
@@ -286,7 +297,13 @@ class _SenhaState extends State<Senha> {
                       ),
                     ),
                   ),
-                  child: const Text(
+                  child: _isLoading
+                      ? Lottie.asset(
+                          'assets/animations/loading_nhac.json',
+                          width: 60,
+                          height: 60,
+                        )
+                      : const Text(
                     'Continuar',
                     style: TextStyle(
                       color: Color(0xFFFEE3E1),
@@ -304,7 +321,7 @@ class _SenhaState extends State<Senha> {
     );
   }
   
- void cadastrar() async {
+ Future<void> cadastrar() async {
   try {
     final authService = context.read<AuthService>();
     final cadastroData = context.read<CadastroController>();

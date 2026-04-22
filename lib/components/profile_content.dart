@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
@@ -22,12 +24,37 @@ class ProfileContent extends StatelessWidget {
       ),
       child: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
+          slivers: [
+            CupertinoSliverRefreshControl(
+              refreshIndicatorExtent: 140.0,
+              refreshTriggerPullDistance: 180.0,
+              onRefresh: () async {
+                await context.read<UserProvider>().carregarDadosUsuario();
+              },
+              builder: (context, refreshState, pulledExtent, refreshTriggerPullDistance, refreshIndicatorExtent) {
+                return Center(
+                  child: Opacity(
+                    opacity: (pulledExtent / refreshIndicatorExtent).clamp(0.0, 1.0),
+                    child: Lottie.asset(
+                      'assets/animations/loading_nhac.json',
+                      width: 240,
+                      height: 240,
+                      animate: refreshState == RefreshIndicatorMode.refresh ||
+                               refreshState == RefreshIndicatorMode.armed,
+                    ),
+                  ),
+                );
+              },
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              sliver: SliverList(
+                delegate: SliverChildListDelegate([
+              const SizedBox(height: 16.0),
               const SizedBox(height: 16.0),
 
               Row(
@@ -442,10 +469,12 @@ class ProfileContent extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 120.0),
-            ],
+                const SizedBox(height: 120.0),
+              ]),
+            ),
           ),
-        ),
+        ],
+      ),
       ),
     );
   }

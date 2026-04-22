@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
@@ -24,6 +25,7 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
 
   
   bool _senhaValida = false;
+  bool _isLoading = false;
 
   TextEditingController text = TextEditingController();
 
@@ -45,7 +47,7 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
     super.dispose();
   }
 
-  void logar() async {
+  Future<void> logar() async {
   try {
       final authService = context.read<AuthService>();
       final cadastroData = context.read<CadastroController>();
@@ -206,8 +208,15 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                 height: 49.0,
                 width: double.infinity,
                 child: ElevatedButton(
-                 onPressed: _senhaValida 
-  ? () => logar() 
+                 onPressed: (_senhaValida && !_isLoading)
+  ? () async {
+    setState(() => _isLoading = true);
+    try {
+      await logar();
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
   : null,
 
 
@@ -227,7 +236,13 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                       ),
                     ),
                   ),
-                  child: const Text(
+                  child: _isLoading
+                      ? Lottie.asset(
+                          'assets/animations/loading_nhac.json',
+                          width: 60,
+                          height: 60,
+                        )
+                      : const Text(
                     'Continuar',
                     style: TextStyle(
                       color: Color(0xFFFEE3E1),

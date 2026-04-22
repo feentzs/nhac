@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:go_router/go_router.dart';
 
 class EditarEmailPage extends StatefulWidget {
@@ -10,6 +11,7 @@ class EditarEmailPage extends StatefulWidget {
 
 class _EditarEmailPageState extends State<EditarEmailPage> {
   final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -82,8 +84,15 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                   width: double.infinity,
                   height: 49.0,
                   child: ElevatedButton(
-                    onPressed: _emailController.text.trim().isNotEmpty
-                        ? () {
+                    onPressed: (_emailController.text.trim().isNotEmpty &&
+                            !_isLoading)
+                        ? () async {
+                            setState(() => _isLoading = true);
+                            try {
+                              // TODO: Firebase save logic
+                            } finally {
+                              if (mounted) setState(() => _isLoading = false);
+                            }
                           }
                         : null,
                     style: ButtonStyle(
@@ -95,23 +104,31 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                         }
                         return const Color(0xFFFE645C);
                       }),
-                      foregroundColor: const WidgetStatePropertyAll<Color?>(null),
+                      foregroundColor:
+                          const WidgetStatePropertyAll<Color?>(null),
                       shadowColor: const WidgetStatePropertyAll<Color?>(null),
                       elevation: const WidgetStatePropertyAll<double?>(null),
                       side: const WidgetStatePropertyAll<BorderSide?>(null),
-                      shape: const WidgetStatePropertyAll<RoundedRectangleBorder?>(
+                      shape:
+                          const WidgetStatePropertyAll<RoundedRectangleBorder?>(
                         null,
                       ),
                     ),
-                    child: const Text(
-                      'Continuar',
-                      style: TextStyle(
-                        color: Color(0xFFFEE3E1),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.1,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? Lottie.asset(
+                            'assets/animations/loading_nhac.json',
+                            width: 60,
+                            height: 60,
+                          )
+                        : const Text(
+                            'Continuar',
+                            style: TextStyle(
+                              color: Color(0xFFFEE3E1),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.1,
+                            ),
+                          ),
                   ),
                 ),
               ),
