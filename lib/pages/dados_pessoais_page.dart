@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:nhac/controllers/user_provider.dart';
+import 'package:lottie/lottie.dart';
 
 class DadosPessoaisPage extends StatelessWidget {
   const DadosPessoaisPage({super.key});
@@ -57,6 +60,22 @@ class DadosPessoaisPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final usuario = userProvider.usuario;
+
+    if (usuario == null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFFFE7E5),
+        body: Center(
+          child: Lottie.asset(
+            'assets/animations/loading_nhac.json',
+            width: 340,
+            height: 340,
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFE7E5),
       appBar: AppBar(
@@ -64,7 +83,8 @@ class DadosPessoaisPage extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: Colors.black87, size: 20),
           onPressed: () => context.pop(),
         ),
         title: const Text(
@@ -81,9 +101,13 @@ class DadosPessoaisPage extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           children: [
             const SizedBox(height: 16.0),
-            _buildListItem('Nome', value: 'Tuxedo Guaraná', onTap: () => context.push('/editar-nome-preferencia')),
-            _buildListItem('E-mail', value: 't***0@gmail.com', onTap: () => context.push('/editar-email')),
-            _buildListItem('Telefone', value: '*******0759'),
+            _buildListItem('Nome',
+                value: usuario.nome,
+                onTap: () => context.push('/editar-nome-preferencia')),
+            _buildListItem('E-mail',
+                value: usuario.email,
+                onTap: () => context.push('/editar-email')),
+            _buildListItem('Telefone', value: usuario.telefone),
             _buildListItem('Senha', value: '**********'),
   
           ],

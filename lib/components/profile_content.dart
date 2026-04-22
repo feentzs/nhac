@@ -24,9 +24,18 @@ class _ProfileContentState extends State<ProfileContent> {
     final userProvider = context.watch<UserProvider>();
   final usuario = userProvider.usuario;
 
-   if (usuario == null) {
-     return const Center(child: CircularProgressIndicator());
-   }
+    if (usuario == null) {
+      return Container(
+        color: const Color(0xFFFFE7E5),
+        child: Center(
+          child: Lottie.asset(
+            'assets/animations/loading_nhac.json',
+            width: 340,
+            height: 340,
+          ),
+        ),
+      );
+    }
 
     return Container(
       decoration: const BoxDecoration(
@@ -385,7 +394,7 @@ class _ProfileContentState extends State<ProfileContent> {
             children: [
               RichText(
                 text: TextSpan( 
-                  // text: usuario.nome,
+                  text: usuario.nome,
                   style: const TextStyle(
                     fontSize: 22.0,
                     fontWeight: FontWeight.bold,
