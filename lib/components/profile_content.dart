@@ -300,9 +300,11 @@ class _ProfileContentState extends State<ProfileContent> {
                           ],
                         ),
                         child: _isUploading
-                            ? const Center(
-                                child: CircularProgressIndicator(
-                                  color: Color(0xFFFF6961),
+                            ? Center(
+                                child: Lottie.asset(
+                                  'assets/animations/loading_nhac.json',
+                                  width: 40,
+                                  height: 40,
                                 ),
                               )
                             : (usuario != null && usuario.fotoUrl.isNotEmpty)
@@ -360,13 +362,12 @@ class _ProfileContentState extends State<ProfileContent> {
                                 color: Colors.black87,
                                 shape: BoxShape.circle,
                               ),
-                              child: _isUploading
-                                  ? const SizedBox(
+                               child: _isUploading
+                                  ? SizedBox(
                                       width: 12,
                                       height: 12,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
+                                      child: Lottie.asset(
+                                        'assets/animations/loading_nhac.json',
                                       ),
                                     )
                                   : const Icon(Icons.edit,
