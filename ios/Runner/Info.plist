@@ -11,6 +11,8 @@
 		<string>Autenticação necessária para acessar seus dados pessoais.</string>
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Precisamos de acesso à sua galeria para você escolher sua foto de perfil.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Precisamos de acesso à sua câmera para você tirar uma foto de perfil.</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

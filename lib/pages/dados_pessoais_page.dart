@@ -108,6 +108,11 @@ class DadosPessoaisPage extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           children: [
             const SizedBox(height: 16.0),
+            _buildListItem(
+              'Foto de Perfil',
+              value: usuario.fotoUrl.isNotEmpty ? 'Alterar foto' : 'Adicionar foto',
+              onTap: () => context.push('/editar-foto'),
+            ),
             _buildListItem('Nome', value: usuario.nome, onTap: () => context.push('/editar-nome-preferencia')),
             _buildListItem(
               'E-mail',
