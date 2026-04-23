@@ -62,13 +62,20 @@ class _EmailClienteState extends State<EmailCliente> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
              const SetaVoltar(),
              const SizedBox(height: 24.0),
               const Text(
@@ -90,7 +97,7 @@ class _EmailClienteState extends State<EmailCliente> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 22.0),
 
               TextFormField(
                 controller: _emailController,
@@ -156,7 +163,7 @@ class _EmailClienteState extends State<EmailCliente> {
                   physics: const BouncingScrollPhysics(),
                 ),
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 22.0),
 
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -180,7 +187,7 @@ class _EmailClienteState extends State<EmailCliente> {
                   ),
                 ],
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 22.0),
 
               SizedBox(
                 width: double.infinity,
@@ -188,7 +195,7 @@ class _EmailClienteState extends State<EmailCliente> {
                 child: ElevatedButton(
                   onPressed: () async {
                     try {
-                      await context.read<AuthService>().signInWithGoogle();
+                      await context.read<AuthService>().signInWithGoogle(context);
                       if (!context.mounted) return;
                       context.go('/home-page');
                     } catch (e) {
@@ -277,7 +284,11 @@ class _EmailClienteState extends State<EmailCliente> {
                 ),
               ),
 
-              const Spacer(),
+                    ],
+                  ),
+                ),
+              ),
+
 
               SizedBox(
                 width: double.infinity,

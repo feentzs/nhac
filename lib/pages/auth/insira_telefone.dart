@@ -1,3 +1,4 @@
+import 'package:nhac/components/seta_voltar.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:nhac/services/auth_service.dart';
@@ -52,26 +53,7 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (GoRouter.of(context).canPop()) {
-                            GoRouter.of(context).pop();
-                          } else {
-                            GoRouter.of(context).go('/home-page');
-                          }
-                        },
-                        child: Transform.scale(
-                          scaleX: -1.0,
-                          child: const SizedBox(
-                            width: 21.0,
-                            height: 21.0,
-                            child: Image(
-                              image: AssetImage('assets/Arrow right (3).png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
+                      const SetaVoltar(),
                       const SizedBox(height: 24.0),
                       
                       const Text(

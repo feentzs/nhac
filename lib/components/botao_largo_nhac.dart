@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class BotaoLargoNhac extends StatelessWidget {
   final String texto;
@@ -33,12 +34,13 @@ class BotaoLargoNhac extends StatelessWidget {
           ),
         ),
         child: carregando
-            ? const SizedBox(
-                height: 20.0,
-                width: 20.0,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.0,
+            ? Transform.scale(
+                scale: 2.5,
+                child: Lottie.asset(
+                  'assets/animations/botao_loading_nhac.json',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.contain,
                 ),
               )
             : Text(

@@ -14,7 +14,7 @@ class AuthService with ChangeNotifier {
 
   User? get currentUser => _auth.currentUser;
 
-  Future<void> signInWithGoogle() async {
+  Future<void> signInWithGoogle(BuildContext context) async {
     _setLoading(true);
 
     try {

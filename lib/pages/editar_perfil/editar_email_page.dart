@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
@@ -205,7 +206,15 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: carregandoDialog
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      ? Transform.scale(
+                          scale: 2.5,
+                          child: Lottie.asset(
+                            'assets/animations/botao_loading_nhac.json',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.contain,
+                          ),
+                        )
                       : const Text('Confirmar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ],
