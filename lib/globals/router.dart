@@ -18,6 +18,7 @@ import 'package:nhac/pages/editar_perfil/editar_foto_page.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:nhac/pages/auth/cadastro/telefone_cadastro.dart';
+import 'package:nhac/pages/enderecos_page.dart';
 
 class _SlideRightToLeftPageRoute<T> extends PageRoute<T>
     with MaterialRouteTransitionMixin<T> {
@@ -239,6 +240,13 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
         child: const EditarFotoPage(),
+      ),
+    ),
+    GoRoute(
+      path: '/enderecos-salvos',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const EnderecosPage(),
       ),
     ),
   ],

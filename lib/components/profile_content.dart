@@ -491,6 +491,7 @@ class _ProfileContentState extends State<ProfileContent> {
                       iconColor: const Color(0xFFFF6961),
                       title: 'Endereços Salvos',
                       subtitle: 'Casa, Trabalho...',
+                      onTap: () => context.push('/enderecos-salvos'),
                     ),
                     Divider(height: 1, color: Colors.grey.shade100, indent: 64),
                     _buildAccountRow(

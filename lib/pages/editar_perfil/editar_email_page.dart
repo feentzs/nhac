@@ -135,6 +135,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      
                     ),
                   ),
                 ],
@@ -294,6 +295,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                             borderSide: BorderSide(color: Colors.black87),
                           ),
                           contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                          hintText: 'Email',
+                          hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
                         ),
                         style: const TextStyle(
                           fontSize: 18.0,
