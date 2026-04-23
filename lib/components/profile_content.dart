@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
@@ -300,42 +301,46 @@ class _ProfileContentState extends State<ProfileContent> {
                 children: [
                   Stack(
                     children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                          image: (usuario.fotoUrl.isNotEmpty)
-                              ? DecorationImage(
-                                  image: NetworkImage(usuario.fotoUrl),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: _isUploading
-                            ? Center(
-                                child: Lottie.asset(
-                                  'assets/animations/loading_nhac.json',
-                                  width: 40,
-                                  height: 40,
-                                ),
+                  GestureDetector(
+                    onLongPress: () => _mostrarPreviewFoto(context, usuario.fotoUrl),
+                    onLongPressUp: () => Navigator.of(context).pop(),
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        image: (usuario.fotoUrl.isNotEmpty)
+                            ? DecorationImage(
+                                image: NetworkImage(usuario.fotoUrl),
+                                fit: BoxFit.cover,
                               )
-                            : (usuario.fotoUrl.isNotEmpty)
-                                ? null
-                                : Icon(
-                                    Icons.person,
-                                    size: 48,
-                                    color: Colors.grey.shade400,
-                                  ),
+                            : null,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
+                      child: _isUploading
+                          ? Center(
+                              child: Lottie.asset(
+                                'assets/animations/loading_nhac.json',
+                                width: 40,
+                                height: 40,
+                              ),
+                            )
+                          : (usuario.fotoUrl.isNotEmpty)
+                              ? null
+                              : Icon(
+                                  Icons.person,
+                                  size: 48,
+                                  color: Colors.grey.shade400,
+                                ),
+                    ),
+                  ),
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -671,6 +676,67 @@ class _ProfileContentState extends State<ProfileContent> {
           ),
         ),
       ],
+    );
+  }
+
+  void _mostrarPreviewFoto(BuildContext context, String? fotoUrl) {
+    showGeneralPage(
+      context,
+      BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+        child: GestureDetector(
+          onTap: () => Navigator.of(context).pop(),
+          child: Container(
+            color: Colors.black.withValues(alpha: 0.4),
+            child: Center(
+              child: Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  border: Border.all(color: Colors.white, width: 4),
+                  image: (fotoUrl != null && fotoUrl.isNotEmpty)
+                      ? DecorationImage(
+                          image: NetworkImage(fotoUrl),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 30,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: (fotoUrl == null || fotoUrl.isEmpty)
+                    ? Icon(Icons.person, size: 160, color: Colors.grey.shade300)
+                    : null,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showGeneralPage(BuildContext context, Widget child) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        barrierDismissible: true,
+        barrierColor: Colors.transparent,
+        transitionDuration: const Duration(milliseconds: 110),
+        reverseTransitionDuration: const Duration(milliseconds: 110),
+        pageBuilder: (context, _, __) => child,
+        transitionsBuilder: (context, animation, __, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+      ),
     );
   }
 }
