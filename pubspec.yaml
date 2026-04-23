@@ -28,11 +28,13 @@ dependencies:
   local_auth: ^2.3.0
   image_picker: ^1.1.2
   firebase_storage: ^13.3.0
+  connectivity_plus: ^7.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_native_splash: ^2.3.1
+  network_image_mock: ^2.1.1
 
 flutter:
   uses-material-design: true

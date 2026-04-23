@@ -4,12 +4,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nhac/controllers/user_provider.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:nhac/services/biometric_service.dart';
 import 'package:provider/provider.dart';
 
 class ProfileContent extends StatefulWidget {
-  
   const ProfileContent({super.key});
 
   @override
@@ -19,10 +20,190 @@ class ProfileContent extends StatefulWidget {
 class _ProfileContentState extends State<ProfileContent> {
   bool _isUploading = false;
 
+  void _logoutUsuario(BuildContext context) async {
+    final authService = context.read<AuthService>();
+    final userProvider = context.read<UserProvider>();
+    final carrinho = context.read<CartProvider>();
+
+    Navigator.pop(context); 
+
+    userProvider.limparUsuario();
+    carrinho.limparCarrinhoLocal();
+
+    await authService.signOut();
+    if (!context.mounted) return;
+
+    context.go('/bem-vindo');
+  }
+
+  void _abrirNotificacoes(BuildContext context) {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 400),
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Notificações',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.notifications_off_outlined, size: 64, color: Colors.grey.shade300),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Você não tem novas notificações.',
+                              style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.fastOutSlowIn;
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+      ),
+    );
+  }
+
+  void _mostrarOpcoesConta(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext ctx) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(40),
+              topRight: Radius.circular(40),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Opções da Conta',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 32),
+              InkWell(
+                onTap: () {},
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.help_outline, color: Colors.grey.shade700),
+                          const SizedBox(width: 12),
+                          Text('Ajuda', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey.shade700)),
+                        ],
+                      ),
+                      Icon(Icons.chevron_right, color: Colors.grey.shade400),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: () => _logoutUsuario(context), 
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.logout, color: Colors.grey.shade700),
+                          const SizedBox(width: 12),
+                          Text('Sair da conta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey.shade700)),
+                        ],
+                      ),
+                      Icon(Icons.chevron_right, color: Colors.grey.shade400),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 48),
+              SizedBox(
+                width: double.infinity,
+                height: 56.0,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF6961),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28.0),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Voltar',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
-  final usuario = userProvider.usuario;
+    final usuario = userProvider.usuario;
 
     if (usuario == null) {
       return Container(
@@ -80,74 +261,7 @@ class _ProfileContentState extends State<ProfileContent> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          transitionDuration: const Duration(milliseconds: 400),
-                          pageBuilder: (context, animation, secondaryAnimation) {
-                            return Scaffold(
-                              
-                              backgroundColor: Colors.white,
-                              body: SafeArea(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          const Text(
-                                            'Notificações',
-                                            style: TextStyle(
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.close),
-                                            onPressed: () => Navigator.pop(context),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 32),
-                                      Expanded(
-                                        child: Center(
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Icon(Icons.notifications_off_outlined, size: 64, color: Colors.grey.shade300),
-                                              const SizedBox(height: 16),
-                                              Text(
-                                                'Você não tem novas notificações.',
-                                                style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(0.0, 1.0);
-                            const end = Offset.zero;
-                            const curve = Curves.fastOutSlowIn;
-
-                            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-                            return SlideTransition(
-                              position: animation.drive(tween),
-                              child: child,
-                            );
-                          },
-                        ),
-                      );
-                    },
+                    onTap: () => _abrirNotificacoes(context), 
                     child: Container(
                       width: 40,
                       height: 40,
@@ -155,8 +269,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         color: Colors.white.withValues(alpha: 0.6),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.notifications_none,
-                          color: Colors.black87),
+                      child: const Icon(Icons.notifications_none, color: Colors.black87),
                     ),
                   ),
                   const Text(
@@ -168,108 +281,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.transparent,
-                        builder: (BuildContext context) {
-                          return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 32.0),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(40),
-                                topRight: Radius.circular(40),
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Opções da Conta',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 32),
-                                InkWell(
-                                  onTap: () {},
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(Icons.help_outline, color: Colors.grey.shade700),
-                                            const SizedBox(width: 12),
-                                            Text('Ajuda', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey.shade700)),
-                                          ],
-                                        ),
-                                        Icon(Icons.chevron_right, color: Colors.grey.shade400),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Saindo...')),
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(Icons.logout, color: Colors.grey.shade700),
-                                            const SizedBox(width: 12),
-                                            Text('Sair da conta', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey.shade700)),
-                                          ],
-                                        ),
-                                        Icon(Icons.chevron_right, color: Colors.grey.shade400),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 48),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 56.0,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFFFF6961),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(28.0),
-                                      ),
-                                      elevation: 0,
-                                    ),
-                                    child: const Text(
-                                      'Voltar',
-                                      style: TextStyle(
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
+                    onTap: () => _mostrarOpcoesConta(context), 
                     child: Container(
                       width: 40,
                       height: 40,
@@ -294,10 +306,10 @@ class _ProfileContentState extends State<ProfileContent> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white,
-                          image: (usuario != null && usuario.fotoUrl.isNotEmpty)
+                          image: (usuario.fotoUrl.isNotEmpty)
                               ? DecorationImage(
                                   image: NetworkImage(usuario.fotoUrl),
-                                  fit: BoxFit.cover, 
+                                  fit: BoxFit.cover,
                                 )
                               : null,
                           boxShadow: [
@@ -316,7 +328,7 @@ class _ProfileContentState extends State<ProfileContent> {
                                   height: 40,
                                 ),
                               )
-                            : (usuario != null && usuario.fotoUrl.isNotEmpty)
+                            : (usuario.fotoUrl.isNotEmpty)
                                 ? null
                                 : Icon(
                                     Icons.person,
@@ -387,32 +399,30 @@ class _ProfileContentState extends State<ProfileContent> {
                       ),
                     ],
                   ),
-                 const SizedBox(width: 16.0),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: TextSpan( 
-                  text: usuario.nome,
-                  style: const TextStyle(
-                    fontSize: 22.0,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5D201C),
-                    fontFamily: 'Roboto', 
-                  ),
-                ),
-              ),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RichText(
+                          text: TextSpan(
+                            text: usuario.nome,
+                            style: const TextStyle(
+                              fontSize: 22.0,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF5D201C),
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 4.0),
                         Row(
                           children: [
-                            Icon(Icons.location_on_outlined,
-                                size: 14, color: Colors.grey.shade600),
+                            Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
                             const SizedBox(width: 4.0),
                             Text(
                               'Rua das Palmeiras, 120',
-                              style: TextStyle(
-                                  color: Colors.grey.shade700, fontSize: 12),
+                              style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
                             ),
                           ],
                         ),
@@ -424,7 +434,6 @@ class _ProfileContentState extends State<ProfileContent> {
               ),
               const SizedBox(height: 32.0),
 
-              // Stats
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -524,16 +533,13 @@ class _ProfileContentState extends State<ProfileContent> {
                     children: [
                       _buildPreferenceItem(Icons.local_pizza, 'Pizza', true),
                       const SizedBox(width: 20.0),
-                      _buildPreferenceItem(
-                          Icons.ramen_dining, 'Vegetariana', false),
+                      _buildPreferenceItem(Icons.ramen_dining, 'Vegetariana', false),
                       const SizedBox(width: 20.0),
                       _buildPreferenceItem(Icons.fastfood, 'Salgados', false),
                       const SizedBox(width: 20.0),
-                      _buildPreferenceItem(
-                          Icons.bakery_dining, 'Padarias', false),
+                      _buildPreferenceItem(Icons.bakery_dining, 'Padarias', false),
                       const SizedBox(width: 20.0),
-                      _buildPreferenceItem(
-                          Icons.set_meal, 'Frutos do mar', false),
+                      _buildPreferenceItem(Icons.set_meal, 'Frutos do mar', false),
                       const SizedBox(width: 20.0),
                       _buildPreferenceItem(Icons.cake, 'Doces', false),
                     ],
@@ -546,24 +552,6 @@ class _ProfileContentState extends State<ProfileContent> {
           ),
         ],
       ),
-      ),
-    );
-  }
-
-  Widget _buildTag(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 10.0,
-          fontWeight: FontWeight.bold,
-        ),
       ),
     );
   }
@@ -602,44 +590,44 @@ class _ProfileContentState extends State<ProfileContent> {
     return InkWell(
       onTap: onTap,
       child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 24),
             ),
-            child: Icon(icon, color: iconColor, size: 24),
-          ),
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15.0,
-                    color: Colors.black87,
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15.0,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12.0,
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12.0,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Icon(Icons.chevron_right, color: Colors.grey),
-        ],
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
       ),
-    ),
     );
   }
 

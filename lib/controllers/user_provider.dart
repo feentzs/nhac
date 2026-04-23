@@ -1,26 +1,50 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:nhac/models/user_model.dart';
+import 'package:nhac/models/usuario/usuario_model.dart';
+import 'package:nhac/repository/user_repository.dart';
 
 class UserProvider with ChangeNotifier {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final UserRepository _userRepository = UserRepository();
   
-  UserModel? _usuario;
+  UsuarioModel? _usuario;
+  
+  StreamSubscription<UsuarioModel?>? _usuarioSubscription; 
 
-  UserModel? get usuario => _usuario;
+  UsuarioModel? get usuario => _usuario;
+
+  void iniciarEscutaUsuario() {
+    final user = _auth.currentUser;
+    
+    if (user != null) {
+      _usuarioSubscription?.cancel(); 
+      
+      _usuarioSubscription = _userRepository.ouvirUsuario(user.uid).listen((usuarioAtualizado) {
+        
+        _usuario = usuarioAtualizado;
+        
+        if (_usuario != null && !_usuario!.ativo) {
+           _auth.signOut();
+           limparUsuario();
+           return;
+        }
+
+        notifyListeners(); 
+      });
+    }
+  }
 
   Future<void> carregarDadosUsuario() async {
-  final user = _auth.currentUser;
-  if (user != null) {
-    DocumentSnapshot doc = await _firestore.collection('usuarios').doc(user.uid).get();
-    
-      if (doc.exists) {
-        _usuario = UserModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        _usuario = await _userRepository.buscarUsuario(user.uid);
         notifyListeners();
+      } catch (e) {
+        debugPrint("Erro ao carregar dados do usuário: $e");
       }
     }
   }
@@ -29,23 +53,35 @@ class UserProvider with ChangeNotifier {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('perfil_fotos')
-        .child('${user.uid}.jpg');
+    try {
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('perfil_fotos')
+          .child('${user.uid}.jpg');
 
-    await ref.putFile(imagem);
-    final url = await ref.getDownloadURL();
+      await ref.putFile(imagem);
+      final url = await ref.getDownloadURL();
 
-    await _firestore.collection('usuarios').doc(user.uid).update({
-      'foto_url': url,
-    });
+      await _userRepository.atualizarDadosUsuario(user.uid, {
+        'foto_url': url,
+      });
 
-    await carregarDadosUsuario();
+      await carregarDadosUsuario();
+    } catch (e) {
+      debugPrint("Erro ao atualizar foto de perfil: $e");
+      rethrow;
+    }
   }
 
   void limparUsuario() {
     _usuario = null;
+    _usuarioSubscription?.cancel(); 
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _usuarioSubscription?.cancel(); 
+    super.dispose();
   }
 }

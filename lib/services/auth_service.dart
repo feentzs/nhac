@@ -1,20 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:nhac/models/user_model.dart';
+import 'package:nhac/globals/exceptions.dart';
+import 'package:nhac/models/usuario/usuario_model.dart'; 
+import 'package:nhac/repository/user_repository.dart'; 
 
-
-class AuthService with ChangeNotifier{
+class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final UserRepository _userRepository = UserRepository();
 
   bool isLoading = false;
 
   User? get currentUser => _auth.currentUser;
 
-  Future<void> signInWithGoogle(BuildContext context) async {
+  Future<void> signInWithGoogle() async {
     _setLoading(true);
 
     try {
@@ -33,51 +33,32 @@ class AuthService with ChangeNotifier{
 
       UserCredential userCredencial = await _auth.signInWithCredential(credential);
 
-     
-      final docUsuario = await _firestore.collection('usuarios').doc(userCredencial.user!.uid).get();
+      final usuarioExistente = await _userRepository.buscarUsuario(userCredencial.user!.uid);
 
-      
-      if (!docUsuario.exists) {
-        UserModel novoUsuarioGoogle = UserModel(
+      if (usuarioExistente == null) {
+        UsuarioModel novoUsuarioGoogle = UsuarioModel(
           uid: userCredencial.user!.uid,
           nome: userCredencial.user!.displayName ?? 'Usuário Google', 
           email: userCredencial.user!.email ?? '', 
           fotoUrl: userCredencial.user!.photoURL ?? '', 
+          telefone: userCredencial.user!.phoneNumber ?? '',
         );
-
-        await _firestore
-            .collection('usuarios')
-            .doc(userCredencial.user!.uid)
-            .set(novoUsuarioGoogle.toMap());
+        await _userRepository.salvarUsuario(novoUsuarioGoogle);
+      } else {
+        if (userCredencial.user!.photoURL != null && userCredencial.user!.photoURL!.isNotEmpty) {
+          await _userRepository.atualizarDadosUsuario(
+            userCredencial.user!.uid, 
+            {'foto_url': userCredencial.user!.photoURL}
+          );
+        }
       }
 
-      
-
-    } on FirebaseAuthException catch (e) {
-      if (!context.mounted) return;
-
-      String message = "Erro ao entrar com Google.";
-      if (e.code == 'account-exists-with-different-credential') {
-        message = "Este e-mail já está associado a outra conta.";
-      } else if (e.code == 'invalid-credential') {
-        message = "Credenciais inválidas. Tente novamente.";
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
-      );
     } catch(e) {
-      if (!context.mounted) return; 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro inesperado: $e")),
-      );
+      throw mapException(e);
     } finally {
       _setLoading(false);
     }
   }
-  
-  
-  
   
   Future<void> signOutGoogle() async {
     await _googleSignIn.signOut();
@@ -90,139 +71,199 @@ class AuthService with ChangeNotifier{
     notifyListeners();
   }
 
-
-
   Future<UserCredential> signIn({
-  required String email,
-  required String password,
-}) async {
-  UserCredential credencial = await _auth.signInWithEmailAndPassword(email: email, password: password);
+    required String email,
+    required String password,
+  }) async {
+    try {
+      UserCredential credencial = await _auth.signInWithEmailAndPassword(email: email, password: password);
 
-  final doc = await _firestore.collection('usuarios').doc(credencial.user!.uid).get();
-  
-  if (doc.exists && doc.data()?['ativo'] == false) {
-    await _auth.signOut(); 
-    throw FirebaseAuthException(
-      code: 'user-disabled',
-      message: 'Esta conta foi desativada pelo usuário.',
-    );
+      final usuario = await _userRepository.buscarUsuario(credencial.user!.uid);
+      
+      if (usuario != null && !usuario.ativo) {
+        await _auth.signOut(); 
+        throw AuthException('Esta conta foi desativada pelo usuário.');
+      }
+
+      return credencial;
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
-  return credencial;
-}
-
-
- Future<UserCredential> createAccount({
-
+  Future<UserCredential> createAccount({
     required String email,
     required String password,
     required String nome,
+    required String telefone,
   }) async {
     try {
-     
       UserCredential credencial = await _auth.createUserWithEmailAndPassword(
         email: email, 
         password: password
       );
 
-      UserModel novoUsuario = UserModel(
+      UsuarioModel novoUsuario = UsuarioModel(
         uid: credencial.user!.uid,
         nome: nome,
         email: email,
         fotoUrl: '',
+        telefone: telefone,
       );
 
-      await _firestore
-          .collection('usuarios')
-          .doc(credencial.user!.uid)
-          .set(novoUsuario.toMap());
+      await _userRepository.salvarUsuario(novoUsuario);
 
       return credencial;
 
     } catch (e) {
-      print("Erro ao criar conta: $e");
-      rethrow;
+      throw mapException(e);
     }
   }
   
-  
-  
-  
-   Future<void> signOut() async {
+  Future<void> signOut() async {
     await _auth.signOut();
-    notifyListeners();
+    notifyListeners(); 
   }
 
-  Future<void> resetPassword({
-    required String email,
-
-  } ) async {
-    return await _auth.sendPasswordResetEmail(email: email);
+  Future<void> resetPassword({required String email}) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
- Future<void> updateUserName({required String userName}) async {
-
-  await currentUser!.updateDisplayName(userName);
-  
-  await _firestore
-      .collection('usuarios')
-      .doc(currentUser!.uid)
-      .update({'nome': userName});
-      
-  notifyListeners();
-}
+  Future<void> updateUserName({required String userName}) async {
+    try {
+      await currentUser!.updateDisplayName(userName);
+      await _userRepository.atualizarDadosUsuario(currentUser!.uid, {'nome': userName});
+      notifyListeners();
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
 
   Future<void> desativarConta({
-  required String email,
-  required String password,
-}) async {
-  try {
-    AuthCredential credential = EmailAuthProvider.credential(email: email, password: password);
-    await currentUser!.reauthenticateWithCredential(credential);
+    required String email,
+    required String password,
+  }) async {
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(email: email, password: password);
+      await currentUser!.reauthenticateWithCredential(credential);
 
-    await _firestore
-        .collection('usuarios')
-        .doc(currentUser!.uid)
-        .update({'ativo': false});
+      await _userRepository.atualizarDadosUsuario(currentUser!.uid, {'ativo': false});
 
-    await _auth.signOut();
-    notifyListeners();
-  } catch (e) {
-    print("Erro ao desativar conta: $e");
-    rethrow;
+      await _auth.signOut();
+      notifyListeners();
+    } catch (e) {
+      throw mapException(e);
+    }
   }
-}
 
-   Future<void> resetPasswordFromCurrentPassword({
+
+  Future<void> resetPasswordFromCurrentPassword({
     required String currentPassword,
     required String newPassword,
     required String email,
-   }) async {
-    AuthCredential credential = 
-              EmailAuthProvider.credential(email: email, password: currentPassword);
+  }) async {
+    AuthCredential credential = EmailAuthProvider.credential(email: email, password: currentPassword);
     await currentUser!.reauthenticateWithCredential(credential);
     await currentUser!.updatePassword(newPassword);
-
-   }
-
+  }
 
   Future<bool> checarEmail(String email) async {
-  try {
-    await _auth.createUserWithEmailAndPassword(
-      email: email, 
-      password: 'senha_temporaria_muito_longa_123'
-    );
-    
-    await _auth.currentUser?.delete();
-    return false;
-  } on FirebaseAuthException catch (e) {
-    if (e.code == 'email-already-in-use') {
+    try {
+     await _auth.signInWithEmailAndPassword(
+        email: email, 
+        password: 'SenhaFalsaParaChecagem123!'
+      );
       return true;
-    }
-    return false;
-  } catch (e) {
-    return false;
-  }
-}
+      
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password') {
+        return true;
+      }
+      
+      if (e.code == 'user-not-found') {
+        return false;
+      }
 
+      
+      if (e.code == 'invalid-credential') {
+         return true; 
+      }
+      
+      return false;
+    } catch (e) {
+      return false;
+    }
+    
+  }
+
+  Future<void> uptadeEmail({required String newEmail}) async {
+    try {
+      await currentUser?.verifyBeforeUpdateEmail(newEmail);
+
+      if (currentUser != null) {
+        await _userRepository.atualizarDadosUsuario(currentUser!.uid, {'email': newEmail});
+      }
+
+      notifyListeners();
+    } catch (e) {
+      print("Erro ao atualizar e-mail: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> enviarSmsDeVerificacao({
+    required String telefone,
+    required Function(String verificationId) onCodeSent,
+    required Function(String erro) onFailed,
+  }) async {
+    String numeroCompleto = '+55$telefone';
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: numeroCompleto,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        onFailed(e.message ?? 'Erro desconhecido');
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        onCodeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+
+  Future<UserCredential> loginComSms({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+    return await FirebaseAuth.instance.signInWithCredential(credential);  
+  }
+
+  Future<void> finalizarCadastroTelefone({
+    required String nome,
+    required String telefone,
+  }) async {
+    User? usuarioAtual = FirebaseAuth.instance.currentUser;
+
+    if (usuarioAtual != null) {
+      UsuarioModel novoUsuario = UsuarioModel(
+        uid: usuarioAtual.uid,
+        nome: nome,
+        email: '', 
+        fotoUrl: '',
+        telefone: telefone,
+      );
+      
+      await _userRepository.salvarUsuario(novoUsuario);
+    }
+  }
 }

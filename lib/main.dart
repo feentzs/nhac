@@ -1,6 +1,9 @@
 import 'package:nhac/controllers/cadastro_controller.dart';
+import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
+import 'package:nhac/services/connectivity_service.dart';
+import 'package:nhac/pages/no_internet_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
@@ -37,17 +40,27 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<AppState>(create: (context) => AppState()),
         ChangeNotifierProvider<AuthService>(create: (context) => AuthService()), 
-              ChangeNotifierProvider<CadastroController>(create: (context) => CadastroController()),
-            ChangeNotifierProvider<UserProvider>(create: (context) => UserProvider()),
-
-              
-
-
+        ChangeNotifierProvider<CadastroController>(create: (context) => CadastroController()),
+        ChangeNotifierProvider<UserProvider>(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider<ConnectivityService>(create: (context) => ConnectivityService()),
       ],
-      builder: (context, child) => MaterialApp.router(
-        theme: AppState.of(context).theme,
-        routerConfig: appRouter,
-      ),
+      builder: (context, child) {
+        return Consumer<ConnectivityService>(
+          builder: (context, connectivity, child) {
+            return MaterialApp.router(
+              theme: AppState.of(context).theme,
+              routerConfig: appRouter,
+              builder: (context, navigator) {
+                if (!connectivity.isOnline) {
+                  return const NoInternetPage();
+                }
+                return navigator!;
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
