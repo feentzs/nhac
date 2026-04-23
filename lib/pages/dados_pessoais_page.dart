@@ -69,13 +69,9 @@ class DadosPessoaisPage extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final bool isGoogleUser;
-    if (isGoogleUserOverride != null) {
-      isGoogleUser = isGoogleUserOverride!;
-    } else {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      isGoogleUser = currentUser?.providerData.any((info) => info.providerId == 'google.com') ?? false;
-    }
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final isGoogleUser = currentUser?.providerData.any((info) => info.providerId == 'google.com') ?? false;
+    final hasPassword = currentUser?.providerData.any((info) => info.providerId == 'password') ?? false;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFE7E5),
@@ -104,12 +100,16 @@ class DadosPessoaisPage extends StatelessWidget {
             _buildListItem('Nome', value: usuario.nome, onTap: () => context.push('/editar-nome-preferencia')),
             _buildListItem(
               'E-mail',
-              value: usuario.email,
+              value: usuario.email.isEmpty ? 'Toque para adicionar' : usuario.email,
               onTap: () => context.push('/editar-email'),
               disabled: isGoogleUser,
             ),
-            _buildListItem('Telefone', value: usuario.telefone),
-            _buildListItem('Senha', value: '**************', disabled: isGoogleUser),
+            _buildListItem('Telefone', value: usuario.telefone, disabled: true),
+            _buildListItem(
+              'Senha', 
+              value: hasPassword ? '**************' : 'Não cadastrada', 
+              disabled: isGoogleUser || !hasPassword,
+            ),
           ],
         ),
       ),

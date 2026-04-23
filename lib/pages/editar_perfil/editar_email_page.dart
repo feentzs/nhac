@@ -5,6 +5,7 @@ import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/components/botao_largo_nhac.dart'; 
+import 'package:nhac/components/loading_nhac.dart';
 
 class EditarEmailPage extends StatefulWidget {
   const EditarEmailPage({super.key});
@@ -17,6 +18,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   final TextEditingController _emailController = TextEditingController();
   bool _emailValido = false;
   String? _erroEmail;
+  bool _carregando = false;
 
   @override
   void initState() {
@@ -52,9 +54,48 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
     });
   }
 
+  Future<void> _processarAtualizacaoEmail() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final hasPassword = user.providerData.any((info) => info.providerId == 'password');
+
+    if (hasPassword) {
+      _mostrarDialogoConfirmacaoSenha();
+    } else {
+      await _atualizarEmailSemSenha();
+    }
+  }
+
+  Future<void> _atualizarEmailSemSenha() async {
+    LoadingNhac.mostrar(context, mensagem: 'Enviando confirmação...');
+    try {
+      final authService = context.read<AuthService>();
+      await authService.uptadeEmail(newEmail: _emailController.text.trim());
+      
+      if (!mounted) return;
+      context.read<UserProvider>().iniciarEscutaUsuario();
+      
+      LoadingNhac.esconder(context);
+      context.pop(); 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Link de confirmação enviado para o novo e-mail!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      LoadingNhac.esconder(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao atualizar e-mail: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   Future<void> _mostrarDialogoConfirmacaoSenha() async {
     final TextEditingController senhaController = TextEditingController();
-    bool carregando = false;
+    bool carregandoDialog = false;
     String? erroSenha;
 
     showDialog(
@@ -99,11 +140,11 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
               ),
               actions: [
                 TextButton(
-                  onPressed: carregando ? null : () => Navigator.pop(context),
+                  onPressed: carregandoDialog ? null : () => Navigator.pop(context),
                   child: const Text('Cancelar', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
                 ),
                 ElevatedButton(
-                  onPressed: carregando
+                  onPressed: carregandoDialog
                       ? null
                       : () async {
                           if (senhaController.text.isEmpty) {
@@ -112,7 +153,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                           }
 
                           setStateDialog(() {
-                            carregando = true;
+                            carregandoDialog = true;
                             erroSenha = null;
                           });
 
@@ -131,10 +172,9 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                               final authService = context.read<AuthService>();
                               
                               await authService.uptadeEmail(newEmail: _emailController.text.trim());
-                                                            if (!context.mounted) return;
+                              if (!context.mounted) return;
 
-
-                               context.read<UserProvider>().iniciarEscutaUsuario();
+                              context.read<UserProvider>().iniciarEscutaUsuario();
 
                               if (!context.mounted) return;
                               Navigator.pop(context); 
@@ -146,7 +186,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                             }
                           } on FirebaseAuthException catch (e) {
                             setStateDialog(() {
-                              carregando = false;
+                              carregandoDialog = false;
                               if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
                                 erroSenha = 'Senha incorreta!';
                               } else {
@@ -155,7 +195,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                             });
                           } catch (e) {
                             setStateDialog(() {
-                              carregando = false;
+                              carregandoDialog = false;
                               erroSenha = 'Erro inesperado. Tente novamente.';
                             });
                           }
@@ -164,7 +204,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                     backgroundColor: const Color(0xFFFE645C),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: carregando
+                  child: carregandoDialog
                       ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : const Text('Confirmar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
@@ -260,7 +300,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0, top: 16.0),
               child: BotaoLargoNhac(
                 texto: 'Continuar',
-                onPressed: _emailValido ? () => _mostrarDialogoConfirmacaoSenha() : null,
+                carregando: _carregando,
+                onPressed: _emailValido ? () => _processarAtualizacaoEmail() : null,
               ),
             ),
           ],
@@ -268,4 +309,5 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
       ),
     );
   }
+
 }
