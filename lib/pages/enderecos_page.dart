@@ -418,15 +418,15 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.zero,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    icon: const Icon(Icons.close, color: Colors.black87, size: 28),
-                    onPressed: () => Navigator.pop(context),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const SizedBox(
+                      width: 24.0,
+                      height: 24.0,
+                      child: Icon(Icons.close, color: Colors.black87, size: 24),
+                    ),
                   ),
-                  const SizedBox(height: 24.0),
+                  const SizedBox(height: 28.0),
                   const Text(
                     'Onde você quer receber o seu pedido?',
                     style: TextStyle(

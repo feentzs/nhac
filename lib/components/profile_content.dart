@@ -51,21 +51,22 @@ class _ProfileContentState extends State<ProfileContent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Notificações',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const SizedBox(
+                        width: 24.0,
+                        height: 24.0,
+                        child: Icon(Icons.close, color: Colors.black87, size: 24),
+                      ),
+                    ),
+                    const SizedBox(height: 28.0),
+                    const Text(
+                      'Notificações',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5D201C),
+                      ),
                     ),
                     const SizedBox(height: 32),
                     Expanded(
