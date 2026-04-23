@@ -1,0 +1,110 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nhac/models/usuario/carrinho_model.dart';
+import 'package:nhac/repository/cart_repository.dart'; 
+
+class CartProvider extends ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final CartRepository _cartRepository = CartRepository();
+
+  Map<String, CarrinhoModel> _itens = {};
+  StreamSubscription<List<CarrinhoModel>>? _carrinhoSubscription;
+
+  Map<String, CarrinhoModel> get itens => _itens;
+  int get quantidadeItens => _itens.length;
+
+  double get valorTotal {
+    double total = 0.0;
+    _itens.forEach((chave, itemCarrinho) {
+      total += itemCarrinho.preco * itemCarrinho.quantidade;
+    });
+    return total;
+  }
+  
+  int get totalDeUnidades {
+    int total = 0;
+    _itens.forEach((chave, item) {
+      total += item.quantidade;
+    });
+    return total;
+  }
+
+  void iniciarEscutaCarrinho() {
+    final user = _auth.currentUser;
+    
+    if (user != null) {
+      _carrinhoSubscription?.cancel();
+      
+      _carrinhoSubscription = _cartRepository.ouvirCarrinho(user.uid).listen((listaItensFirebase) {
+        _itens.clear();
+        
+        for (var item in listaItensFirebase) {
+          _itens[item.idProduto] = item;
+        }
+        
+        notifyListeners();
+      });
+    }
+  }
+
+  void limparCarrinhoLocal() {
+    _itens.clear();
+    _carrinhoSubscription?.cancel();
+    notifyListeners();
+  }
+
+  
+  Future<void> adicionarItem({
+    required String idProduto,
+    required String nome,
+    required double preco,
+    required String imagemUrl,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    int novaQuantidade = 1;
+    if (_itens.containsKey(idProduto)) {
+      novaQuantidade = _itens[idProduto]!.quantidade + 1;
+    }
+
+    final novoItem = CarrinhoModel(
+      idDocumento: idProduto, 
+      idProduto: idProduto,
+      nome: nome,
+      preco: preco,
+      quantidade: novaQuantidade,
+      imagemUrl: imagemUrl,
+    );
+
+    await _cartRepository.adicionarItemAoCarrinho(user.uid, novoItem);
+  }
+
+  Future<void> removerItem(String idProduto) async {
+    final user = _auth.currentUser;
+    if (user == null || !_itens.containsKey(idProduto)) return;
+
+    if (_itens[idProduto]!.quantidade > 1) {
+      final itemAtualizado = _itens[idProduto]!.copyWith(
+        quantidade: _itens[idProduto]!.quantidade - 1,
+      );
+      await _cartRepository.adicionarItemAoCarrinho(user.uid, itemAtualizado);
+    } else {
+      await _cartRepository.removerItemDoCarrinho(user.uid, idProduto);
+    }
+  }
+
+  Future<void> esvaziarCarrinho() async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+    
+    await _cartRepository.esvaziarCarrinho(user.uid);
+  }
+
+  @override
+  void dispose() {
+    _carrinhoSubscription?.cancel();
+    super.dispose();
+  }
+}

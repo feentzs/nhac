@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/pages/bem_vindo.dart';
-import 'package:nhac/pages/continuar_senha.dart';
-import 'package:nhac/pages/email_cliente.dart';
-import 'package:nhac/pages/insira_telefone.dart';
+import 'package:nhac/pages/auth/continuar_senha.dart';
+import 'package:nhac/pages/auth/email_cliente.dart';
+import 'package:nhac/pages/auth/insira_telefone.dart';
 import 'package:nhac/pages/splash_screen.dart';
-import 'package:nhac/bem_vindo_motoca.dart';
-import 'package:nhac/pages/verificacao_numero.dart';
+import 'package:nhac/pages/bem_vindo_motoca.dart';
+import 'package:nhac/pages/auth/verificacao_numero.dart';
 import 'package:nhac/pages/home_page.dart';
 import 'package:nhac/services/auth_check.dart';
-import 'package:nhac/pages/Cadastro/nome.dart';
-import 'package:nhac/pages/Cadastro/senha.dart';
+import 'package:nhac/pages/auth/cadastro/nome.dart';
+import 'package:nhac/pages/auth/cadastro/senha.dart';
 import 'package:nhac/pages/dados_pessoais_page.dart';
 import 'package:nhac/pages/editar_perfil/editar_nome_preferencia_page.dart';
 import 'package:nhac/pages/editar_perfil/editar_email_page.dart';
+import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
+import 'package:nhac/pages/auth/cadastro/telefone_cadastro.dart';
 
-class _SlideRightToLeftPageRoute<T> extends PageRoute<T> with MaterialRouteTransitionMixin<T> {
+class _SlideRightToLeftPageRoute<T> extends PageRoute<T>
+    with MaterialRouteTransitionMixin<T> {
   _SlideRightToLeftPageRoute({
     required this.child,
     required super.settings,
@@ -37,7 +40,8 @@ class _SlideRightToLeftPageRoute<T> extends PageRoute<T> with MaterialRouteTrans
   Duration get reverseTransitionDuration => const Duration(milliseconds: 400);
 
   @override
-  Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
     var curvedAnimation = CurvedAnimation(
       parent: animation,
       curve: Curves.easeOutQuart,
@@ -48,10 +52,10 @@ class _SlideRightToLeftPageRoute<T> extends PageRoute<T> with MaterialRouteTrans
       curve: Curves.easeOutQuart,
       reverseCurve: Curves.easeInQuart,
     );
-    
+
     var enterTween = Tween(begin: const Offset(1.0, 0.0), end: Offset.zero);
     var exitTween = Tween(begin: Offset.zero, end: const Offset(-0.3, 0.0));
-    
+
     Widget page = SlideTransition(
       position: enterTween.animate(curvedAnimation),
       child: DecoratedBox(
@@ -99,9 +103,38 @@ Page _buildSlideRightToLeftPage({
   return SlideRightToLeftPage(key: key, child: child);
 }
 
+final authServiceRoteador = AuthService();
+
 @NowaGenerated()
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
+  refreshListenable: authServiceRoteador,
+ redirect: (BuildContext context, GoRouterState state) {
+    final bool estaLogado = authServiceRoteador.currentUser != null;
+
+    final bool telaPublica = state.matchedLocation == '/splash' ||
+        state.matchedLocation == '/' ||
+        state.matchedLocation == '/bem-vindo' ||
+        state.matchedLocation == '/bem-vindo-motoca' ||
+        state.matchedLocation == '/email-cliente' ||
+        state.matchedLocation == '/insira_telefone' ||
+        state.matchedLocation == '/verificacao_numero' ||
+        state.matchedLocation == '/continuar_senha' ||
+        state.matchedLocation.startsWith('/cadastro');
+
+    final bool noMeioDoCadastro = state.matchedLocation == '/verificacao_numero' || 
+                                  state.matchedLocation.startsWith('/cadastro');
+
+    if (!estaLogado && !telaPublica) {
+      return '/bem-vindo';
+    }
+
+    if (estaLogado && telaPublica && state.matchedLocation != '/splash' && !noMeioDoCadastro) {
+      return '/home-page';
+    }
+
+    return null; 
+  },
   routes: [
     GoRoute(path: '/', builder: (context, state) => const AuthCheck()),
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
@@ -133,21 +166,26 @@ final GoRouter appRouter = GoRouter(
         child: const EmailCliente(),
       ),
     ),
-   GoRoute(
-      path: '/Cadastro/senha',
+    GoRoute(
+      path: '/cadastro/senha',
       pageBuilder: (context, state) {
-        
         return _buildSlideRightToLeftPage(
-          key: state.pageKey, child: const Senha(),
+          key: state.pageKey,
+          child: const Senha(),
         );
       },
-   ),
-    GoRoute(
-      path: '/Cadastro/nome',
-      pageBuilder: (context, state) =>
-          _buildSlideRightToLeftPage(key: state.pageKey, child: const Nome()),
     ),
-    
+    GoRoute(
+      path: '/cadastro/nome',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const Nome(),
+      ),
+    ),
+    GoRoute(
+      path: '/cadastro/telefone',
+      builder: (context, state) => const TelefoneCadastro(),
+    ),
     GoRoute(
       path: '/verificacao_numero',
       pageBuilder: (context, state) {
@@ -168,9 +206,8 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/continuar_senha',
       pageBuilder: (context, state) {
-
         return _buildSlideRightToLeftPage(
-          key: state.pageKey, 
+          key: state.pageKey,
           child: const ContinuarSenha(),
         );
       },

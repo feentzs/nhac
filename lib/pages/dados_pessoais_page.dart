@@ -1,15 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:nhac/controllers/user_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
 
 class DadosPessoaisPage extends StatelessWidget {
-  const DadosPessoaisPage({super.key});
+  final bool? isGoogleUserOverride;
 
-  Widget _buildListItem(String title, {String? value, VoidCallback? onTap}) {
+  const DadosPessoaisPage({super.key, this.isGoogleUserOverride});
+
+  Widget _buildListItem(String title, {String? value, VoidCallback? onTap, bool disabled = false}) {
     return InkWell(
-      onTap: onTap ?? () {},
+      onTap: disabled ? null : (onTap ?? () {}),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18.0),
         decoration: BoxDecoration(
@@ -46,7 +49,7 @@ class DadosPessoaisPage extends StatelessWidget {
                   ),
                 if (value != null) const SizedBox(width: 8.0),
                 Icon(
-                  Icons.arrow_forward_ios,
+                  disabled ? Icons.lock_outline : Icons.arrow_forward_ios,
                   size: 14.0,
                   color: Colors.grey.shade400,
                 ),
@@ -76,6 +79,10 @@ class DadosPessoaisPage extends StatelessWidget {
       );
     }
 
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final isGoogleUser = currentUser?.providerData.any((info) => info.providerId == 'google.com') ?? false;
+    final hasPassword = currentUser?.providerData.any((info) => info.providerId == 'password') ?? false;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFE7E5),
       appBar: AppBar(
@@ -101,15 +108,19 @@ class DadosPessoaisPage extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           children: [
             const SizedBox(height: 16.0),
-            _buildListItem('Nome',
-                value: usuario.nome,
-                onTap: () => context.push('/editar-nome-preferencia')),
-            _buildListItem('E-mail',
-                value: usuario.email,
-                onTap: () => context.push('/editar-email')),
-            _buildListItem('Telefone', value: usuario.telefone),
-            _buildListItem('Senha', value: '**********'),
-  
+            _buildListItem('Nome', value: usuario.nome, onTap: () => context.push('/editar-nome-preferencia')),
+            _buildListItem(
+              'E-mail',
+              value: usuario.email.isEmpty ? 'Toque para adicionar' : usuario.email,
+              onTap: () => context.push('/editar-email'),
+              disabled: isGoogleUser,
+            ),
+            _buildListItem('Telefone', value: usuario.telefone, disabled: true),
+            _buildListItem(
+              'Senha', 
+              value: hasPassword ? '**************' : 'Não cadastrada', 
+              disabled: isGoogleUser || !hasPassword,
+            ),
           ],
         ),
       ),
