@@ -150,7 +150,7 @@ class _EnderecosPageState extends State<EnderecosPage> {
         borderRadius: BorderRadius.circular(24.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 15.0,
             offset: const Offset(0, 5),
           ),
@@ -175,7 +175,7 @@ class _EnderecosPageState extends State<EnderecosPage> {
                 Container(
                   padding: const EdgeInsets.all(12.0),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFE645C).withOpacity(0.1),
+                    color: const Color(0xFFFE645C).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -304,7 +304,7 @@ class _EnderecosPageState extends State<EnderecosPage> {
             onPressed: () async {
               Navigator.pop(context);
               await context.read<EnderecoProvider>().definirComoPadrao(endereco.idDocumento);
-              if (mounted) context.showSuccess('Endereço padrão atualizado!');
+              if (mounted && context.mounted) context.showSuccess('Endereço padrão atualizado!');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFE645C),
@@ -333,7 +333,7 @@ class _EnderecosPageState extends State<EnderecosPage> {
             onPressed: () async {
               Navigator.pop(context);
               await context.read<EnderecoProvider>().removerEndereco(endereco.idDocumento);
-              if (mounted) context.showSuccess('Endereço removido!');
+              if (mounted && context.mounted) context.showSuccess('Endereço removido!');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,

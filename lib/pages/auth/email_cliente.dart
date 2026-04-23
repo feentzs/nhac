@@ -194,13 +194,15 @@ class _EmailClienteState extends State<EmailCliente> {
                 height: 49.0,
                 child: ElevatedButton(
                   onPressed: () async {
+                    final localContext = context;
+                    final authService = localContext.read<AuthService>();
                     try {
-                      await context.read<AuthService>().signInWithGoogle(context);
-                      if (!context.mounted) return;
-                      context.go('/home-page');
+                      await authService.signInWithGoogle(localContext);
+                      if (!localContext.mounted) return;
+                      localContext.go('/home-page');
                     } catch (e) {
-                      if (context.mounted) {
-                        context.showError(e.toString());
+                      if (localContext.mounted) {
+                        localContext.showError(e.toString());
                       }
                     }
                   },
@@ -307,28 +309,32 @@ class _EmailClienteState extends State<EmailCliente> {
   }
 
   Future<void> redirecionadorEmail() async {
-    final authService = context.read<AuthService>();
-    final cadastroData = context.read<CadastroController>();
+    final localContext = context;
+    final authService = localContext.read<AuthService>();
+    final cadastroData = localContext.read<CadastroController>();
 
     final emailDoUsuario = _emailController.text.trim();
 
     try {
       bool emailExiste = await authService.checarEmail(emailDoUsuario);
 
-      if (!mounted) return;
+      if (!localContext.mounted) return;
 
-      context.showInfo(emailExiste ? "Bem-vindo de volta!" : "Criando sua conta...");
+      localContext.showInfo(
+          emailExiste ? "Bem-vindo de volta!" : "Criando sua conta...");
 
       cadastroData.setEmail(emailDoUsuario);
 
       if (emailExiste) {
-        context.push('/continuar_senha');
+        if (!localContext.mounted) return;
+        localContext.push('/continuar_senha');
       } else {
-        context.push('/cadastro/nome');
+        if (!localContext.mounted) return;
+        localContext.push('/cadastro/nome');
       }
     } catch (e) {
-      if (!mounted) return;
-      context.showError("Erro ao verificar email: $e");
+      if (!localContext.mounted) return;
+      localContext.showError("Erro ao verificar email: $e");
     }
   }
 }

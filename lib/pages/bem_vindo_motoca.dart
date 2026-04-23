@@ -85,9 +85,10 @@ class BemVindoMotoca extends StatelessWidget {
               left: 346.0,
               width: 15.0,
               height: 15.0,
-              child: Image(
-                image: AssetImage('assets/Arrow right (4).png'),
-                fit: BoxFit.cover,
+              child: Icon(
+                Icons.arrow_forward_ios,
+                size: 14.0,
+                color: Color(0xCCFFFFFF),
               ),
             ),
             const Positioned(

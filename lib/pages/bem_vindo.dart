@@ -70,13 +70,10 @@ class _BemVindoState extends State<BemVindo> {
                             ),
                           ),
                           const SizedBox(width: 8.0),
-                          SizedBox(
-                            width: 15.0,
-                            height: 15.0,
-                            child: Image.asset(
-                              'assets/Arrow right (3).png',
-                              fit: BoxFit.cover,
-                            ),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 14.0,
+                            color: Color(0xFF7C6F6F),
                           ),
                         ],
                       ),

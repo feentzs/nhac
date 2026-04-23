@@ -210,7 +210,7 @@ class AuthService with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print("Erro ao atualizar e-mail: $e");
+      debugPrint("Erro ao atualizar e-mail: $e");
       rethrow;
     }
   }

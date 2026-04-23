@@ -46,6 +46,7 @@ app.*.map.json
 
 # Nowa related
 .nowa/temp
+.nowa/
 
 # Certificados e chaves de segurança
 *.jks

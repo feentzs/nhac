@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nhac/models/usuario/usuario_model.dart';
 
 class UserRepository {
@@ -12,7 +13,7 @@ class UserRepository {
       }
       return null;
     } catch (e) {
-      print("Erro ao buscar usuário no Firestore: $e");
+      debugPrint("Erro ao buscar usuário no Firestore: $e");
       rethrow;
     }
   }
@@ -24,7 +25,7 @@ class UserRepository {
           .doc(usuario.uid)
           .set(usuario.toMap());
     } catch (e) {
-      print("Erro ao salvar usuário no Firestore: $e");
+      debugPrint("Erro ao salvar usuário no Firestore: $e");
       rethrow;
     }
   }
@@ -46,7 +47,7 @@ class UserRepository {
     try {
       await _firestore.collection('usuarios').doc(uid).update(dados);
     } catch (e) {
-      print("Erro ao atualizar usuário: $e");
+      debugPrint("Erro ao atualizar usuário: $e");
       rethrow;
     }
   }

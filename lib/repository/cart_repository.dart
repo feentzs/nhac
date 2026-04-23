@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:nhac/models/usuario/carrinho_model.dart';
 
 class CartRepository {
@@ -13,7 +14,7 @@ class CartRepository {
           .doc(item.idProduto) 
           .set(item.toMap(), SetOptions(merge: true));
     } catch (e) {
-      print("Erro ao adicionar ao carrinho: $e");
+      debugPrint("Erro ao adicionar ao carrinho: $e");
       rethrow;
     }
   }
@@ -27,7 +28,7 @@ class CartRepository {
           .doc(idProduto)
           .delete();
     } catch (e) {
-      print("Erro ao remover do carrinho: $e");
+      debugPrint("Erro ao remover do carrinho: $e");
       rethrow;
     }
   }
@@ -44,7 +45,7 @@ class CartRepository {
         await doc.reference.delete();
       }
     } catch (e) {
-      print("Erro ao esvaziar carrinho: $e");
+      debugPrint("Erro ao esvaziar carrinho: $e");
       rethrow;
     }
   }
