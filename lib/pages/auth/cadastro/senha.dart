@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:nhac/components/botao_largo_nhac.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/services/auth_service.dart';

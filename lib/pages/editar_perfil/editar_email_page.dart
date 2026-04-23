@@ -18,7 +18,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   final TextEditingController _emailController = TextEditingController();
   bool _emailValido = false;
   String? _erroEmail;
-  bool _carregando = false;
+  final bool _carregando = false;
 
   @override
   void initState() {

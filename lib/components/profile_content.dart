@@ -351,11 +351,14 @@ class _ProfileContentState extends State<ProfileContent> {
                                   if (pickedFile != null && mounted) {
                                     setState(() => _isUploading = true);
                                     try {
+                                      if(!context.mounted) return;
                                       await context
                                           .read<UserProvider>()
                                           .atualizarFotoPerfil(
                                               File(pickedFile.path));
                                     } catch (e) {
+                                                                            if(!context.mounted) return;
+
                                       if (mounted) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(

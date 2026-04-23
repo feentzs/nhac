@@ -154,6 +154,7 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                                   border: Border.all(color: Colors.white, width: 4),
                                   boxShadow: [
                                     BoxShadow(
+                                      // ignore: deprecated_member_use
                                       color: Colors.black.withOpacity(0.1),
                                       blurRadius: 10,
                                       spreadRadius: 2,
@@ -163,8 +164,8 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                                 child: ClipOval(
                                   child: _image != null
                                       ? Image.file(_image!, fit: BoxFit.cover)
-                                      : (usuario?.fotoUrl.isNotEmpty == true
-                                          ? Image.network(usuario!.fotoUrl, fit: BoxFit.cover)
+                                      : (usuario!.fotoUrl.isNotEmpty == true
+                                          ? Image.network(usuario.fotoUrl, fit: BoxFit.cover)
                                           : Container(
                                               color: Colors.grey.shade300,
                                               child: Icon(Icons.person, size: 80, color: Colors.grey.shade600),
