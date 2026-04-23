@@ -8,7 +8,7 @@ class CartProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CartRepository _cartRepository = CartRepository();
 
-  Map<String, CarrinhoModel> _itens = {};
+  final Map<String, CarrinhoModel> _itens = {};
   StreamSubscription<List<CarrinhoModel>>? _carrinhoSubscription;
 
   Map<String, CarrinhoModel> get itens => _itens;

@@ -53,6 +53,8 @@ class NoInternetPage extends StatelessWidget {
                 onPressed: () async {
                   final service = Provider.of<ConnectivityService>(context, listen: false);
                   await service.checkConnection();
+                                                        if(!context.mounted) return;
+
                   
                   if (service.isOnline) {
                     ScaffoldMessenger.of(context).showSnackBar(

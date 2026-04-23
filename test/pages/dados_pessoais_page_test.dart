@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nhac/models/usuario/usuario_model.dart';
@@ -23,6 +25,18 @@ class MockUserProvider extends ChangeNotifier implements UserProvider {
   void dispose() {}
   @override
   bool get hasListeners => false;
+
+  @override
+  Future<void> atualizarFotoPerfil(File imagem) {
+    // TODO: implement atualizarFotoPerfil
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> carregarDadosUsuario() {
+    // TODO: implement carregarDadosUsuario
+    throw UnimplementedError();
+  }
 }
 
 void main() {
