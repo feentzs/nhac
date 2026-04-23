@@ -54,13 +54,26 @@ class UserProvider with ChangeNotifier {
     if (user == null) return;
 
     try {
+      debugPrint("Iniciando upload para o usuário: ${user.uid}");
+      
       final ref = FirebaseStorage.instance
           .ref()
           .child('perfil_fotos')
           .child('${user.uid}.jpg');
 
-      await ref.putFile(imagem);
-      final url = await ref.getDownloadURL();
+      debugPrint("Caminho no Storage: ${ref.fullPath}");
+
+      // Upload direto aguardando o snapshot
+      TaskSnapshot snapshot = await ref.putFile(
+        imagem,
+        SettableMetadata(contentType: 'image/jpeg'),
+      );
+
+      debugPrint("Upload concluído com sucesso.");
+
+      // Busca a URL diretamente da referência do snapshot
+      final url = await snapshot.ref.getDownloadURL();
+      debugPrint("URL obtida: $url");
 
       await _userRepository.atualizarDadosUsuario(user.uid, {
         'foto_url': url,
@@ -68,7 +81,7 @@ class UserProvider with ChangeNotifier {
 
       await carregarDadosUsuario();
     } catch (e) {
-      debugPrint("Erro ao atualizar foto de perfil: $e");
+      debugPrint("ERRO AO SALVAR FOTO: $e");
       rethrow;
     }
   }
