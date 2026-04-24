@@ -10,7 +10,6 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nhac/components/loading_nhac.dart';
 import 'package:nhac/globals/ui_utils.dart';
 
 @NowaGenerated()
@@ -54,9 +53,7 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
   Future<void> logar() async {
     final localContext = context;
     try {
-      if (localContext.mounted) {
-        LoadingNhac.mostrar(localContext, mensagem: 'Entrando...');
-      }
+      setState(() => _isLoading = true);
 
       final authService = localContext.read<AuthService>();
       final cadastroData = localContext.read<CadastroController>();
@@ -79,12 +76,13 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
       
       setState(() {
         _errorMessage = e.toString();
+        _isLoading = false;
       });
       
       localContext.showError(e.toString());
     } finally {
       if (localContext.mounted) {
-        LoadingNhac.esconder(localContext);
+        setState(() => _isLoading = false);
       }
     }
   }

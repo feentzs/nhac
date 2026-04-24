@@ -8,7 +8,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
-import 'package:nhac/components/loading_nhac.dart';
 import 'package:nhac/globals/ui_utils.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -28,6 +27,8 @@ class _EmailClienteState extends State<EmailCliente> {
   final TextEditingController _emailController = TextEditingController();
 
   bool _emailValido = false;
+  bool _isLoading = false;
+  bool _isGoogleLoading = false;
 
   final List<String> _dominios = [
     '@gmail.com',
@@ -194,6 +195,7 @@ class _EmailClienteState extends State<EmailCliente> {
               BotaoLargoNhac(
                 texto: 'Continuar com o Google',
                 isSecundario: true,
+                carregando: _isGoogleLoading,
                 icone: SvgPicture.asset(
                   'assets/google-logo.svg',
                   height: 24.0,
@@ -206,9 +208,7 @@ class _EmailClienteState extends State<EmailCliente> {
                       final googleAccount = await authService.pickGoogleAccount();
                       if (googleAccount == null) return;
 
-                      if (localContext.mounted) {
-                        LoadingNhac.mostrar(localContext, mensagem: 'Conectando com o Google...');
-                      }
+                      setState(() => _isGoogleLoading = true);
 
                       await authService.signInWithGoogleAccount(googleAccount);
                       
@@ -220,7 +220,7 @@ class _EmailClienteState extends State<EmailCliente> {
                       }
                     } finally {
                       if (localContext.mounted) {
-                        LoadingNhac.esconder(localContext);
+                        setState(() => _isGoogleLoading = false);
                       }
                     }
                   },
@@ -242,13 +242,10 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
 
 
-              SizedBox(
-                width: double.infinity,
-                height: 49.0,
-                child:BotaoLargoNhac(
+              BotaoLargoNhac(
                 texto: 'Continuar',
+                carregando: _isLoading,
                 onPressed: _emailValido ? () async { await redirecionadorEmail(); } : null,
-              ),
               ),
               const SizedBox(height: 16.0),  
             ],
@@ -266,9 +263,7 @@ class _EmailClienteState extends State<EmailCliente> {
     final emailDoUsuario = _emailController.text.trim();
 
     try {
-      if (localContext.mounted) {
-        LoadingNhac.mostrar(localContext, mensagem: 'Verificando e-mail...');
-      }
+      setState(() => _isLoading = true);
 
       bool emailExiste = await authService.checarEmail(emailDoUsuario);
 
@@ -286,7 +281,7 @@ class _EmailClienteState extends State<EmailCliente> {
       localContext.showError("Erro ao verificar email: $e");
     } finally {
       if (localContext.mounted) {
-        LoadingNhac.esconder(localContext);
+        setState(() => _isLoading = false);
       }
     }
   }

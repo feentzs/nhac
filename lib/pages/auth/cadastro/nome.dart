@@ -7,7 +7,6 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nhac/components/loading_nhac.dart';
 import 'package:nhac/globals/ui_utils.dart';
 
 @NowaGenerated()
@@ -24,6 +23,7 @@ class Nome extends StatefulWidget {
 @NowaGenerated()
 class _NomeState extends State<Nome> {
   bool _nomeValido = false;
+  bool _isLoading = false;
 
   final TextEditingController _nomeController = TextEditingController();
 
@@ -118,6 +118,7 @@ class _NomeState extends State<Nome> {
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0, top: 8.0),
               child: BotaoLargoNhac(
                 texto: 'Continuar',
+                carregando: _isLoading,
                 onPressed: _nomeValido
                     ? () async {
                         final localContext = context;
@@ -130,9 +131,7 @@ class _NomeState extends State<Nome> {
                            final authService = localContext.read<AuthService>(); 
 
                            try {
-                             if (localContext.mounted) {
-                               LoadingNhac.mostrar(localContext, mensagem: 'Finalizando cadastro...');
-                             }
+                             setState(() => _isLoading = true);
 
                              await authService.finalizarCadastroTelefone(
                                nome: cadastroData.nome,
@@ -150,7 +149,7 @@ class _NomeState extends State<Nome> {
                              }
                            } finally {
                              if (localContext.mounted) {
-                               LoadingNhac.esconder(localContext);
+                               setState(() => _isLoading = false);
                              }
                            }
                         }

@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nhac/components/loading_nhac.dart';
 import 'package:nhac/globals/ui_utils.dart';
 
 @NowaGenerated()
@@ -257,9 +256,7 @@ class _SenhaState extends State<Senha> {
   Future<void> cadastrar() async {
     final localContext = context;
     try {
-      if (localContext.mounted) {
-        LoadingNhac.mostrar(localContext, mensagem: 'Criando sua conta...');
-      }
+      setState(() => _isLoading = true);
 
       final authService = localContext.read<AuthService>();
       final cadastroData = localContext.read<CadastroController>();
@@ -282,7 +279,7 @@ class _SenhaState extends State<Senha> {
       localContext.showError(e.toString());
     } finally {
       if (localContext.mounted) {
-        LoadingNhac.esconder(localContext);
+        setState(() => _isLoading = false);
       }
     }
   }

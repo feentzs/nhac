@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/controllers/cadastro_controller.dart'; 
 
-import 'package:nhac/components/loading_nhac.dart';
 import 'package:nhac/globals/ui_utils.dart';
 
 @NowaGenerated()
@@ -26,6 +25,7 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
   final TextEditingController _telefoneController = TextEditingController();
 
   bool _numeroValido = false;
+  bool _isLoading = false;
 
   final maskFormatter = MaskTextInputFormatter(
     mask: '(##) #####-####',
@@ -131,6 +131,7 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
               ),
               child: BotaoLargoNhac(
                 texto: 'Continuar', 
+                carregando: _isLoading,
                  onPressed: _numeroValido
                       ? () async {
                           final localContext = context;
@@ -141,15 +142,13 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
                           cadastroData.setTelefone(telefoneLimpo); 
 
                           try {
-                            if (localContext.mounted) {
-                              LoadingNhac.mostrar(localContext, mensagem: 'Enviando código SMS...');
-                            }
+                            setState(() => _isLoading = true);
 
                             await authService.enviarSmsDeVerificacao(
                               telefone: telefoneLimpo,
                               onCodeSent: (String verId) {
                                 if (localContext.mounted) {
-                                  LoadingNhac.esconder(localContext);
+                                  setState(() => _isLoading = false);
                                 }
                                 cadastroData.setVerificationId(verId);
                                 if (localContext.mounted) {
@@ -158,14 +157,14 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
                               },
                               onFailed: (String erro) {
                                 if (localContext.mounted) {
-                                  LoadingNhac.esconder(localContext);
+                                  setState(() => _isLoading = false);
                                   localContext.showError('Erro ao enviar SMS: $erro');
                                 }
                               },
                             );
                           } catch (e) {
                              if (localContext.mounted) {
-                                LoadingNhac.esconder(localContext);
+                                setState(() => _isLoading = false);
                                 localContext.showError(e.toString());
                              }
                           }
