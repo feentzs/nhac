@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nhac/models/usuario/carrinho_model.dart';
+import 'package:nhac/globals/app_constants.dart';
 
 class CartRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -8,9 +9,9 @@ class CartRepository {
   Future<void> adicionarItemAoCarrinho(String uidUsuario, CarrinhoModel item) async {
     try {
       await _firestore
-          .collection('usuarios')
+          .collection(AppConstants.firestoreUsuarios)
           .doc(uidUsuario)
-          .collection('carrinho')
+          .collection(AppConstants.firestoreCarrinho)
           .doc(item.idProduto) 
           .set(item.toMap(), SetOptions(merge: true));
     } catch (e) {
@@ -22,9 +23,9 @@ class CartRepository {
   Future<void> removerItemDoCarrinho(String uidUsuario, String idProduto) async {
     try {
       await _firestore
-          .collection('usuarios')
+          .collection(AppConstants.firestoreUsuarios)
           .doc(uidUsuario)
-          .collection('carrinho')
+          .collection(AppConstants.firestoreCarrinho)
           .doc(idProduto)
           .delete();
     } catch (e) {
@@ -36,9 +37,9 @@ class CartRepository {
   Future<void> esvaziarCarrinho(String uidUsuario) async {
     try {
       var snapshots = await _firestore
-          .collection('usuarios')
+          .collection(AppConstants.firestoreUsuarios)
           .doc(uidUsuario)
-          .collection('carrinho')
+          .collection(AppConstants.firestoreCarrinho)
           .get();
 
       for (var doc in snapshots.docs) {
@@ -52,9 +53,9 @@ class CartRepository {
 
   Stream<List<CarrinhoModel>> ouvirCarrinho(String uidUsuario) {
     return _firestore
-        .collection('usuarios')
+        .collection(AppConstants.firestoreUsuarios)
         .doc(uidUsuario)
-        .collection('carrinho')
+        .collection(AppConstants.firestoreCarrinho)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {

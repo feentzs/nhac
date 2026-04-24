@@ -1,14 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nhac/models/usuario/endereco_model.dart';
+import 'package:nhac/globals/app_constants.dart';
 
 class EnderecoRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Stream<List<EnderecoModel>> ouvirEnderecos(String uid) {
     return _firestore
-        .collection('usuarios')
+        .collection(AppConstants.firestoreUsuarios)
         .doc(uid)
-        .collection('enderecos')
+        .collection(AppConstants.firestoreEnderecos)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -22,9 +23,9 @@ class EnderecoRepository {
     
     if (endereco.padrao) {
       final enderecosAtuais = await _firestore
-          .collection('usuarios')
+          .collection(AppConstants.firestoreUsuarios)
           .doc(uid)
-          .collection('enderecos')
+          .collection(AppConstants.firestoreEnderecos)
           .where('padrao', isEqualTo: true)
           .get();
           
@@ -33,7 +34,7 @@ class EnderecoRepository {
       }
     }
 
-    final docRef = _firestore.collection('usuarios').doc(uid).collection('enderecos').doc();
+    final docRef = _firestore.collection(AppConstants.firestoreUsuarios).doc(uid).collection(AppConstants.firestoreEnderecos).doc();
     batch.set(docRef, endereco.toMap());
     
     await batch.commit();
@@ -44,9 +45,9 @@ class EnderecoRepository {
     
 
     final enderecosAtuais = await _firestore
-        .collection('usuarios')
+        .collection(AppConstants.firestoreUsuarios)
         .doc(uid)
-        .collection('enderecos')
+        .collection(AppConstants.firestoreEnderecos)
         .where('padrao', isEqualTo: true)
         .get();
         
@@ -55,9 +56,9 @@ class EnderecoRepository {
     }
     
     final docRef = _firestore
-        .collection('usuarios')
+        .collection(AppConstants.firestoreUsuarios)
         .doc(uid)
-        .collection('enderecos')
+        .collection(AppConstants.firestoreEnderecos)
         .doc(enderecoId);
     batch.update(docRef, {'padrao': true});
     
@@ -66,9 +67,9 @@ class EnderecoRepository {
 
   Future<void> removerEndereco(String uid, String enderecoId) async {
     await _firestore
-        .collection('usuarios')
+        .collection(AppConstants.firestoreUsuarios)
         .doc(uid)
-        .collection('enderecos')
+        .collection(AppConstants.firestoreEnderecos)
         .doc(enderecoId)
         .delete();
   }
