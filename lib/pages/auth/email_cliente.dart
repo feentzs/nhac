@@ -8,7 +8,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
+import 'package:nhac/components/loading_nhac.dart';
 import 'package:nhac/globals/ui_utils.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -189,101 +191,49 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
               const SizedBox(height: 22.0),
 
-              SizedBox(
-                width: double.infinity,
-                height: 49.0,
-                child: ElevatedButton(
-                  onPressed: () async {
+              BotaoLargoNhac(
+                texto: 'Continuar com o Google',
+                isSecundario: true,
+                icone: SvgPicture.asset(
+                  'assets/google-logo.svg',
+                  height: 24.0,
+                  width: 24.0,
+                ),
+                onPressed: () async {
                     final localContext = context;
                     final authService = localContext.read<AuthService>();
                     try {
-                      await authService.signInWithGoogle(localContext);
+                      final googleAccount = await authService.pickGoogleAccount();
+                      if (googleAccount == null) return;
+
+                      if (localContext.mounted) {
+                        LoadingNhac.mostrar(localContext, mensagem: 'Conectando com o Google...');
+                      }
+
+                      await authService.signInWithGoogleAccount(googleAccount);
+                      
                       if (!localContext.mounted) return;
                       localContext.go('/home-page');
                     } catch (e) {
                       if (localContext.mounted) {
                         localContext.showError(e.toString());
                       }
+                    } finally {
+                      if (localContext.mounted) {
+                        LoadingNhac.esconder(localContext);
+                      }
                     }
                   },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll<Color?>(
-                      Theme.of(context).colorScheme.surface,
-                    ),
-                    elevation: const WidgetStatePropertyAll<double?>(0.0),
-                    side: const WidgetStatePropertyAll<BorderSide>(
-                      BorderSide(color: Color(0xFF5D201C), width: 1.5),
-                    ),
-                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/google-logo.svg',
-                        height: 24.0,
-                        width: 24.0,
-                      ),
-                      const Expanded(
-                        child: Text(
-                          'Continuar com o Google',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF5D201C),
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 24.0),
-                    ],
-                  ),
-                ),
               ),
               const SizedBox(height: 16.0),
 
-              SizedBox(
-                width: double.infinity,
-                height: 49.0,
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.push('/insira_telefone');
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll<Color?>(
-                      Theme.of(context).colorScheme.surface,
-                    ),
-                    elevation: const WidgetStatePropertyAll<double?>(0.0),
-                    side: const WidgetStatePropertyAll<BorderSide>(
-                      BorderSide(color: Color(0xFF5D201C), width: 1.5),
-                    ),
-                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.phone, size: 24.0, color: Color(0xFF5D201C)),
-                      Expanded(
-                        child: Text(
-                          'Continuar com o telefone',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF5D201C),
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 24.0),
-                    ],
-                  ),
-                ),
+              BotaoLargoNhac(
+                texto: 'Continuar com o telefone',
+                isSecundario: true,
+                icone: const Icon(Icons.phone, size: 24.0, color: Color(0xFF5D201C)),
+                onPressed: () {
+                  context.push('/insira_telefone');
+                },
               ),
 
                     ],
@@ -316,25 +266,28 @@ class _EmailClienteState extends State<EmailCliente> {
     final emailDoUsuario = _emailController.text.trim();
 
     try {
+      if (localContext.mounted) {
+        LoadingNhac.mostrar(localContext, mensagem: 'Verificando e-mail...');
+      }
+
       bool emailExiste = await authService.checarEmail(emailDoUsuario);
 
       if (!localContext.mounted) return;
 
-      localContext.showInfo(
-          emailExiste ? "Bem-vindo de volta!" : "Criando sua conta...");
-
       cadastroData.setEmail(emailDoUsuario);
 
       if (emailExiste) {
-        if (!localContext.mounted) return;
         localContext.push('/continuar_senha');
       } else {
-        if (!localContext.mounted) return;
         localContext.push('/cadastro/nome');
       }
     } catch (e) {
       if (!localContext.mounted) return;
       localContext.showError("Erro ao verificar email: $e");
+    } finally {
+      if (localContext.mounted) {
+        LoadingNhac.esconder(localContext);
+      }
     }
   }
 }
