@@ -10,6 +10,9 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:nhac/components/loading_nhac.dart';
+import 'package:nhac/globals/ui_utils.dart';
+
 @NowaGenerated()
 class ContinuarSenha extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -49,53 +52,40 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
   }
 
   Future<void> logar() async {
-    setState(() => _isLoading = true);
+    final localContext = context;
     try {
-      final authService = context.read<AuthService>();
-      final cadastroData = context.read<CadastroController>();
+      if (localContext.mounted) {
+        LoadingNhac.mostrar(localContext, mensagem: 'Entrando...');
+      }
+
+      final authService = localContext.read<AuthService>();
+      final cadastroData = localContext.read<CadastroController>();
 
       await authService.signIn(
         email: cadastroData.email, 
         password: _senhaController.text.trim() 
       );
       
-      if (!mounted) return;
+      if (!localContext.mounted) return;
 
-      context.read<UserProvider>().iniciarEscutaUsuario();
+      localContext.read<UserProvider>().iniciarEscutaUsuario();
       cadastroData.limparDados();
       
-      if (!mounted) return;
+      localContext.showSuccess("Logado com sucesso!");
+      localContext.go('/home-page'); 
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),
-      );
-      
-      context.go('/home-page'); 
-
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      
-      String erro = "Erro ao entrar";
-      if (e.code == 'user-not-found') erro = "Usuário não encontrado.";
-      if (e.code == 'wrong-password') erro = "Senha incorreta.";
-
-      setState(() {
-        _errorMessage = erro;
-      });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(erro), backgroundColor: Colors.redAccent),
-      );
     } catch (e) {
-      if (!mounted) return;
+      if (!localContext.mounted) return;
+      
       setState(() {
-        _errorMessage = "Erro inesperado: $e";
+        _errorMessage = e.toString();
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro inesperado: $e")),
-      );
+      
+      localContext.showError(e.toString());
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (localContext.mounted) {
+        LoadingNhac.esconder(localContext);
+      }
     }
   }
 

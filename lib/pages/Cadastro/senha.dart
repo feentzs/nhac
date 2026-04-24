@@ -9,6 +9,9 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import 'package:nhac/components/loading_nhac.dart';
+import 'package:nhac/globals/ui_utils.dart';
+
 @NowaGenerated()
 class Senha extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -316,57 +319,36 @@ class _SenhaState extends State<Senha> {
     );
   }
   
- Future<void> cadastrar() async {
-  try {
-    final authService = context.read<AuthService>();
-    final cadastroData = context.read<CadastroController>();
+  Future<void> cadastrar() async {
+    final localContext = context;
+    try {
+      if (localContext.mounted) {
+        LoadingNhac.mostrar(localContext, mensagem: 'Criando sua conta...');
+      }
 
+      final authService = localContext.read<AuthService>();
+      final cadastroData = localContext.read<CadastroController>();
 
+      await authService.createAccount(
+        email: cadastroData.email, 
+        password: text.text,
+        nome: cadastroData.nome,
+        telefone: '',
+      );
 
-    await authService.createAccount(
-      email: cadastroData.email, 
-      password: text.text,
-      nome:cadastroData.nome, telefone: '',
-    );
+      if (!localContext.mounted) return;
 
-        
-       //print('✅ Objeto Cadastro: ${cadastroData.email}');
-    
-    
-      
-    
+      cadastroData.limparDados();
+      localContext.showSuccess("Conta criada com sucesso!");
+      localContext.go('/home-page');
 
-    if (!mounted) return;
-
-    
-    cadastroData.limparDados();
-
-
-
-    
-    
-
-
-    context.go('/home-page');
-
-  } on FirebaseAuthException catch (e) {
-    if (!mounted) return;
-
-    String mensagem = "Erro ao criar conta";
-    if (e.code == 'email-already-in-use') {
-      mensagem = "Este e-mail já está em uso.";
-    } else if (e.code == 'weak-password') {
-      mensagem = "A senha é muito fraca.";
+    } catch (e) {
+      if (!localContext.mounted) return;
+      localContext.showError(e.toString());
+    } finally {
+      if (localContext.mounted) {
+        LoadingNhac.esconder(localContext);
+      }
     }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensagem), backgroundColor: Colors.redAccent),
-    );
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Erro inesperado: $e")),
-    );
   }
-}
 }

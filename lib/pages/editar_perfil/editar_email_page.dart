@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:nhac/components/botao_largo_nhac.dart'; 
 import 'package:nhac/components/loading_nhac.dart';
 
+import 'package:nhac/globals/ui_utils.dart';
+
 class EditarEmailPage extends StatefulWidget {
   const EditarEmailPage({super.key});
 
@@ -69,28 +71,26 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   }
 
   Future<void> _atualizarEmailSemSenha() async {
-    LoadingNhac.mostrar(context, mensagem: 'Enviando confirmação...');
+    final localContext = context;
     try {
-      final authService = context.read<AuthService>();
+      if (localContext.mounted) {
+        LoadingNhac.mostrar(localContext, mensagem: 'Enviando confirmação...');
+      }
+      final authService = localContext.read<AuthService>();
       await authService.uptadeEmail(newEmail: _emailController.text.trim());
       
-      if (!mounted) return;
-      context.read<UserProvider>().iniciarEscutaUsuario();
+      if (!localContext.mounted) return;
+      localContext.read<UserProvider>().iniciarEscutaUsuario();
       
-      LoadingNhac.esconder(context);
-      context.pop(); 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Link de confirmação enviado para o novo e-mail!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      localContext.pop(); 
+      localContext.showSuccess('Link de confirmação enviado para o novo e-mail!');
     } catch (e) {
-      if (!mounted) return;
-      LoadingNhac.esconder(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar e-mail: $e'), backgroundColor: Colors.red),
-      );
+      if (!localContext.mounted) return;
+      localContext.showError('Erro ao atualizar e-mail: $e');
+    } finally {
+      if (localContext.mounted) {
+        LoadingNhac.esconder(localContext);
+      }
     }
   }
 
@@ -98,6 +98,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
     final TextEditingController senhaController = TextEditingController();
     bool carregandoDialog = false;
     String? erroSenha;
+    final parentContext = context;
 
     showDialog(
       context: context,
@@ -171,34 +172,22 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                               await user.reauthenticateWithCredential(credential);
 
                               if (!context.mounted) return;
-                              final authService = context.read<AuthService>();
+                              final authService = parentContext.read<AuthService>();
                               
                               await authService.uptadeEmail(newEmail: _emailController.text.trim());
+                              
                               if (!context.mounted) return;
+                              parentContext.read<UserProvider>().iniciarEscutaUsuario();
 
-                              context.read<UserProvider>().iniciarEscutaUsuario();
+                              Navigator.pop(context); // Fecha dialog
+                              parentContext.pop(); // Fecha página
 
-                              if (!context.mounted) return;
-                              Navigator.pop(context); 
-                              Navigator.pop(context); 
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('E-mail atualizado com sucesso!'), backgroundColor: Colors.green),
-                              );
+                              parentContext.showSuccess('E-mail atualizado com sucesso!');
                             }
-                          } on FirebaseAuthException catch (e) {
-                            setStateDialog(() {
-                              carregandoDialog = false;
-                              if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-                                erroSenha = 'Senha incorreta!';
-                              } else {
-                                erroSenha = 'Erro: ${e.message}';
-                              }
-                            });
                           } catch (e) {
                             setStateDialog(() {
                               carregandoDialog = false;
-                              erroSenha = 'Erro inesperado. Tente novamente.';
+                              erroSenha = e.toString();
                             });
                           }
                         },

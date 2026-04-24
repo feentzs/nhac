@@ -7,6 +7,9 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:nhac/components/loading_nhac.dart';
+import 'package:nhac/globals/ui_utils.dart';
+
 @NowaGenerated()
 class Nome extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -117,32 +120,37 @@ class _NomeState extends State<Nome> {
                 texto: 'Continuar',
                 onPressed: _nomeValido
                     ? () async {
-                        final cadastroData = context.read<CadastroController>();
+                        final localContext = context;
+                        final cadastroData = localContext.read<CadastroController>();
                         cadastroData.setNome(_nomeController.text.trim());
 
                       if (cadastroData.email.isNotEmpty) {
-                          context.push('/cadastro/telefone'); 
+                          localContext.push('/cadastro/telefone'); 
                         } else {
-                           final authService = context.read<AuthService>(); 
-                           
-                           ScaffoldMessenger.of(context).showSnackBar(
-                             const SnackBar(content: Text('A finalizar cadastro...')),
-                           );
+                           final authService = localContext.read<AuthService>(); 
 
                            try {
+                             if (localContext.mounted) {
+                               LoadingNhac.mostrar(localContext, mensagem: 'Finalizando cadastro...');
+                             }
+
                              await authService.finalizarCadastroTelefone(
                                nome: cadastroData.nome,
                                telefone: cadastroData.telefone,
                              );
                              
+                             if (!localContext.mounted) return;
                              cadastroData.limparDados();
-                             if (context.mounted) context.go('/home-page');
+                             localContext.showSuccess('Cadastro finalizado!');
+                             localContext.go('/home-page');
                              
                            } catch (e) {
-                             if (context.mounted) {
-                               ScaffoldMessenger.of(context).showSnackBar(
-                                 SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
-                               );
+                             if (localContext.mounted) {
+                               localContext.showError(e.toString());
+                             }
+                           } finally {
+                             if (localContext.mounted) {
+                               LoadingNhac.esconder(localContext);
                              }
                            }
                         }

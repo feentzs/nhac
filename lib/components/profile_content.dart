@@ -11,6 +11,9 @@ import 'package:nhac/services/auth_service.dart';
 import 'package:nhac/services/biometric_service.dart';
 import 'package:provider/provider.dart';
 
+import 'package:nhac/components/loading_nhac.dart';
+import 'package:nhac/globals/ui_utils.dart';
+
 class ProfileContent extends StatefulWidget {
   const ProfileContent({super.key});
 
@@ -22,19 +25,35 @@ class _ProfileContentState extends State<ProfileContent> {
   bool _isUploading = false;
 
   void _logoutUsuario(BuildContext context) async {
-    final authService = context.read<AuthService>();
-    final userProvider = context.read<UserProvider>();
-    final carrinho = context.read<CartProvider>();
+    final localContext = context;
+    try {
+      if (localContext.mounted) {
+        LoadingNhac.mostrar(localContext, mensagem: 'Saindo...');
+      }
 
-    Navigator.pop(context); 
+      final authService = localContext.read<AuthService>();
+      final userProvider = localContext.read<UserProvider>();
+      final carrinho = localContext.read<CartProvider>();
 
-    userProvider.limparUsuario();
-    carrinho.limparCarrinhoLocal();
+      Navigator.pop(localContext); 
 
-    await authService.signOut();
-    if (!context.mounted) return;
+      userProvider.limparUsuario();
+      carrinho.limparCarrinhoLocal();
 
-    context.go('/bem-vindo');
+      await authService.signOut();
+      
+      if (!localContext.mounted) return;
+      localContext.go('/bem-vindo');
+
+    } catch (e) {
+      if (localContext.mounted) {
+        localContext.showError('Erro ao sair: $e');
+      }
+    } finally {
+      if (localContext.mounted) {
+        LoadingNhac.esconder(localContext);
+      }
+    }
   }
 
   void _abrirNotificacoes(BuildContext context) {

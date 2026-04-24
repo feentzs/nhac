@@ -9,6 +9,9 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import 'package:nhac/components/loading_nhac.dart';
+import 'package:nhac/globals/ui_utils.dart';
+
 @NowaGenerated()
 class Senha extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -252,10 +255,14 @@ class _SenhaState extends State<Senha> {
   }
   
   Future<void> cadastrar() async {
-    setState(() => _isLoading = true);
+    final localContext = context;
     try {
-      final authService = context.read<AuthService>();
-      final cadastroData = context.read<CadastroController>();
+      if (localContext.mounted) {
+        LoadingNhac.mostrar(localContext, mensagem: 'Criando sua conta...');
+      }
+
+      final authService = localContext.read<AuthService>();
+      final cadastroData = localContext.read<CadastroController>();
 
       await authService.createAccount(
         email: cadastroData.email, 
@@ -264,31 +271,19 @@ class _SenhaState extends State<Senha> {
         telefone: cadastroData.telefone
       );
 
-      if (!mounted) return;
+      if (!localContext.mounted) return;
 
       cadastroData.limparDados();
-      context.go('/home-page');
+      localContext.showSuccess("Conta criada com sucesso!");
+      localContext.go('/home-page');
 
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-
-      String mensagem = "Erro ao criar conta";
-      if (e.code == 'email-already-in-use') {
-        mensagem = "Este e-mail já está em uso.";
-      } else if (e.code == 'weak-password') {
-        mensagem = "A senha é muito fraca.";
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensagem), backgroundColor: Colors.redAccent),
-      );
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro inesperado: $e")),
-      );
+      if (!localContext.mounted) return;
+      localContext.showError(e.toString());
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (localContext.mounted) {
+        LoadingNhac.esconder(localContext);
+      }
     }
   }
 }
