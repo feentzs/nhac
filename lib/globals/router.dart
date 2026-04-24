@@ -113,7 +113,8 @@ final GoRouter appRouter = GoRouter(
  redirect: (BuildContext context, GoRouterState state) {
     final bool estaLogado = authServiceRoteador.currentUser != null;
 
-    final bool telaPublica = state.matchedLocation == '/splash' ||
+    final bool telaPublica = state.matchedLocation == '/' ||
+        state.matchedLocation == '/splash' ||
         state.matchedLocation == '/bem-vindo' ||
         state.matchedLocation == '/bem-vindo-motoca' ||
         state.matchedLocation == '/email-cliente' ||
