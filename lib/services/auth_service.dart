@@ -4,6 +4,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nhac/globals/exceptions.dart';
 import 'package:nhac/models/usuario/usuario_model.dart'; 
 import 'package:nhac/repository/user_repository.dart'; 
+import 'package:nhac/components/loading_nhac.dart';
+
 
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -14,52 +16,60 @@ class AuthService with ChangeNotifier {
 
   User? get currentUser => _auth.currentUser;
 
-  Future<void> signInWithGoogle(BuildContext context) async {
-    _setLoading(true);
 
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      
-      if (googleUser == null) {
-        _setLoading(false);
-        return; 
-      }
+Future<void> signInWithGoogle(BuildContext context) async {
+  _setLoading(true);
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      UserCredential userCredencial = await _auth.signInWithCredential(credential);
-
-      final usuarioExistente = await _userRepository.buscarUsuario(userCredencial.user!.uid);
-
-      if (usuarioExistente == null) {
-        UsuarioModel novoUsuarioGoogle = UsuarioModel(
-          uid: userCredencial.user!.uid,
-          nome: userCredencial.user!.displayName ?? 'Usuário Google', 
-          email: userCredencial.user!.email ?? '', 
-          fotoUrl: userCredencial.user!.photoURL ?? '', 
-          telefone: userCredencial.user!.phoneNumber ?? '',
-        );
-        await _userRepository.salvarUsuario(novoUsuarioGoogle);
-      } else {
-        if (userCredencial.user!.photoURL != null && userCredencial.user!.photoURL!.isNotEmpty) {
-          await _userRepository.atualizarDadosUsuario(
-            userCredencial.user!.uid, 
-            {'foto_url': userCredencial.user!.photoURL}
-          );
-        }
-      }
-
-    } catch(e) {
-      throw mapException(e);
-    } finally {
+  try {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    
+    if (googleUser == null) {
       _setLoading(false);
+      return; 
     }
+
+    if (context.mounted) {
+      LoadingNhac.mostrar(context, mensagem: 'Conectando com o Google...');
+    }
+
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    UserCredential userCredencial = await _auth.signInWithCredential(credential);
+
+    final usuarioExistente = await _userRepository.buscarUsuario(userCredencial.user!.uid);
+
+    if (usuarioExistente == null) {
+      UsuarioModel novoUsuarioGoogle = UsuarioModel(
+        uid: userCredencial.user!.uid,
+        nome: userCredencial.user!.displayName ?? 'Usuário Google', 
+        email: userCredencial.user!.email ?? '', 
+        fotoUrl: userCredencial.user!.photoURL ?? '', 
+        telefone: userCredencial.user!.phoneNumber ?? '',
+      );
+      await _userRepository.salvarUsuario(novoUsuarioGoogle);
+    } else {
+      if (userCredencial.user!.photoURL != null && userCredencial.user!.photoURL!.isNotEmpty) {
+        await _userRepository.atualizarDadosUsuario(
+          userCredencial.user!.uid, 
+          {'foto_url': userCredencial.user!.photoURL}
+        );
+      }
+    }
+
+  } catch(e) {
+    throw mapException(e);
+  } finally {
+    if (context.mounted) {
+      LoadingNhac.esconder(context);
+    }
+    _setLoading(false);
   }
-  
+}
+
   Future<void> signOutGoogle() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
