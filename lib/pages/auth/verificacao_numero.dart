@@ -177,8 +177,9 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       }
 
                     } catch (e) {
-                      if (!localContext.mounted) return;
-                      localContext.showError('Código SMS inválido ou expirado.');
+                      if (localContext.mounted) {
+                        localContext.showError('Código SMS inválido ou expirado.');
+                      }
                     } finally {
                       if (localContext.mounted) {
                         LoadingNhac.esconder(localContext);

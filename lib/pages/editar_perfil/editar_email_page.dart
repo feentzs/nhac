@@ -6,7 +6,6 @@ import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/components/botao_largo_nhac.dart'; 
-import 'package:nhac/components/loading_nhac.dart';
 
 import 'package:nhac/globals/ui_utils.dart';
 
@@ -21,7 +20,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   final TextEditingController _emailController = TextEditingController();
   bool _emailValido = false;
   String? _erroEmail;
-  final bool _carregando = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -73,9 +72,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   Future<void> _atualizarEmailSemSenha() async {
     final localContext = context;
     try {
-      if (localContext.mounted) {
-        LoadingNhac.mostrar(localContext, mensagem: 'Enviando confirmação...');
-      }
+      setState(() => _isLoading = true);
+      
       final authService = localContext.read<AuthService>();
       await authService.uptadeEmail(newEmail: _emailController.text.trim());
       
@@ -88,8 +86,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
       if (!localContext.mounted) return;
       localContext.showError('Erro ao atualizar e-mail: $e');
     } finally {
-      if (localContext.mounted) {
-        LoadingNhac.esconder(localContext);
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -179,16 +177,18 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                               if (!context.mounted) return;
                               parentContext.read<UserProvider>().iniciarEscutaUsuario();
 
-                              Navigator.pop(context); // Fecha dialog
-                              parentContext.pop(); // Fecha página
+                              if (context.mounted) Navigator.pop(context); // Fecha dialog
+                              if (parentContext.mounted) parentContext.pop(); // Fecha página
 
                               parentContext.showSuccess('E-mail atualizado com sucesso!');
                             }
                           } catch (e) {
-                            setStateDialog(() {
-                              carregandoDialog = false;
-                              erroSenha = e.toString();
-                            });
+                            if (context.mounted) {
+                              setStateDialog(() {
+                                carregandoDialog = false;
+                                erroSenha = e.toString();
+                              });
+                            }
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -222,10 +222,12 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
 
     if (isGoogleUser) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Usuários do Google não podem alterar o e-mail por aqui.')),
-        );
+        if (context.mounted) {
+          context.pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Usuários do Google não podem alterar o e-mail por aqui.')),
+          );
+        }
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -301,7 +303,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0, top: 16.0),
               child: BotaoLargoNhac(
                 texto: 'Continuar',
-                carregando: _carregando,
+                carregando: _isLoading,
                 onPressed: _emailValido ? () => _processarAtualizacaoEmail() : null,
               ),
             ),

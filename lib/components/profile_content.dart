@@ -23,11 +23,13 @@ class ProfileContent extends StatefulWidget {
 
 class _ProfileContentState extends State<ProfileContent> {
   bool _isUploading = false;
+  bool _isLoggingOut = false;
 
   void _logoutUsuario(BuildContext context) async {
     final localContext = context;
     try {
       if (localContext.mounted) {
+        setState(() => _isLoggingOut = true);
         LoadingNhac.mostrar(localContext, mensagem: 'Saindo...');
       }
 
@@ -35,7 +37,7 @@ class _ProfileContentState extends State<ProfileContent> {
       final userProvider = localContext.read<UserProvider>();
       final carrinho = localContext.read<CartProvider>();
 
-      Navigator.pop(localContext); 
+      if (localContext.mounted) Navigator.pop(localContext); 
 
       userProvider.limparUsuario();
       carrinho.limparCarrinhoLocal();
@@ -50,6 +52,9 @@ class _ProfileContentState extends State<ProfileContent> {
         localContext.showError('Erro ao sair: $e');
       }
     } finally {
+      if (mounted) {
+        setState(() => _isLoggingOut = false);
+      }
       if (localContext.mounted) {
         LoadingNhac.esconder(localContext);
       }

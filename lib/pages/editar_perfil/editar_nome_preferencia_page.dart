@@ -5,7 +5,6 @@ import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nhac/components/loading_nhac.dart';
 import 'package:nhac/globals/ui_utils.dart';
 
 class EditarNomePreferenciaPage extends StatefulWidget {
@@ -28,9 +27,7 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
   void renameName() async {
     final localContext = context;
     try {
-      if (localContext.mounted) {
-        LoadingNhac.mostrar(localContext, mensagem: 'Atualizando nome...');
-      }
+      setState(() => _isLoading = true);
 
       final authService = localContext.read<AuthService>();
 
@@ -45,8 +42,8 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
       if (!localContext.mounted) return;
       localContext.showError(e.toString());
     } finally {
-      if (localContext.mounted) {
-        LoadingNhac.esconder(localContext);
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
