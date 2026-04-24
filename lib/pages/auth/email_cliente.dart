@@ -9,7 +9,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/globals/ui_utils.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {

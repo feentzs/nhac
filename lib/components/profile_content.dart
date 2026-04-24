@@ -11,9 +11,6 @@ import 'package:nhac/services/auth_service.dart';
 import 'package:nhac/services/biometric_service.dart';
 import 'package:provider/provider.dart';
 
-import 'package:nhac/components/loading_nhac.dart';
-import 'package:nhac/globals/ui_utils.dart';
-
 class ProfileContent extends StatefulWidget {
   const ProfileContent({super.key});
 
@@ -23,42 +20,21 @@ class ProfileContent extends StatefulWidget {
 
 class _ProfileContentState extends State<ProfileContent> {
   bool _isUploading = false;
-  bool _isLoggingOut = false;
 
   void _logoutUsuario(BuildContext context) async {
-    final localContext = context;
-    try {
-      if (localContext.mounted) {
-        setState(() => _isLoggingOut = true);
-        LoadingNhac.mostrar(localContext, mensagem: 'Saindo...');
-      }
+    final authService = context.read<AuthService>();
+    final userProvider = context.read<UserProvider>();
+    final carrinho = context.read<CartProvider>();
 
-      final authService = localContext.read<AuthService>();
-      final userProvider = localContext.read<UserProvider>();
-      final carrinho = localContext.read<CartProvider>();
+    Navigator.pop(context); 
 
-      if (localContext.mounted) Navigator.pop(localContext); 
+    userProvider.limparUsuario();
+    carrinho.limparCarrinhoLocal();
 
-      userProvider.limparUsuario();
-      carrinho.limparCarrinhoLocal();
+    await authService.signOut();
+    if (!context.mounted) return;
 
-      await authService.signOut();
-      
-      if (!localContext.mounted) return;
-      localContext.go('/bem-vindo');
-
-    } catch (e) {
-      if (localContext.mounted) {
-        localContext.showError('Erro ao sair: $e');
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoggingOut = false);
-      }
-      if (localContext.mounted) {
-        LoadingNhac.esconder(localContext);
-      }
-    }
+    context.go('/bem-vindo');
   }
 
   void _abrirNotificacoes(BuildContext context) {
@@ -236,9 +212,9 @@ class _ProfileContentState extends State<ProfileContent> {
         color: const Color(0xFFFFE7E5),
         child: Center(
           child: Lottie.asset(
-            'assets/animations/botao_loading_nhac.json',
-            width: 250,
-            height: 250,
+            'assets/animations/loading_nhac.json',
+            width: 340,
+            height: 340,
           ),
         ),
       );
@@ -266,7 +242,7 @@ class _ProfileContentState extends State<ProfileContent> {
                   child: Opacity(
                     opacity: (pulledExtent / refreshIndicatorExtent).clamp(0.0, 1.0),
                     child: Lottie.asset(
-                      'assets/animations/botao_loading_nhac.json',
+                      'assets/animations/loading_nhac.json',
                       width: 240,
                       height: 240,
                       animate: refreshState == RefreshIndicatorMode.refresh ||
@@ -352,7 +328,7 @@ class _ProfileContentState extends State<ProfileContent> {
                       child: _isUploading
                           ? Center(
                               child: Lottie.asset(
-                                'assets/animations/botao_loading_nhac.json',
+                                'assets/animations/loading_nhac.json',
                                 width: 40,
                                 height: 40,
                               ),
@@ -421,7 +397,7 @@ class _ProfileContentState extends State<ProfileContent> {
                                       width: 12,
                                       height: 12,
                                       child: Lottie.asset(
-                                        'assets/animations/botao_loading_nhac.json',
+                                        'assets/animations/loading_nhac.json',
                                       ),
                                     )
                                   : const Icon(Icons.edit,

@@ -1,5 +1,4 @@
 import 'package:nhac/components/seta_voltar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:nhac/components/botao_largo_nhac.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';

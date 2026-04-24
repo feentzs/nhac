@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:nhac/globals/ui_utils.dart'; // Para os Toasts/Snackbars
-
 class AddressPickerSheet extends StatefulWidget {
   const AddressPickerSheet({super.key});
 

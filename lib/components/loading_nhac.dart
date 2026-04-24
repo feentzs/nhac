@@ -23,7 +23,7 @@ class LoadingNhac extends StatelessWidget {
           width: tamanho,
           height: tamanho,
           child: Lottie.asset(
-            'assets/animations/botao_loading_nhac.json',
+            'assets/animations/nhac-intro.json',
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
               return const Center(
