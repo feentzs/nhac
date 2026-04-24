@@ -42,9 +42,11 @@ class CartRepository {
           .collection(AppConstants.firestoreCarrinho)
           .get();
 
+      final batch = _firestore.batch();
       for (var doc in snapshots.docs) {
-        await doc.reference.delete();
+        batch.delete(doc.reference);
       }
+      await batch.commit();
     } catch (e) {
       debugPrint("Erro ao esvaziar carrinho: $e");
       rethrow;
