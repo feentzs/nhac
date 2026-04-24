@@ -8,7 +8,6 @@ import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/pages/bem_vindo_motoca.dart';
 import 'package:nhac/pages/auth/verificacao_numero.dart';
 import 'package:nhac/pages/home_page.dart';
-import 'package:nhac/services/auth_check.dart';
 import 'package:nhac/pages/auth/cadastro/nome.dart';
 import 'package:nhac/pages/auth/cadastro/senha.dart';
 import 'package:nhac/pages/dados_pessoais_page.dart';
@@ -115,7 +114,6 @@ final GoRouter appRouter = GoRouter(
     final bool estaLogado = authServiceRoteador.currentUser != null;
 
     final bool telaPublica = state.matchedLocation == '/splash' ||
-        state.matchedLocation == '/' ||
         state.matchedLocation == '/bem-vindo' ||
         state.matchedLocation == '/bem-vindo-motoca' ||
         state.matchedLocation == '/email-cliente' ||
@@ -138,7 +136,7 @@ final GoRouter appRouter = GoRouter(
     return null; 
   },
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const AuthCheck()),
+    GoRoute(path: '/', builder: (context, state) => const HomePage()),
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/home-page',
