@@ -1,83 +1,76 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:nhac/globals/exceptions.dart';
 import 'package:nhac/models/usuario/usuario_model.dart'; 
 import 'package:nhac/repository/user_repository.dart'; 
-import 'package:nhac/components/loading_nhac.dart';
-
 
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final UserRepository _userRepository = UserRepository();
 
-  bool isLoading = false;
+  AuthService() {
+    _auth.authStateChanges().listen((_) {
+      notifyListeners();
+    });
+  }
 
   User? get currentUser => _auth.currentUser;
 
-
-Future<void> signInWithGoogle(BuildContext context) async {
-  _setLoading(true);
-
-  try {
-    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-    
-    if (googleUser == null) {
-      _setLoading(false);
-      return; 
+  Future<GoogleSignInAccount?> pickGoogleAccount() async {
+    try {
+      return await _googleSignIn.signIn();
+    } catch (e) {
+      throw mapException(e);
     }
+  }
 
-    if (context.mounted) {
-      LoadingNhac.mostrar(context, mensagem: 'Conectando com o Google...');
-    }
-
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-
-    UserCredential userCredencial = await _auth.signInWithCredential(credential);
-
-    final usuarioExistente = await _userRepository.buscarUsuario(userCredencial.user!.uid);
-
-    if (usuarioExistente == null) {
-      UsuarioModel novoUsuarioGoogle = UsuarioModel(
-        uid: userCredencial.user!.uid,
-        nome: userCredencial.user!.displayName ?? 'Usuário Google', 
-        email: userCredencial.user!.email ?? '', 
-        fotoUrl: userCredencial.user!.photoURL ?? '', 
-        telefone: userCredencial.user!.phoneNumber ?? '',
+  Future<void> signInWithGoogleAccount(GoogleSignInAccount googleUser) async {
+    try {
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
-      await _userRepository.salvarUsuario(novoUsuarioGoogle);
-    } else {
-      if (userCredencial.user!.photoURL != null && userCredencial.user!.photoURL!.isNotEmpty) {
+
+      UserCredential userCredencial = await _auth.signInWithCredential(credential);
+
+      final usuarioExistente = await _userRepository.buscarUsuario(userCredencial.user!.uid);
+
+      if (usuarioExistente == null) {
+        UsuarioModel novoUsuarioGoogle = UsuarioModel(
+          uid: userCredencial.user!.uid,
+          nome: userCredencial.user!.displayName ?? 'Usuário Google', 
+          email: userCredencial.user!.email ?? '', 
+          fotoUrl: userCredencial.user!.photoURL ?? '', 
+          telefone: userCredencial.user!.phoneNumber ?? '',
+        );
+        await _userRepository.salvarUsuario(novoUsuarioGoogle);
+      } else {
+        Map<String, dynamic> dadosParaAtualizar = {
+          'ultimo_login': FieldValue.serverTimestamp(),
+        };
+
+        if (userCredencial.user!.photoURL != null && userCredencial.user!.photoURL!.isNotEmpty) {
+          dadosParaAtualizar['foto_url'] = userCredencial.user!.photoURL;
+        }
+
         await _userRepository.atualizarDadosUsuario(
           userCredencial.user!.uid, 
-          {'foto_url': userCredencial.user!.photoURL}
+          dadosParaAtualizar
         );
       }
+      notifyListeners();
+    } catch(e) {
+      throw mapException(e);
     }
-
-  } catch(e) {
-    throw mapException(e);
-  } finally {
-    if (context.mounted) {
-      LoadingNhac.esconder(context);
-    }
-    _setLoading(false);
   }
-}
 
   Future<void> signOutGoogle() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
-    notifyListeners();
-  }
-
-  void _setLoading(bool value) {
-    isLoading = value;
     notifyListeners();
   }
 
@@ -95,6 +88,12 @@ Future<void> signInWithGoogle(BuildContext context) async {
         throw AuthException('Esta conta foi desativada pelo usuário.');
       }
 
+      await _userRepository.atualizarDadosUsuario(
+        credencial.user!.uid, 
+        {'ultimo_login': FieldValue.serverTimestamp()}
+      );
+
+      notifyListeners();
       return credencial;
     } catch (e) {
       throw mapException(e);
@@ -122,7 +121,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
       );
 
       await _userRepository.salvarUsuario(novoUsuario);
-
+      notifyListeners();
       return credencial;
 
     } catch (e) {
@@ -176,9 +175,13 @@ Future<void> signInWithGoogle(BuildContext context) async {
     required String newPassword,
     required String email,
   }) async {
-    AuthCredential credential = EmailAuthProvider.credential(email: email, password: currentPassword);
-    await currentUser!.reauthenticateWithCredential(credential);
-    await currentUser!.updatePassword(newPassword);
+    try {
+      AuthCredential credential = EmailAuthProvider.credential(email: email, password: currentPassword);
+      await currentUser!.reauthenticateWithCredential(credential);
+      await currentUser!.updatePassword(newPassword);
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   Future<bool> checarEmail(String email) async {
@@ -230,50 +233,66 @@ Future<void> signInWithGoogle(BuildContext context) async {
     required Function(String verificationId) onCodeSent,
     required Function(String erro) onFailed,
   }) async {
-    String numeroCompleto = '+55$telefone';
+    try {
+      String numeroCompleto = '+55$telefone';
 
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: numeroCompleto,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await FirebaseAuth.instance.signInWithCredential(credential);
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        onFailed(e.message ?? 'Erro desconhecido');
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        onCodeSent(verificationId);
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
-    );
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: numeroCompleto,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await FirebaseAuth.instance.signInWithCredential(credential);
+          notifyListeners();
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          onFailed(e.message ?? 'Erro desconhecido');
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          onCodeSent(verificationId);
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   Future<UserCredential> loginComSms({
     required String verificationId,
     required String smsCode,
   }) async {
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: smsCode,
-    );
-    return await FirebaseAuth.instance.signInWithCredential(credential);  
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      notifyListeners();
+      return userCredential;
+    } catch (e) {
+      throw mapException(e);
+    }
   }
 
   Future<void> finalizarCadastroTelefone({
     required String nome,
     required String telefone,
   }) async {
-    User? usuarioAtual = FirebaseAuth.instance.currentUser;
+    try {
+      User? usuarioAtual = FirebaseAuth.instance.currentUser;
 
-    if (usuarioAtual != null) {
-      UsuarioModel novoUsuario = UsuarioModel(
-        uid: usuarioAtual.uid,
-        nome: nome,
-        email: '', 
-        fotoUrl: '',
-        telefone: telefone,
-      );
-      
-      await _userRepository.salvarUsuario(novoUsuario);
+      if (usuarioAtual != null) {
+        UsuarioModel novoUsuario = UsuarioModel(
+          uid: usuarioAtual.uid,
+          nome: nome,
+          email: '', 
+          fotoUrl: '',
+          telefone: telefone,
+        );
+        
+        await _userRepository.salvarUsuario(novoUsuario);
+      }
+      notifyListeners();
+    } catch (e) {
+      throw mapException(e);
     }
   }
 }
