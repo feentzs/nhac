@@ -125,7 +125,7 @@ class _HomeContentState extends State<HomeContent> {
             return Center(
               child: Opacity(
                 opacity: (pulledExtent / refreshIndicatorExtent).clamp(0.0, 1.0),
-                child: Lottie.asset('assets/animations/loading_nhac.json', width: 240, height: 240),
+                child: Lottie.asset('assets/animations/botao_loading_nhac.json', width: 240, height: 240),
               ),
             );
           },

@@ -71,9 +71,9 @@ class DadosPessoaisPage extends StatelessWidget {
         backgroundColor: const Color(0xFFFFE7E5),
         body: Center(
           child: Lottie.asset(
-            'assets/animations/loading_nhac.json',
-            width: 340,
-            height: 340,
+            'assets/animations/botao_loading_nhac.json',
+            width: 150,
+            height: 150,
           ),
         ),
       );

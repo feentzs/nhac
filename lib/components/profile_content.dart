@@ -236,9 +236,9 @@ class _ProfileContentState extends State<ProfileContent> {
         color: const Color(0xFFFFE7E5),
         child: Center(
           child: Lottie.asset(
-            'assets/animations/loading_nhac.json',
-            width: 340,
-            height: 340,
+            'assets/animations/botao_loading_nhac.json',
+            width: 250,
+            height: 250,
           ),
         ),
       );
@@ -266,7 +266,7 @@ class _ProfileContentState extends State<ProfileContent> {
                   child: Opacity(
                     opacity: (pulledExtent / refreshIndicatorExtent).clamp(0.0, 1.0),
                     child: Lottie.asset(
-                      'assets/animations/loading_nhac.json',
+                      'assets/animations/botao_loading_nhac.json',
                       width: 240,
                       height: 240,
                       animate: refreshState == RefreshIndicatorMode.refresh ||
@@ -352,7 +352,7 @@ class _ProfileContentState extends State<ProfileContent> {
                       child: _isUploading
                           ? Center(
                               child: Lottie.asset(
-                                'assets/animations/loading_nhac.json',
+                                'assets/animations/botao_loading_nhac.json',
                                 width: 40,
                                 height: 40,
                               ),
@@ -421,7 +421,7 @@ class _ProfileContentState extends State<ProfileContent> {
                                       width: 12,
                                       height: 12,
                                       child: Lottie.asset(
-                                        'assets/animations/loading_nhac.json',
+                                        'assets/animations/botao_loading_nhac.json',
                                       ),
                                     )
                                   : const Icon(Icons.edit,

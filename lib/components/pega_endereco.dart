@@ -143,7 +143,7 @@ class _AddressPickerSheetState extends State<AddressPickerSheet> {
                     ),
                     const SizedBox(height: 20),
                     if (_isLoadingSearch)
-                      Center(child: Lottie.asset('assets/animations/loading_nhac.json', width: 150, height: 150))
+                      Center(child: Lottie.asset('assets/animations/botao_loading_nhac.json', width: 150, height: 150))
                     else if (_sugestoes.isEmpty && _estaDigitando)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 40),

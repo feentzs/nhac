@@ -67,7 +67,7 @@ class _EnderecosPageState extends State<EnderecosPage> {
               child: enderecoProvider.isLoading
                   ? Center(
                       child: Lottie.asset(
-                        'assets/animations/loading_nhac.json',
+                        'assets/animations/botao_loading_nhac.json',
                         width: 250,
                         height: 250,
                       ),
@@ -124,7 +124,7 @@ class _EnderecosPageState extends State<EnderecosPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Lottie.asset(
-            'assets/animations/loading_nhac.json',
+            'assets/animations/botao_loading_nhac.json',
             width: 60,
             height: 60,
           ),
@@ -534,7 +534,7 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Lottie.asset(
-            'assets/animations/loading_nhac.json',
+            'assets/animations/botao_loading_nhac.json',
             width: 250,
             height: 250,
           ),
