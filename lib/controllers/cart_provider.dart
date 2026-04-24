@@ -11,24 +11,14 @@ class CartProvider extends ChangeNotifier {
   final Map<String, CarrinhoModel> _itens = {};
   StreamSubscription<List<CarrinhoModel>>? _carrinhoSubscription;
 
+  double _valorTotal = 0.0;
+  int _totalDeUnidades = 0;
+
   Map<String, CarrinhoModel> get itens => _itens;
   int get quantidadeItens => _itens.length;
 
-  double get valorTotal {
-    double total = 0.0;
-    _itens.forEach((chave, itemCarrinho) {
-      total += itemCarrinho.preco * itemCarrinho.quantidade;
-    });
-    return total;
-  }
-  
-  int get totalDeUnidades {
-    int total = 0;
-    _itens.forEach((chave, item) {
-      total += item.quantidade;
-    });
-    return total;
-  }
+  double get valorTotal => _valorTotal;
+  int get totalDeUnidades => _totalDeUnidades;
 
   void iniciarEscutaCarrinho() {
     final user = _auth.currentUser;
@@ -38,9 +28,13 @@ class CartProvider extends ChangeNotifier {
       
       _carrinhoSubscription = _cartRepository.ouvirCarrinho(user.uid).listen((listaItensFirebase) {
         _itens.clear();
+        _valorTotal = 0.0;
+        _totalDeUnidades = 0;
         
         for (var item in listaItensFirebase) {
           _itens[item.idProduto] = item;
+          _valorTotal += item.preco * item.quantidade;
+          _totalDeUnidades += item.quantidade;
         }
         
         notifyListeners();
@@ -50,6 +44,8 @@ class CartProvider extends ChangeNotifier {
 
   void limparCarrinhoLocal() {
     _itens.clear();
+    _valorTotal = 0.0;
+    _totalDeUnidades = 0;
     _carrinhoSubscription?.cancel();
     notifyListeners();
   }
