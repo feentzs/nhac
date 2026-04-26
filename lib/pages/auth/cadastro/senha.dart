@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 
 import 'package:nhac/globals/ui_utils.dart';
 
+import 'package:nhac/components/nhac_input_field.dart';
+
 @NowaGenerated()
 class Senha extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -114,118 +116,78 @@ class _SenhaState extends State<Senha> {
                         ),
                       ),
                       const SizedBox(height: 24.0),
-                      TextFormField(
-                        controller: _senhaController,  
-                        focusNode: _senhaFocus, 
+                      NhacInputField(
+                        controller: _senhaController,
+                        focusNode: _senhaFocus,
                         onChanged: (value) => _verificarSenha(),
                         obscureText: !_senhaVisivel,
                         obscuringCharacter: '⬤',
                         autofocus: true,
-                        cursorColor: const Color(0xFFFF6961),
+                        hintText: 'Senha',
+                        errorText: _erroSenha,
                         style: TextStyle(
                           color: const Color(0xFF5D201C),
                           fontFamily: 'Roboto',
                           fontWeight: FontWeight.w600,
                           letterSpacing: _senhaVisivel ? 0.0 : 4.0,
                         ),
-                        decoration: InputDecoration(
-                          enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFC9BCBC),
-                              width: 2.0,
-                            ),
-                          ),
-                          hintText: 'Senha',
-                          hintStyle: const TextStyle(
-                            color: Color(0xFFC9BCBC),
-                            letterSpacing: 0.0,
-                            fontSize: 16.0,
-                          ),
-                          errorText: _erroSenha,
-                          suffixIcon: IconButton(
-                            icon: _senhaVisivel
-                                ? const Icon(
-                                    Icons.visibility,
-                                    color: Color(0xFFFF6961),
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/olho-fechado.svg',
-                                    width: 24.0,
-                                    height: 24.0,
-                                    colorFilter: const ColorFilter.mode(
-                                      Color(0xFFC9BCBC),
-                                      BlendMode.srcIn,
-                                    ),
+                        suffixIcon: IconButton(
+                          icon: _senhaVisivel
+                              ? const Icon(
+                                  Icons.visibility,
+                                  color: Color(0xFFFF6961),
+                                )
+                              : SvgPicture.asset(
+                                  'assets/olho-fechado.svg',
+                                  width: 24.0,
+                                  height: 24.0,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFFC9BCBC),
+                                    BlendMode.srcIn,
                                   ),
-                            onPressed: () {
-                              setState(() {
-                                _senhaVisivel = !_senhaVisivel;
-                              });
-                            },
-                          ),
+                                ),
+                          onPressed: () {
+                            setState(() {
+                              _senhaVisivel = !_senhaVisivel;
+                            });
+                          },
                         ),
                       ),
                       const SizedBox(height: 24.0),
-                      TextFormField(
-                        controller: _confirmarSenhaController, 
-                        focusNode: _confirmarSenhaFocus, 
+                      NhacInputField(
+                        controller: _confirmarSenhaController,
+                        focusNode: _confirmarSenhaFocus,
                         onChanged: (value) => _verificarSenha(),
                         obscureText: !_confirmacaoVisivel,
                         obscuringCharacter: '⬤',
-                        cursorColor: const Color(0xFFFF6961),
+                        hintText: 'Confirmar senha',
+                        errorText: _erroConfirmacao,
                         style: TextStyle(
                           color: const Color(0xFF5D201C),
                           fontFamily: 'Roboto',
                           fontWeight: FontWeight.w600,
                           letterSpacing: _confirmacaoVisivel ? 0.0 : 4.0,
                         ),
-                        decoration: InputDecoration(
-                          enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFC9BCBC),
-                              width: 2.0,
-                            ),
-                          ),
-                          hintText: 'Confirmar senha',
-                          hintStyle: const TextStyle(
-                            color: Color(0xFFC9BCBC),
-                            letterSpacing: 0.0,
-                            fontSize: 16.0,
-                          ),
-                          errorText: _erroConfirmacao,
-                          suffixIcon: IconButton(
-                            icon: _confirmacaoVisivel
-                                ? const Icon(
-                                    Icons.visibility,
-                                    color: Color(0xFFFF6961),
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/olho-fechado.svg',
-                                    width: 24.0,
-                                    height: 24.0,
-                                    colorFilter: const ColorFilter.mode(
-                                      Color(0xFFC9BCBC),
-                                      BlendMode.srcIn,
-                                    ),
+                        suffixIcon: IconButton(
+                          icon: _confirmacaoVisivel
+                              ? const Icon(
+                                  Icons.visibility,
+                                  color: Color(0xFFFF6961),
+                                )
+                              : SvgPicture.asset(
+                                  'assets/olho-fechado.svg',
+                                  width: 24.0,
+                                  height: 24.0,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFFC9BCBC),
+                                    BlendMode.srcIn,
                                   ),
-                            onPressed: () {
-                              setState(() {
-                                _confirmacaoVisivel = !_confirmacaoVisivel;
-                              });
-                            },
-                          ),
+                                ),
+                          onPressed: () {
+                            setState(() {
+                              _confirmacaoVisivel = !_confirmacaoVisivel;
+                            });
+                          },
                         ),
                       ),
                     ],

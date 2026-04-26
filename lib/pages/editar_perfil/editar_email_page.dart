@@ -9,6 +9,8 @@ import 'package:nhac/components/botao_largo_nhac.dart';
 
 import 'package:nhac/globals/ui_utils.dart';
 
+import 'package:nhac/components/nhac_input_field.dart';
+
 class EditarEmailPage extends StatefulWidget {
   const EditarEmailPage({super.key});
 
@@ -119,23 +121,12 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                     style: TextStyle(color: Colors.black87),
                   ),
                   const SizedBox(height: 20),
-                  TextField(
+                  NhacInputField(
                     controller: senhaController,
                     obscureText: true,
-                    cursorColor: const Color(0xFFFF6961),
                     onChanged: (_) => setStateDialog(() => erroSenha = null),
-                    decoration: InputDecoration(
-                      labelText: 'Senha atual',
-                      errorText: erroSenha,
-                      labelStyle: TextStyle(color: Colors.grey.shade600),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFFFF6961), width: 2),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      
-                    ),
+                    hintText: 'Senha atual',
+                    errorText: erroSenha,
                   ),
                 ],
               ),
@@ -274,24 +265,16 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                         ),
                       ),
                       const SizedBox(height: 28.0),
-                      TextField(
+                      NhacInputField(
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          errorText: _erroEmail,
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.black87),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                          hintText: 'Email',
-                          hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
-                        ),
+                        errorText: _erroEmail,
+                        hintText: 'Email',
                         style: const TextStyle(
                           fontSize: 18.0,
-                          color: Colors.black87,
+                          color: Color(0xFF5D201C),
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],

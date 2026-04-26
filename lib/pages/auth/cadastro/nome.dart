@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 
 import 'package:nhac/globals/ui_utils.dart';
 
+import 'package:nhac/components/nhac_input_field.dart';
+
 @NowaGenerated()
 class Nome extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -79,34 +81,11 @@ class _NomeState extends State<Nome> {
                         ),
                       ),
                       const SizedBox(height: 16.0),
-                      TextFormField(
+                      NhacInputField(
                         controller: _nomeController,
-                        enabled: true,
-                        autofocus: true, 
-                        showCursor: true,
-                        cursorColor: const Color(0xFFFF6961),
+                        autofocus: true,
                         textCapitalization: TextCapitalization.words,
-                        style: const TextStyle(
-                          color: Color(0xFF5D201C),
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w600,
-                        ),
-                        decoration: const InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFC9BCBC),
-                              width: 2.0,
-                            ),
-                          ),
-                          hintText: 'Nome',
-                          hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
-                        ),
+                        hintText: 'Nome',
                       ),
                     ],
                   ),

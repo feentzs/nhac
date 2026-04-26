@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 
 import 'package:nhac/globals/ui_utils.dart';
 
+import 'package:nhac/components/nhac_input_field.dart';
+
 class EditarNomePreferenciaPage extends StatefulWidget {
   const EditarNomePreferenciaPage({super.key});
 
@@ -92,29 +94,18 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                         ),
                       ),
                       const SizedBox(height: 28.0),
-                      TextField(
+                      NhacInputField(
                         controller: _nameController,
                         onChanged: (value) {
                           setState(() {});
                         },
-                        textCapitalization: TextCapitalization.words, 
-                        decoration: InputDecoration(
-                          labelText: 'Nome',
-                          labelStyle: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 16.0,
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.black87),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                        ),
+                        textCapitalization: TextCapitalization.words,
+                        hintText: 'Nome',
                         style: const TextStyle(
                           fontSize: 18.0,
-                          color: Colors.black87,
+                          color: Color(0xFF5D201C),
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],

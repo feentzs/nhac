@@ -11,6 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:nhac/globals/ui_utils.dart';
 
 
+import 'package:nhac/components/nhac_input_field.dart';
+
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -102,32 +104,11 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
               const SizedBox(height: 22.0),
 
-              TextFormField(
+              NhacInputField(
                 controller: _emailController,
-                enabled: true,
                 autofocus: true,
-                showCursor: true,
-                cursorColor: const Color(0xFFFF6961),
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(
-                  color: Color(0xFF5D201C),
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w600,
-                ),
-                decoration: const InputDecoration(
-                  filled: false,
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color(0xFFC9BCBC),
-                      width: 2.0,
-                    ),
-                  ),
-                  hintText: 'Email',
-                  hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
-                ),
+                hintText: 'Email',
               ),
               const SizedBox(height: 16.0),
 
