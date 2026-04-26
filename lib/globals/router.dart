@@ -111,7 +111,8 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
   refreshListenable: authServiceRoteador,
  redirect: (BuildContext context, GoRouterState state) {
-    final bool estaLogado = authServiceRoteador.currentUser != null;
+    final bool estaAutenticado = authServiceRoteador.currentUser != null;
+    final bool usuarioExisteNoBanco = authServiceRoteador.userExists;
 
     final bool telaPublica = state.matchedLocation == '/' ||
         state.matchedLocation == '/splash' ||
@@ -126,11 +127,21 @@ final GoRouter appRouter = GoRouter(
     final bool noMeioDoCadastro = state.matchedLocation == '/verificacao_numero' || 
                                   state.matchedLocation.startsWith('/cadastro');
 
-    if (!estaLogado && !telaPublica) {
+    // Se não está autenticado e tenta acessar tela privada, vai pro bem-vindo
+    if (!estaAutenticado && !telaPublica) {
       return '/bem-vindo';
     }
 
-    if (estaLogado && telaPublica && state.matchedLocation != '/splash' && !noMeioDoCadastro) {
+    // Se está autenticado mas NÃO existe no banco, ele PRECISA terminar o cadastro.
+    // Não deixamos ele ir para a home-page.
+    if (estaAutenticado && !usuarioExisteNoBanco && !noMeioDoCadastro) {
+       // Se ele caiu aqui, provavelmente acabou de logar e não tem cadastro.
+       // Deixamos ele seguir o fluxo de cadastro.
+       return null; 
+    }
+
+    // Se está autenticado e o usuário existe, mas tenta acessar telas de login/cadastro, manda pra home
+    if (estaAutenticado && usuarioExisteNoBanco && telaPublica && state.matchedLocation != '/splash' && !noMeioDoCadastro) {
       return '/home-page';
     }
 
