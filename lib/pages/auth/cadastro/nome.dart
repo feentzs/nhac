@@ -11,6 +11,8 @@ import 'package:nhac/globals/ui_utils.dart';
 
 import 'package:nhac/components/nhac_input_field.dart';
 
+import 'package:nhac/utils/validators.dart';
+
 @NowaGenerated()
 class Nome extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -86,6 +88,7 @@ class _NomeState extends State<Nome> {
                         autofocus: true,
                         textCapitalization: TextCapitalization.words,
                         hintText: 'Nome',
+                        validator: Validators.validarNome,
                       ),
                     ],
                   ),

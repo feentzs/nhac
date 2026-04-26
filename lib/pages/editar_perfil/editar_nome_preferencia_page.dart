@@ -9,6 +9,8 @@ import 'package:nhac/globals/ui_utils.dart';
 
 import 'package:nhac/components/nhac_input_field.dart';
 
+import 'package:nhac/utils/validators.dart';
+
 class EditarNomePreferenciaPage extends StatefulWidget {
   const EditarNomePreferenciaPage({super.key});
 
@@ -101,6 +103,7 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                         },
                         textCapitalization: TextCapitalization.words,
                         hintText: 'Nome',
+                        validator: Validators.validarNome,
                         style: const TextStyle(
                           fontSize: 18.0,
                           color: Color(0xFF5D201C),

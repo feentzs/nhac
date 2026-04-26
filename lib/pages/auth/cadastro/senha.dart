@@ -12,6 +12,8 @@ import 'package:nhac/globals/ui_utils.dart';
 
 import 'package:nhac/components/nhac_input_field.dart';
 
+import 'package:nhac/utils/validators.dart';
+
 @NowaGenerated()
 class Senha extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -125,6 +127,7 @@ class _SenhaState extends State<Senha> {
                         autofocus: true,
                         hintText: 'Senha',
                         errorText: _erroSenha,
+                        validator: Validators.validarSenha,
                         style: TextStyle(
                           color: const Color(0xFF5D201C),
                           fontFamily: 'Roboto',
@@ -162,6 +165,7 @@ class _SenhaState extends State<Senha> {
                         obscuringCharacter: '⬤',
                         hintText: 'Confirmar senha',
                         errorText: _erroConfirmacao,
+                        validator: Validators.validarSenha,
                         style: TextStyle(
                           color: const Color(0xFF5D201C),
                           fontFamily: 'Roboto',

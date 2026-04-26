@@ -13,6 +13,8 @@ import 'package:nhac/globals/ui_utils.dart';
 
 import 'package:nhac/components/nhac_input_field.dart';
 
+import 'package:nhac/utils/validators.dart';
+
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -109,6 +111,7 @@ class _EmailClienteState extends State<EmailCliente> {
                 autofocus: true,
                 keyboardType: TextInputType.emailAddress,
                 hintText: 'Email',
+                validator: Validators.validarEmail,
               ),
               const SizedBox(height: 16.0),
 

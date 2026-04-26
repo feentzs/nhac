@@ -11,6 +11,8 @@ import 'package:nhac/globals/ui_utils.dart';
 
 import 'package:nhac/components/nhac_input_field.dart';
 
+import 'package:nhac/utils/validators.dart';
+
 class EditarEmailPage extends StatefulWidget {
   const EditarEmailPage({super.key});
 
@@ -127,6 +129,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                     onChanged: (_) => setStateDialog(() => erroSenha = null),
                     hintText: 'Senha atual',
                     errorText: erroSenha,
+                    validator: Validators.validarSenha,
                   ),
                 ],
               ),
@@ -270,6 +273,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                         keyboardType: TextInputType.emailAddress,
                         errorText: _erroEmail,
                         hintText: 'Email',
+                        validator: Validators.validarEmail,
                         style: const TextStyle(
                           fontSize: 18.0,
                           color: Color(0xFF5D201C),
