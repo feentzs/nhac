@@ -40,33 +40,24 @@ class _SenhaState extends State<Senha> {
   final FocusNode _confirmarSenhaFocus = FocusNode();
 
   void _verificarSenha() {
-    if (!mounted) {
-      return;
-    }
-    final senha = _senhaController.text;
+    if (!mounted) return;
+    final texto = _senhaController.text;
     final confirmacao = _confirmarSenhaController.text;
-    
-    String? erroSenhaTemp;
+
+    String? erroTemp = Validators.validarSenha(texto);
     String? erroConfirmacaoTemp;
-    
-    if (senha.isNotEmpty) {
-      if (senha.length < 8) {
-        erroSenhaTemp = 'Mínimo de 8 caracteres';
-      } else if (!senha.contains(RegExp('[A-Z]'))) {
-        erroSenhaTemp = 'Precisa de pelo menos uma letra maiúscula';
-      }
-    }
-    if (confirmacao.isNotEmpty && senha != confirmacao) {
+
+    if (confirmacao.isNotEmpty && texto != confirmacao) {
       erroConfirmacaoTemp = 'As senhas não coincidem';
     }
+
     setState(() {
-      _erroSenha = erroSenhaTemp;
+      _erroSenha = erroTemp;
       _erroConfirmacao = erroConfirmacaoTemp;
-      _senhaValida =
-          senha.isNotEmpty &&
+      _senhaValida = erroTemp == null &&
+          texto.isNotEmpty &&
           confirmacao.isNotEmpty &&
-          _erroSenha == null &&
-          _erroConfirmacao == null;
+          erroConfirmacaoTemp == null;
     });
   }
 

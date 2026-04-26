@@ -21,11 +21,31 @@ class EditarNomePreferenciaPage extends StatefulWidget {
 class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
   final TextEditingController _nameController = TextEditingController();
   bool _isLoading = false;
+  bool _nomeValido = false;
+  String? _erroNome;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_verificarNome);
+  }
 
   @override
   void dispose() {
+    _nameController.removeListener(_verificarNome);
     _nameController.dispose();
     super.dispose();
+  }
+
+  void _verificarNome() {
+    if (!mounted) return;
+    final texto = _nameController.text;
+    String? erroTemp = Validators.validarNome(texto);
+
+    setState(() {
+      _erroNome = erroTemp;
+      _nomeValido = erroTemp == null && texto.isNotEmpty;
+    });
   }
 
   void renameName() async {
@@ -98,11 +118,10 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                       const SizedBox(height: 28.0),
                       NhacInputField(
                         controller: _nameController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
+                        onChanged: (value) => _verificarNome(),
                         textCapitalization: TextCapitalization.words,
                         hintText: 'Nome',
+                        errorText: _erroNome,
                         validator: Validators.validarNome,
                         style: const TextStyle(
                           fontSize: 18.0,
@@ -122,9 +141,7 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
               child: BotaoLargoNhac(
                 texto: 'Salvar alterações',
                 carregando: _isLoading,
-                onPressed: (_nameController.text.trim().isNotEmpty && !_isLoading)
-                      ? () => renameName()
-                      : null,
+                onPressed: _nomeValido ? () => renameName() : null,
               ),
             ),
           ],

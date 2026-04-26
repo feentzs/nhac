@@ -31,6 +31,7 @@ class _EmailClienteState extends State<EmailCliente> {
   final TextEditingController _emailController = TextEditingController();
 
   bool _emailValido = false;
+  String? _erroEmail;
   bool _isLoading = false;
   bool _isGoogleLoading = false;
 
@@ -49,14 +50,14 @@ class _EmailClienteState extends State<EmailCliente> {
   }
 
   void _verificarEmail() {
-    String emailUsuario = _emailController.text;
+    if (!mounted) return;
+    final texto = _emailController.text;
+    String? erroTemp = Validators.validarEmail(texto);
 
-    final bool ehValido = EmailValidator.validate(emailUsuario);
-    if (_emailValido != ehValido) {
-      setState(() {
-        _emailValido = ehValido;
-      });
-    }
+    setState(() {
+      _erroEmail = erroTemp;
+      _emailValido = erroTemp == null && texto.isNotEmpty;
+    });
   }
 
   @override
@@ -111,6 +112,7 @@ class _EmailClienteState extends State<EmailCliente> {
                 autofocus: true,
                 keyboardType: TextInputType.emailAddress,
                 hintText: 'Email',
+                errorText: _erroEmail,
                 validator: Validators.validarEmail,
               ),
               const SizedBox(height: 16.0),

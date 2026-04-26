@@ -28,6 +28,7 @@ class Nome extends StatefulWidget {
 class _NomeState extends State<Nome> {
   bool _nomeValido = false;
   bool _isLoading = false;
+  String? _erroNome;
 
   final TextEditingController _nomeController = TextEditingController();
 
@@ -38,12 +39,14 @@ class _NomeState extends State<Nome> {
   }
 
   void _verificarNome() {
-    final ehValido = _nomeController.text.trim().length >= 2;
-    if (_nomeValido != ehValido) {
-      setState(() {
-        _nomeValido = ehValido;
-      });
-    }
+    if (!mounted) return;
+    final texto = _nomeController.text;
+    String? erroTemp = Validators.validarNome(texto);
+
+    setState(() {
+      _erroNome = erroTemp;
+      _nomeValido = erroTemp == null && texto.isNotEmpty;
+    });
   }
 
   @override
@@ -88,6 +91,7 @@ class _NomeState extends State<Nome> {
                         autofocus: true,
                         textCapitalization: TextCapitalization.words,
                         hintText: 'Nome',
+                        errorText: _erroNome,
                         validator: Validators.validarNome,
                       ),
                     ],

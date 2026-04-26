@@ -18,10 +18,16 @@ class TelefoneCadastro extends StatefulWidget {
 class _TelefoneCadastroState extends State<TelefoneCadastro> {
   final TextEditingController _telefoneController = TextEditingController();
   bool _telefoneValido = false;
+  String? _erroTelefone;
 
   void _verificarTelefone() {
+    if (!mounted) return;
+    final texto = _telefoneController.text;
+    String? erroTemp = Validators.validarTelefone(texto);
+
     setState(() {
-      _telefoneValido = _telefoneController.text.trim().length >= 10;
+      _erroTelefone = erroTemp;
+      _telefoneValido = erroTemp == null && texto.isNotEmpty;
     });
   }
 
@@ -69,6 +75,7 @@ class _TelefoneCadastroState extends State<TelefoneCadastro> {
                         keyboardType: TextInputType.phone,
                         autofocus: true,
                         hintText: '11999999999',
+                        errorText: _erroTelefone,
                         validator: Validators.validarTelefone,
                         style: const TextStyle(
                           fontSize: 20.0,

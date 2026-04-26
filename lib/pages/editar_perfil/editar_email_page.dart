@@ -39,24 +39,20 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   }
 
   void _validarNovoEmail() {
-    final novoEmail = _emailController.text.trim();
+    if (!mounted) return;
+    final texto = _emailController.text;
     final usuarioLogado = FirebaseAuth.instance.currentUser;
     final emailAtual = usuarioLogado?.email ?? '';
 
+    String? erroTemp = Validators.validarEmail(texto);
+
+    if (erroTemp == null && texto.toLowerCase() == emailAtual.toLowerCase()) {
+      erroTemp = 'Este já é o seu e-mail atual';
+    }
+
     setState(() {
-      if (novoEmail.isEmpty) {
-        _erroEmail = null;
-        _emailValido = false;
-      } else if (novoEmail.toLowerCase() == emailAtual.toLowerCase()) {
-        _erroEmail = 'Este já é o seu e-mail atual';
-        _emailValido = false;
-      } else if (!novoEmail.contains('@') || !novoEmail.contains('.')) {
-        _erroEmail = 'Insira um e-mail válido';
-        _emailValido = false;
-      } else {
-        _erroEmail = null;
-        _emailValido = true; 
-      }
+      _erroEmail = erroTemp;
+      _emailValido = erroTemp == null && texto.isNotEmpty;
     });
   }
 
