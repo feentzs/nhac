@@ -6,12 +6,10 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return 'Campo obrigatório';
     }
-    // Verificação 1: Tamanho do nome
-    if (value.trim().length < 2) {
+        if (value.trim().length < 2) {
       return 'O nome deve ter pelo menos 2 letras';
     }
-    // Verificação 2: Não pode conter números nem caracteres especiais
-    // Esta regra aceita A-Z, a-z, letras com acentos (À-ÿ) e espaços. Nada mais.
+
     if (!RegExp(r'^[a-zA-ZÀ-ÿ\s]+$').hasMatch(value)) {
       return 'O nome não pode conter números ou caracteres especiais';
     }
@@ -22,13 +20,11 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return 'E-mail obrigatório';
     }
-    // Verificação 1: Garante que os únicos "caracteres especiais" são os que 
-    // compõem um e-mail válido (@, ponto, sublinhado ou traço). 
-    // Bloqueia tentativas com !, #, $, %, etc.
+  
+
     if (!RegExp(r'^[a-zA-Z0-9@._-]+$').hasMatch(value.trim())) {
       return 'Caracteres inválidos (use apenas letras, números, @ e ponto)';
     }
-    // Verificação 2: Regra estrutural do e-mail (tem de ter texto antes e depois do @)
     if (!EmailValidator.validate(value.trim())) {
       return 'E-mail inválido';
     }
@@ -52,13 +48,10 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return 'Telefone obrigatório';
     }
-    // Verificação 1: Bloqueia letras e caracteres especiais indesejados.
-    // Ele permite apenas números e a formatação padrão de máscara: ( ) - e espaços.
     if (!RegExp(r'^[0-9\s()\-]+$').hasMatch(value)) {
       return 'O telefone não pode conter letras ou caracteres especiais';
     }
 
-    // Verificação 2: Tamanho exato (removendo a formatação para contar só os dígitos)
     final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
     if (digitsOnly.length < 10 || digitsOnly.length > 11) {
       return 'Tamanho inválido (deve ter 10 ou 11 números)';

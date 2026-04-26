@@ -167,6 +167,10 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                           .doc(credencial.user!.uid)
                           .get();
 
+                      if (localContext.mounted) {
+                        LoadingNhac.esconder(localContext);
+                      }
+
                       if (!localContext.mounted) return;
 
                       if (docUsuario.exists) {
@@ -178,15 +182,12 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
 
                     } catch (e) {
                       if (localContext.mounted) {
+                        LoadingNhac.esconder(localContext);
                         localContext.showError('Código SMS inválido ou expirado.');
                       }
-                    } finally {
-                      if (localContext.mounted) {
-                        LoadingNhac.esconder(localContext);
-                      }
                     }
-                  },
-                      
+                    
+                  },  
                 
                   
                    autoFocus: true,
