@@ -6,6 +6,9 @@ import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/components/botao_largo_nhac.dart'; 
+import 'dart:async';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:flutter_svg/flutter_svg.dart'; 
 
 import 'package:nhac/globals/ui_utils.dart';
 
@@ -61,12 +64,173 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
     if (user == null) return;
 
     final hasPassword = user.providerData.any((info) => info.providerId == 'password');
+    final hasPhone = user.providerData.any((info) => info.providerId == 'phone');
 
     if (hasPassword) {
       _mostrarDialogoConfirmacaoSenha();
+    } else if (hasPhone) {
+      _mostrarDialogoConfirmacaoTelefone();
     } else {
       await _atualizarEmailSemSenha();
     }
+  }
+
+  Future<void> _mostrarDialogoConfirmacaoTelefone() async {
+    final parentContext = context;
+    final user = FirebaseAuth.instance.currentUser;
+    final telefoneCompleto = user?.phoneNumber ?? '';
+    final telefoneLimpo = telefoneCompleto.replaceAll('+55', '');
+    final authService = parentContext.read<AuthService>();
+
+    String? vId;
+    bool enviandoSms = true;
+    bool verificandoCodigo = false;
+    String? erroSms;
+    int tempoRestante = 60;
+    Timer? timer;
+
+    void iniciarTimer(StateSetter setStateDialog) {
+      tempoRestante = 60;
+      timer?.cancel();
+      timer = Timer.periodic(const Duration(seconds: 1), (t) {
+        if (tempoRestante > 0) {
+          setStateDialog(() => tempoRestante--);
+        } else {
+          t.cancel();
+        }
+      });
+    }
+
+    void enviarSms(StateSetter setStateDialog) async {
+      setStateDialog(() {
+        enviandoSms = true;
+        erroSms = null;
+      });
+
+      try {
+        await authService.enviarSmsDeVerificacao(
+          telefone: telefoneLimpo,
+          onCodeSent: (id) {
+            setStateDialog(() {
+              vId = id;
+              enviandoSms = false;
+            });
+            iniciarTimer(setStateDialog);
+          },
+          onFailed: (erro) {
+            setStateDialog(() {
+              erroSms = erro;
+              enviandoSms = false;
+            });
+          },
+        );
+      } catch (e) {
+        setStateDialog(() {
+          erroSms = e.toString();
+          enviandoSms = false;
+        });
+      }
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            if (enviandoSms && vId == null) {
+              enviarSms(setStateDialog);
+            }
+
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: const Text(
+                'Verifique seu número',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF5D201C)),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (enviandoSms && vId == null)
+                    const Center(child: CircularProgressIndicator(color: Color(0xFFFE645C)))
+                  else if (erroSms != null)
+                    Text(erroSms!, style: const TextStyle(color: Colors.red))
+                  else ...[
+                    Text(
+                      'Enviamos um código para $telefoneCompleto para confirmar sua identidade.',
+                      style: const TextStyle(color: Colors.black87),
+                    ),
+                    const SizedBox(height: 20),
+                    PinCodeTextField(
+                      appContext: context,
+                      length: 6,
+                      onChanged: (_) {},
+                      onCompleted: (code) async {
+                        setStateDialog(() => verificandoCodigo = true);
+                        try {
+                          await authService.reautenticarComSms(
+                            verificationId: vId!,
+                            smsCode: code,
+                          );
+
+                          if (!context.mounted) return;
+
+                          await authService.uptadeEmail(newEmail: _emailController.text.trim());
+
+                          if (!context.mounted) return;
+                          parentContext.read<UserProvider>().iniciarEscutaUsuario();
+
+                          timer?.cancel();
+                          if (context.mounted) Navigator.pop(context); // Fecha dialog
+                          if (parentContext.mounted) parentContext.pop(); // Fecha página
+
+                          parentContext.showSuccess('E-mail atualizado com sucesso!');
+                        } catch (e) {
+                          setStateDialog(() {
+                            verificandoCodigo = false;
+                            erroSms = 'Código inválido ou expirado.';
+                          });
+                        }
+                      },
+                      keyboardType: TextInputType.number,
+                      pinTheme: PinTheme(
+                        shape: PinCodeFieldShape.box,
+                        borderRadius: BorderRadius.circular(8),
+                        fieldHeight: 45,
+                        fieldWidth: 35,
+                        activeFillColor: Colors.white,
+                        inactiveColor: Colors.grey[300],
+                        selectedColor: const Color(0xFFFE645C),
+                      ),
+                    ),
+                    if (verificandoCodigo)
+                      const LinearProgressIndicator(color: Color(0xFFFE645C)),
+                    const SizedBox(height: 10),
+                    TextButton(
+                      onPressed: tempoRestante == 0 ? () => enviarSms(setStateDialog) : null,
+                      child: Text(
+                        tempoRestante > 0 ? 'Reenviar em ${tempoRestante}s' : 'Reenviar código',
+                        style: TextStyle(color: tempoRestante > 0 ? Colors.grey : const Color(0xFFFE645C)),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    timer?.cancel();
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancelar', style: TextStyle(color: Colors.grey)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((_) => timer?.cancel());
   }
 
   Future<void> _atualizarEmailSemSenha() async {

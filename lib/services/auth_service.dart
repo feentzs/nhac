@@ -286,6 +286,22 @@ class AuthService with ChangeNotifier {
     }
   }
 
+  Future<void> reautenticarComSms({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      await currentUser?.reauthenticateWithCredential(credential);
+      notifyListeners();
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
   Future<void> finalizarCadastroTelefone({
     required String nome,
     required String telefone,
