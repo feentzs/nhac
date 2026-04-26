@@ -144,7 +144,7 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                     fieldHeight: 55.0,
                   ),
                   onChanged: (value) {},
-                  onCompleted: (value) async {
+                 onCompleted: (value) async {
                     final localContext = context;
                     final router = GoRouter.of(localContext);
                     final authService = localContext.read<AuthService>();
@@ -162,6 +162,8 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
 
                       if (!localContext.mounted) return;
                       
+                      bool isNewUser = credencial.additionalUserInfo?.isNewUser ?? false;
+                      
                       final docUsuario = await FirebaseFirestore.instance
                           .collection('usuarios')
                           .doc(credencial.user!.uid)
@@ -173,10 +175,11 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
 
                       if (!localContext.mounted) return;
 
-                      if (docUsuario.exists) {
+                      if (!isNewUser && docUsuario.exists) {
                         cadastroData.limparDados();
                         router.go('/home-page');
                       } else {
+                        
                         router.push('/cadastro/nome'); 
                       }
 
@@ -185,10 +188,8 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                         LoadingNhac.esconder(localContext);
                         localContext.showError('Código SMS inválido ou expirado.');
                       }
-                    }
-                    
-                  },  
-                
+                    } 
+                  },
                   
                    autoFocus: true,
                   enableActiveFill: true,
