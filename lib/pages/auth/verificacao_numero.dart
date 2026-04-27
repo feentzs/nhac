@@ -11,6 +11,9 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
+import 'package:nhac/components/loading_nhac.dart';
+import 'package:nhac/globals/ui_utils.dart';
+
 @NowaGenerated()
 class VerificacaoNumero extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -142,24 +145,29 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                   ),
                   onChanged: (value) {},
                   onCompleted: (value) async {
-                    final router = GoRouter.of(context);
-                    final authService = context.read<AuthService>();
-                    final cadastroData = context.read<CadastroController>();
+                    final localContext = context;
+                    final router = GoRouter.of(localContext);
+                    final authService = localContext.read<AuthService>();
+                    final cadastroData = localContext.read<CadastroController>();
 
                     try {
+                      if (localContext.mounted) {
+                        LoadingNhac.mostrar(localContext, mensagem: 'Verificando código...');
+                      }
+
                       UserCredential credencial = await authService.loginComSms(
                         verificationId: cadastroData.verificationId,
                         smsCode: value,
                       );
 
-                      if (!mounted) return;
+                      if (!localContext.mounted) return;
                       
                       final docUsuario = await FirebaseFirestore.instance
                           .collection('usuarios')
                           .doc(credencial.user!.uid)
                           .get();
 
-                      if (!mounted) return;
+                      if (!localContext.mounted) return;
 
                       if (docUsuario.exists) {
                         cadastroData.limparDados();
@@ -169,13 +177,13 @@ class _VerificacaoNumeroState extends State<VerificacaoNumero> {
                       }
 
                     } catch (e) {
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Código SMS inválido!'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                      if (localContext.mounted) {
+                        localContext.showError('Código SMS inválido ou expirado.');
+                      }
+                    } finally {
+                      if (localContext.mounted) {
+                        LoadingNhac.esconder(localContext);
+                      }
                     }
                   },
                       

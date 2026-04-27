@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nhac/components/botao_largo_nhac.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
+
+import 'package:nhac/globals/ui_utils.dart';
 
 class EditarNomePreferenciaPage extends StatefulWidget {
   const EditarNomePreferenciaPage({super.key});
@@ -23,29 +26,26 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
   }
 
   void renameName() async {
-    setState(() => _isLoading = true);
+    final localContext = context;
     try {
-      final authService = context.read<AuthService>();
+      setState(() => _isLoading = true);
+
+      final authService = localContext.read<AuthService>();
 
       await authService.updateUserName(userName: _nameController.text);
 
-      if (!mounted) return;
-      context.read<UserProvider>().iniciarEscutaUsuario();
+      if (!localContext.mounted) return;
+      localContext.read<UserProvider>().iniciarEscutaUsuario();
       
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nome atualizado com sucesso!')),
-      );
-
-      context.pop();
+      localContext.showSuccess('Nome atualizado com sucesso!');
+      localContext.pop();
     } catch (e){
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: $e')),
-      );
+      if (!localContext.mounted) return;
+      localContext.showError(e.toString());
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -126,46 +126,12 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
             
             Padding(
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0, top: 16.0),
-              child: SizedBox(
-                width: double.infinity,
-                height: 49.0,
-                child: ElevatedButton(
-                  onPressed: (_nameController.text.trim().isNotEmpty && !_isLoading)
+              child: BotaoLargoNhac(
+                texto: 'Salvar alterações',
+                carregando: _isLoading,
+                onPressed: (_nameController.text.trim().isNotEmpty && !_isLoading)
                       ? () => renameName()
                       : null,
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return const Color(0xFFC9BCBC);
-                      }
-                      return const Color(0xFFFE645C);
-                    }),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0), 
-                      ),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? Transform.scale(
-                          scale: 2.5,
-                          child: Lottie.asset(
-                            'assets/animations/botao_loading_nhac.json',
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.contain,
-                          ),
-                        )
-                      : const Text(
-                          'Salvar alterações',
-                          style: TextStyle(
-                            color: Color(0xFFFEE3E1),
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.1,
-                          ),
-                        ),
-                ),
               ),
             ),
           ],

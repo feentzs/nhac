@@ -22,8 +22,6 @@ class MockUserProvider extends ChangeNotifier implements UserProvider {
   @override
   void limparUsuario() {}
   @override
-  void dispose() {}
-  @override
   bool get hasListeners => false;
 
   @override
@@ -34,14 +32,13 @@ class MockUserProvider extends ChangeNotifier implements UserProvider {
 
   @override
   Future<void> carregarDadosUsuario() {
-    // TODO: implement carregarDadosUsuario
     throw UnimplementedError();
   }
 }
 
 void main() {
   testWidgets('Deve mostrar ícone de cadeado e desabilitar clique para usuário Google', (WidgetTester tester) async {
-    // Mock do UserProvider
+
     final mockProvider = MockUserProvider();
 
     await tester.pumpWidget(

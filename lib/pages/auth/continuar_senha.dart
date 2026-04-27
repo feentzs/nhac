@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nhac/components/seta_voltar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nhac/components/botao_largo_nhac.dart';
@@ -8,6 +8,8 @@ import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+import 'package:nhac/globals/ui_utils.dart';
 
 @NowaGenerated()
 class ContinuarSenha extends StatefulWidget {
@@ -48,53 +50,39 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
   }
 
   Future<void> logar() async {
-    setState(() => _isLoading = true);
+    final localContext = context;
     try {
-      final authService = context.read<AuthService>();
-      final cadastroData = context.read<CadastroController>();
+      setState(() => _isLoading = true);
+
+      final authService = localContext.read<AuthService>();
+      final cadastroData = localContext.read<CadastroController>();
 
       await authService.signIn(
         email: cadastroData.email, 
         password: _senhaController.text.trim() 
       );
       
-      if (!mounted) return;
+      if (!localContext.mounted) return;
 
-      context.read<UserProvider>().iniciarEscutaUsuario();
+      localContext.read<UserProvider>().iniciarEscutaUsuario();
       cadastroData.limparDados();
       
-      if (!mounted) return;
+      localContext.showSuccess("Logado com sucesso!");
+      localContext.go('/home-page'); 
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Logado com sucesso!!"), backgroundColor: Colors.green),
-      );
-      
-      context.go('/home-page'); 
-
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      
-      String erro = "Erro ao entrar";
-      if (e.code == 'user-not-found') erro = "Usuário não encontrado.";
-      if (e.code == 'wrong-password') erro = "Senha incorreta.";
-
-      setState(() {
-        _errorMessage = erro;
-      });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(erro), backgroundColor: Colors.redAccent),
-      );
     } catch (e) {
-      if (!mounted) return;
+      if (!localContext.mounted) return;
+      
       setState(() {
-        _errorMessage = "Erro inesperado: $e";
+        _errorMessage = e.toString();
+        _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro inesperado: $e")),
-      );
+      
+      localContext.showError(e.toString());
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (localContext.mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -115,26 +103,7 @@ class _ContinuarSenhaState extends State<ContinuarSenha> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (GoRouter.of(context).canPop()) {
-                            GoRouter.of(context).pop();
-                          } else {
-                            GoRouter.of(context).go('/home-page');
-                          }
-                        },
-                       child: Transform.scale(
-                          scaleX: -1.0,
-                          child: const SizedBox(
-                            width: 21.0,
-                            height: 21.0,
-                            child: Image(
-                              image: AssetImage('assets/Arrow right (3).png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
+                      const SetaVoltar(),
                       const SizedBox(height: 18.0),
                       const Text(
                         'Bem-vindo Novamente!\nInsira sua senha',

@@ -46,6 +46,7 @@ app.*.map.json
 
 # Nowa related
 .nowa/temp
+.nowa/
 
 # Certificados e chaves de segurança
 *.jks
@@ -58,6 +59,7 @@ app.*.map.json
 .env.*.local
 
 # iOS/macOS
+**/ios/Runner/GoogleService-Info.plist
 **/ios/**/*.pbxuser
 **/ios/**/*.perspectivev3
 **/ios/**/.DS_Store
@@ -70,6 +72,7 @@ app.*.map.json
 **/macos/**/*.perspectivev3
 
 # Android específico
+**/android/app/google-services.json
 **/android/.gradle/
 **/android/local.properties
 **/android/key.properties

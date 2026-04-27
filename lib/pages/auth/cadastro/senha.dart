@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nhac/components/seta_voltar.dart';
 import 'package:flutter/material.dart';
 import 'package:nhac/components/botao_largo_nhac.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
@@ -7,6 +7,8 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+
+import 'package:nhac/globals/ui_utils.dart';
 
 @NowaGenerated()
 class Senha extends StatefulWidget {
@@ -90,28 +92,7 @@ class _SenhaState extends State<Senha> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          _senhaFocus.unfocus();
-                          _confirmarSenhaFocus.unfocus();
-                          if (GoRouter.of(context).canPop()) {
-                            GoRouter.of(context).pop();
-                          } else {
-                            GoRouter.of(context).go('/home-page');
-                          }
-                        },
-                        child: Transform.scale(
-                          scaleX: -1.0, 
-                          child: const SizedBox(
-                            width: 21.0,
-                            height: 21.0,
-                            child: Image(
-                              image: AssetImage('assets/Arrow right (3).png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
+                      const SetaVoltar(),
                       const SizedBox(height: 18.0),
                       const Text(
                         'Vamos criar a sua senha',
@@ -272,10 +253,12 @@ class _SenhaState extends State<Senha> {
   }
   
   Future<void> cadastrar() async {
-    setState(() => _isLoading = true);
+    final localContext = context;
     try {
-      final authService = context.read<AuthService>();
-      final cadastroData = context.read<CadastroController>();
+      setState(() => _isLoading = true);
+
+      final authService = localContext.read<AuthService>();
+      final cadastroData = localContext.read<CadastroController>();
 
       await authService.createAccount(
         email: cadastroData.email, 
@@ -284,31 +267,19 @@ class _SenhaState extends State<Senha> {
         telefone: cadastroData.telefone
       );
 
-      if (!mounted) return;
+      if (!localContext.mounted) return;
 
       cadastroData.limparDados();
-      context.go('/home-page');
+      localContext.showSuccess("Conta criada com sucesso!");
+      localContext.go('/home-page');
 
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-
-      String mensagem = "Erro ao criar conta";
-      if (e.code == 'email-already-in-use') {
-        mensagem = "Este e-mail já está em uso.";
-      } else if (e.code == 'weak-password') {
-        mensagem = "A senha é muito fraca.";
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(mensagem), backgroundColor: Colors.redAccent),
-      );
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erro inesperado: $e")),
-      );
+      if (!localContext.mounted) return;
+      localContext.showError(e.toString());
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (localContext.mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 }

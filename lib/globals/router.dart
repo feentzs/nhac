@@ -8,7 +8,6 @@ import 'package:nhac/pages/splash_screen.dart';
 import 'package:nhac/pages/bem_vindo_motoca.dart';
 import 'package:nhac/pages/auth/verificacao_numero.dart';
 import 'package:nhac/pages/home_page.dart';
-import 'package:nhac/services/auth_check.dart';
 import 'package:nhac/pages/auth/cadastro/nome.dart';
 import 'package:nhac/pages/auth/cadastro/senha.dart';
 import 'package:nhac/pages/dados_pessoais_page.dart';
@@ -18,6 +17,7 @@ import 'package:nhac/pages/editar_perfil/editar_foto_page.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:nhac/pages/auth/cadastro/telefone_cadastro.dart';
+import 'package:nhac/pages/enderecos_page.dart';
 
 class _SlideRightToLeftPageRoute<T> extends PageRoute<T>
     with MaterialRouteTransitionMixin<T> {
@@ -113,8 +113,8 @@ final GoRouter appRouter = GoRouter(
  redirect: (BuildContext context, GoRouterState state) {
     final bool estaLogado = authServiceRoteador.currentUser != null;
 
-    final bool telaPublica = state.matchedLocation == '/splash' ||
-        state.matchedLocation == '/' ||
+    final bool telaPublica = state.matchedLocation == '/' ||
+        state.matchedLocation == '/splash' ||
         state.matchedLocation == '/bem-vindo' ||
         state.matchedLocation == '/bem-vindo-motoca' ||
         state.matchedLocation == '/email-cliente' ||
@@ -137,7 +137,7 @@ final GoRouter appRouter = GoRouter(
     return null; 
   },
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const AuthCheck()),
+    GoRoute(path: '/', builder: (context, state) => const HomePage()),
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
       path: '/home-page',
@@ -239,6 +239,14 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
         child: const EditarFotoPage(),
+      ),
+    ),
+
+    GoRoute(
+      path: '/enderecos-salvos',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const EnderecosPage(),
       ),
     ),
   ],

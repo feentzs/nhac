@@ -1,3 +1,5 @@
+import 'package:nhac/components/botao_largo_nhac.dart';
+import 'package:nhac/components/seta_voltar.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:nhac/services/auth_service.dart';
@@ -5,6 +7,8 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/controllers/cadastro_controller.dart'; 
+
+import 'package:nhac/globals/ui_utils.dart';
 
 @NowaGenerated()
 class InsiraTelefone extends StatefulWidget {
@@ -22,6 +26,7 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
   final TextEditingController _telefoneController = TextEditingController();
 
   bool _numeroValido = false;
+  bool _isLoading = false;
 
   final maskFormatter = MaskTextInputFormatter(
     mask: '(##) #####-####',
@@ -52,26 +57,7 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (GoRouter.of(context).canPop()) {
-                            GoRouter.of(context).pop();
-                          } else {
-                            GoRouter.of(context).go('/home-page');
-                          }
-                        },
-                        child: Transform.scale(
-                          scaleX: -1.0,
-                          child: const SizedBox(
-                            width: 21.0,
-                            height: 21.0,
-                            child: Image(
-                              image: AssetImage('assets/Arrow right (3).png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      ),
+                      const SetaVoltar(),
                       const SizedBox(height: 24.0),
                       
                       const Text(
@@ -144,63 +130,47 @@ class _InsiraTelefoneState extends State<InsiraTelefone> {
                 bottom: 24.0,
                 top: 8.0,
               ),
-              child: SizedBox(
-                height: 49.0,
-                width: double.infinity,
-                child: ElevatedButton(
+              child: BotaoLargoNhac(
+                texto: 'Continuar', 
+                carregando: _isLoading,
                  onPressed: _numeroValido
                       ? () async {
-                          final authService = context.read<AuthService>();
-                          final cadastroData = context.read<CadastroController>();
+                          final localContext = context;
+                          final authService = localContext.read<AuthService>();
+                          final cadastroData = localContext.read<CadastroController>();
                           
                           final telefoneLimpo = maskFormatter.getUnmaskedText();
                           cadastroData.setTelefone(telefoneLimpo); 
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('A enviar SMS...')),
-                          );
+                          try {
+                            setState(() => _isLoading = true);
 
-                          await authService.enviarSmsDeVerificacao(
-                            telefone: telefoneLimpo,
-                            onCodeSent: (String verId) {
-                              cadastroData.setVerificationId(verId);
-                              if (mounted) {
-                                context.push('/verificacao_numero', extra: _telefoneController.text);
-                              }
-                            },
-                            onFailed: (String erro) {
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Erro: $erro'), backgroundColor: Colors.red),
-                                );
-                              }
-                            },
-                          );
+                            await authService.enviarSmsDeVerificacao(
+                              telefone: telefoneLimpo,
+                              onCodeSent: (String verId) {
+                                if (localContext.mounted) {
+                                  setState(() => _isLoading = false);
+                                }
+                                cadastroData.setVerificationId(verId);
+                                if (localContext.mounted) {
+                                  localContext.push('/verificacao_numero', extra: _telefoneController.text);
+                                }
+                              },
+                              onFailed: (String erro) {
+                                if (localContext.mounted) {
+                                  setState(() => _isLoading = false);
+                                  localContext.showError('Erro ao enviar SMS: $erro');
+                                }
+                              },
+                            );
+                          } catch (e) {
+                             if (localContext.mounted) {
+                                setState(() => _isLoading = false);
+                                localContext.showError(e.toString());
+                             }
+                          }
                         }
                       : null,
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return Colors.grey.shade400;
-                      }
-                      return const Color(0xFFFE645C); 
-                    }),
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: const Text(
-                    'Continuar',
-                    style: TextStyle(
-                      color: Color(0xFFFEE3E1),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                ),
               ),
             ),
           ],

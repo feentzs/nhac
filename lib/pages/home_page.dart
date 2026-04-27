@@ -49,10 +49,9 @@ class _HomePageState extends State<HomePage> {
           const ProfileContent(),
         ],
       ),
-      floatingActionButton: Builder(
-        builder: (context) {
-          final quantidadeNoCarrinho = context.watch<CartProvider>().totalDeUnidades;
-
+      floatingActionButton: Selector<CartProvider, int>(
+        selector: (context, provider) => provider.totalDeUnidades,
+        builder: (context, quantidadeNoCarrinho, child) {
           if (quantidadeNoCarrinho == 0) return const SizedBox.shrink();
 
           return FloatingActionButton(

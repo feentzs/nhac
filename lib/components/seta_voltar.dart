@@ -14,17 +14,12 @@ class SetaVoltar extends StatelessWidget {
           GoRouter.of(context).go('/home-page');
         }
       },
-      child: Transform.scale(
-        scaleX: -1.0,
         child: const SizedBox(
           width: 21.0,
           height: 21.0,
-          child: Image(
-            image: AssetImage('assets/Arrow right (3).png'),
-            fit: BoxFit.cover,
-          ),
+          child: Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
         ),
-      ),
+      
     );
   }
 }

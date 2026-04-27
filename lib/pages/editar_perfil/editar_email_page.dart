@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/components/botao_largo_nhac.dart'; 
-import 'package:nhac/components/loading_nhac.dart';
+
+import 'package:nhac/globals/ui_utils.dart';
 
 class EditarEmailPage extends StatefulWidget {
   const EditarEmailPage({super.key});
@@ -18,7 +20,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   final TextEditingController _emailController = TextEditingController();
   bool _emailValido = false;
   String? _erroEmail;
-  final bool _carregando = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -68,28 +70,25 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
   }
 
   Future<void> _atualizarEmailSemSenha() async {
-    LoadingNhac.mostrar(context, mensagem: 'Enviando confirmação...');
+    final localContext = context;
     try {
-      final authService = context.read<AuthService>();
+      setState(() => _isLoading = true);
+      
+      final authService = localContext.read<AuthService>();
       await authService.uptadeEmail(newEmail: _emailController.text.trim());
       
-      if (!mounted) return;
-      context.read<UserProvider>().iniciarEscutaUsuario();
+      if (!localContext.mounted) return;
+      localContext.read<UserProvider>().iniciarEscutaUsuario();
       
-      LoadingNhac.esconder(context);
-      context.pop(); 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Link de confirmação enviado para o novo e-mail!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      localContext.pop(); 
+      localContext.showSuccess('Link de confirmação enviado para o novo e-mail!');
     } catch (e) {
-      if (!mounted) return;
-      LoadingNhac.esconder(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao atualizar e-mail: $e'), backgroundColor: Colors.red),
-      );
+      if (!localContext.mounted) return;
+      localContext.showError('Erro ao atualizar e-mail: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -97,6 +96,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
     final TextEditingController senhaController = TextEditingController();
     bool carregandoDialog = false;
     String? erroSenha;
+    final parentContext = context;
 
     showDialog(
       context: context,
@@ -134,6 +134,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      
                     ),
                   ),
                 ],
@@ -169,35 +170,25 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                               await user.reauthenticateWithCredential(credential);
 
                               if (!context.mounted) return;
-                              final authService = context.read<AuthService>();
+                              final authService = parentContext.read<AuthService>();
                               
                               await authService.uptadeEmail(newEmail: _emailController.text.trim());
+                              
                               if (!context.mounted) return;
+                              parentContext.read<UserProvider>().iniciarEscutaUsuario();
 
-                              context.read<UserProvider>().iniciarEscutaUsuario();
+                              if (context.mounted) Navigator.pop(context); // Fecha dialog
+                              if (parentContext.mounted) parentContext.pop(); // Fecha página
 
-                              if (!context.mounted) return;
-                              Navigator.pop(context); 
-                              Navigator.pop(context); 
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('E-mail atualizado com sucesso!'), backgroundColor: Colors.green),
-                              );
+                              parentContext.showSuccess('E-mail atualizado com sucesso!');
                             }
-                          } on FirebaseAuthException catch (e) {
-                            setStateDialog(() {
-                              carregandoDialog = false;
-                              if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-                                erroSenha = 'Senha incorreta!';
-                              } else {
-                                erroSenha = 'Erro: ${e.message}';
-                              }
-                            });
                           } catch (e) {
-                            setStateDialog(() {
-                              carregandoDialog = false;
-                              erroSenha = 'Erro inesperado. Tente novamente.';
-                            });
+                            if (context.mounted) {
+                              setStateDialog(() {
+                                carregandoDialog = false;
+                                erroSenha = e.toString();
+                              });
+                            }
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -205,7 +196,15 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: carregandoDialog
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      ? Transform.scale(
+                          scale: 2.5,
+                          child: Lottie.asset(
+                            'assets/animations/botao_loading_nhac.json',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.contain,
+                          ),
+                        )
                       : const Text('Confirmar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
               ],
@@ -223,10 +222,12 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
 
     if (isGoogleUser) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Usuários do Google não podem alterar o e-mail por aqui.')),
-        );
+        if (context.mounted) {
+          context.pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Usuários do Google não podem alterar o e-mail por aqui.')),
+          );
+        }
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -285,6 +286,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                             borderSide: BorderSide(color: Colors.black87),
                           ),
                           contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                          hintText: 'Email',
+                          hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
                         ),
                         style: const TextStyle(
                           fontSize: 18.0,
@@ -300,7 +303,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 32.0, top: 16.0),
               child: BotaoLargoNhac(
                 texto: 'Continuar',
-                carregando: _carregando,
+                carregando: _isLoading,
                 onPressed: _emailValido ? () => _processarAtualizacaoEmail() : null,
               ),
             ),

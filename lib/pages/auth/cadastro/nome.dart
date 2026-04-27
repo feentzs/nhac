@@ -7,6 +7,8 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import 'package:nhac/globals/ui_utils.dart';
+
 @NowaGenerated()
 class Nome extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -21,6 +23,7 @@ class Nome extends StatefulWidget {
 @NowaGenerated()
 class _NomeState extends State<Nome> {
   bool _nomeValido = false;
+  bool _isLoading = false;
 
   final TextEditingController _nomeController = TextEditingController();
 
@@ -115,34 +118,38 @@ class _NomeState extends State<Nome> {
               padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0, top: 8.0),
               child: BotaoLargoNhac(
                 texto: 'Continuar',
+                carregando: _isLoading,
                 onPressed: _nomeValido
                     ? () async {
-                        final cadastroData = context.read<CadastroController>();
+                        final localContext = context;
+                        final cadastroData = localContext.read<CadastroController>();
                         cadastroData.setNome(_nomeController.text.trim());
 
                       if (cadastroData.email.isNotEmpty) {
-                          context.push('/cadastro/telefone'); 
+                          localContext.push('/cadastro/telefone'); 
                         } else {
-                           final authService = context.read<AuthService>(); 
-                           
-                           ScaffoldMessenger.of(context).showSnackBar(
-                             const SnackBar(content: Text('A finalizar cadastro...')),
-                           );
+                           final authService = localContext.read<AuthService>(); 
 
                            try {
+                             setState(() => _isLoading = true);
+
                              await authService.finalizarCadastroTelefone(
                                nome: cadastroData.nome,
                                telefone: cadastroData.telefone,
                              );
                              
+                             if (!localContext.mounted) return;
                              cadastroData.limparDados();
-                             if (context.mounted) context.go('/home-page');
+                             localContext.showSuccess('Cadastro finalizado!');
+                             localContext.go('/home-page');
                              
                            } catch (e) {
-                             if (context.mounted) {
-                               ScaffoldMessenger.of(context).showSnackBar(
-                                 SnackBar(content: Text('Erro: $e'), backgroundColor: Colors.red),
-                               );
+                             if (localContext.mounted) {
+                               localContext.showError(e.toString());
+                             }
+                           } finally {
+                             if (localContext.mounted) {
+                               setState(() => _isLoading = false);
                              }
                            }
                         }

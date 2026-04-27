@@ -10,6 +10,7 @@ import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/globals/ui_utils.dart';
 
+
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -26,6 +27,8 @@ class _EmailClienteState extends State<EmailCliente> {
   final TextEditingController _emailController = TextEditingController();
 
   bool _emailValido = false;
+  bool _isLoading = false;
+  bool _isGoogleLoading = false;
 
   final List<String> _dominios = [
     '@gmail.com',
@@ -62,13 +65,20 @@ class _EmailClienteState extends State<EmailCliente> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+
              const SetaVoltar(),
              const SizedBox(height: 24.0),
               const Text(
@@ -90,7 +100,7 @@ class _EmailClienteState extends State<EmailCliente> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 22.0),
 
               TextFormField(
                 controller: _emailController,
@@ -156,7 +166,7 @@ class _EmailClienteState extends State<EmailCliente> {
                   physics: const BouncingScrollPhysics(),
                 ),
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 22.0),
 
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -180,112 +190,62 @@ class _EmailClienteState extends State<EmailCliente> {
                   ),
                 ],
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 22.0),
 
-              SizedBox(
-                width: double.infinity,
-                height: 49.0,
-                child: ElevatedButton(
-                  onPressed: () async {
+              BotaoLargoNhac(
+                texto: 'Continuar com o Google',
+                isSecundario: true,
+                carregando: _isGoogleLoading,
+                icone: SvgPicture.asset(
+                  'assets/google-logo.svg',
+                  height: 24.0,
+                  width: 24.0,
+                ),
+                onPressed: () async {
+                    final localContext = context;
+                    final authService = localContext.read<AuthService>();
                     try {
-                      await context.read<AuthService>().signInWithGoogle();
-                      if (!context.mounted) return;
-                      context.go('/home-page');
+                      final googleAccount = await authService.pickGoogleAccount();
+                      if (googleAccount == null) return;
+
+                      setState(() => _isGoogleLoading = true);
+
+                      await authService.signInWithGoogleAccount(googleAccount);
+                      
+                      if (!localContext.mounted) return;
+                      localContext.go('/home-page');
                     } catch (e) {
-                      if (context.mounted) {
-                        context.showError(e.toString());
+                      if (localContext.mounted) {
+                        localContext.showError(e.toString());
+                      }
+                    } finally {
+                      if (localContext.mounted) {
+                        setState(() => _isGoogleLoading = false);
                       }
                     }
                   },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll<Color?>(
-                      Theme.of(context).colorScheme.surface,
-                    ),
-                    elevation: const WidgetStatePropertyAll<double?>(0.0),
-                    side: const WidgetStatePropertyAll<BorderSide>(
-                      BorderSide(color: Color(0xFF5D201C), width: 1.5),
-                    ),
-                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        'assets/google-logo.svg',
-                        height: 24.0,
-                        width: 24.0,
-                      ),
-                      const Expanded(
-                        child: Text(
-                          'Continuar com o Google',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF5D201C),
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 24.0),
-                    ],
-                  ),
-                ),
               ),
               const SizedBox(height: 16.0),
 
-              SizedBox(
-                width: double.infinity,
-                height: 49.0,
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.push('/insira_telefone');
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll<Color?>(
-                      Theme.of(context).colorScheme.surface,
-                    ),
-                    elevation: const WidgetStatePropertyAll<double?>(0.0),
-                    side: const WidgetStatePropertyAll<BorderSide>(
-                      BorderSide(color: Color(0xFF5D201C), width: 1.5),
-                    ),
-                    shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.phone, size: 24.0, color: Color(0xFF5D201C)),
-                      Expanded(
-                        child: Text(
-                          'Continuar com o telefone',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Color(0xFF5D201C),
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 24.0),
+              BotaoLargoNhac(
+                texto: 'Continuar com o telefone',
+                isSecundario: true,
+                icone: const Icon(Icons.phone, size: 24.0, color: Color(0xFF5D201C)),
+                onPressed: () {
+                  context.push('/insira_telefone');
+                },
+              ),
+
                     ],
                   ),
                 ),
               ),
 
-              const Spacer(),
 
-              SizedBox(
-                width: double.infinity,
-                height: 49.0,
-                child:BotaoLargoNhac(
+              BotaoLargoNhac(
                 texto: 'Continuar',
+                carregando: _isLoading,
                 onPressed: _emailValido ? () async { await redirecionadorEmail(); } : null,
-              ),
               ),
               const SizedBox(height: 16.0),  
             ],
@@ -296,28 +256,33 @@ class _EmailClienteState extends State<EmailCliente> {
   }
 
   Future<void> redirecionadorEmail() async {
-    final authService = context.read<AuthService>();
-    final cadastroData = context.read<CadastroController>();
+    final localContext = context;
+    final authService = localContext.read<AuthService>();
+    final cadastroData = localContext.read<CadastroController>();
 
     final emailDoUsuario = _emailController.text.trim();
 
     try {
+      setState(() => _isLoading = true);
+
       bool emailExiste = await authService.checarEmail(emailDoUsuario);
 
-      if (!mounted) return;
-
-      context.showInfo(emailExiste ? "Bem-vindo de volta!" : "Criando sua conta...");
+      if (!localContext.mounted) return;
 
       cadastroData.setEmail(emailDoUsuario);
 
       if (emailExiste) {
-        context.push('/continuar_senha');
+        localContext.push('/continuar_senha');
       } else {
-        context.push('/cadastro/nome');
+        localContext.push('/cadastro/nome');
       }
     } catch (e) {
-      if (!mounted) return;
-      context.showError("Erro ao verificar email: $e");
+      if (!localContext.mounted) return;
+      localContext.showError("Erro ao verificar email: $e");
+    } finally {
+      if (localContext.mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 }

@@ -28,7 +28,10 @@ class _BemVindoState extends State<BemVindo> {
       child: Scaffold(
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 24.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -48,7 +51,7 @@ class _BemVindoState extends State<BemVindo> {
                         backgroundColor: const WidgetStatePropertyAll<Color?>(
                           Color(0xFFFFF5F5),
                         ),
-                        elevation: const WidgetStatePropertyAll<double?>(0),
+                        elevation: const WidgetStatePropertyAll<double?>(0.0),
                         shape: WidgetStatePropertyAll<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50.0),
@@ -67,39 +70,40 @@ class _BemVindoState extends State<BemVindo> {
                             ),
                           ),
                           const SizedBox(width: 8.0),
-                          SizedBox(
-                            width: 15.0,
-                            height: 15.0,
-                            child: Image.asset(
-                              'assets/Arrow right (3).png',
-                              fit: BoxFit.cover,
-                            ),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 14.0,
+                            color: Color(0xFF7C6F6F),
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                
-                Expanded(
+                FlexSizedBox(
+                  height: 406.0,
                   child: Center(
                     child: Image.asset(
                       'assets/lanche-bem-vindo.png',
-                      fit: BoxFit.contain, 
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
-                const Text(
-                  'O Nhac que sua fome pedia',
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    color: Color(0xFF5D201C),
-                    fontFamily: 'Roboto',
-                    fontWeight: FontWeight.w600,
+                const FlexSizedBox(
+                  width: 301.1875,
+                  height: 34.0,
+                  child: Text(
+                    'O Nhac que sua fome pedia',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      color: Color(0xFF5D201C),
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 12.0), 
+                const SizedBox(height: 12.0),
                 const Text(
                   'Encontre os melhores restaurantes locais e peça sua comida favorita com rapidez e facilidade.',
                   style: TextStyle(
@@ -108,9 +112,9 @@ class _BemVindoState extends State<BemVindo> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 32.0), 
+                const SizedBox(height: 32.0),
                 const SizedBox(
-                  width: double.infinity, 
+                  width: double.infinity,
                   height: 49.0,
                   child: BotaoNhac(),
                 ),
