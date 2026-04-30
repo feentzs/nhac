@@ -8,6 +8,8 @@ import 'package:nhac/controllers/endereco_provider.dart';
 import 'package:nhac/globals/ui_utils.dart';
 import 'package:nhac/models/usuario/endereco_model.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EnderecosPage extends StatefulWidget {
   const EnderecosPage({super.key});
@@ -356,20 +358,12 @@ class _BuscaEnderecoOverlay extends StatefulWidget {
 
 class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
   final TextEditingController _searchController = TextEditingController();
-  List<Map<String, String>> _sugestoes = [];
+  List<Map<String, dynamic>> _sugestoes = [];
   bool _estaDigitando = false;
   bool _isLoadingSearch = false;
   Timer? _debounce;
-
-  final List<Map<String, String>> _mockEnderecos = [
-    {
-      'rua': 'Avenida Do seu Coração',
-      'numero': '4444',
-      'bairro': 'Solidão',
-      'cidade': 'São Paulo',
-      'estado': 'SP'
-    },
-  ];
+  final Dio _dio = Dio();
+  final String _googleApiKey = dotenv.env['GOOGLE_PLACES_API_KEY'] ?? '';
 
   void _filtrarEnderecos(String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
@@ -388,15 +382,113 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
       _isLoadingSearch = true;
     });
 
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _sugestoes = _mockEnderecos.where((addr) {
-          final fullAddr = '${addr['rua']} ${addr['bairro']} ${addr['cidade']}'.toLowerCase();
-          return fullAddr.contains(query.toLowerCase());
-        }).toList();
-        _isLoadingSearch = false;
-      });
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final response = await _dio.get(
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json',
+          queryParameters: {
+            'input': query,
+            'key': _googleApiKey,
+            'components': 'country:br',
+            'language': 'pt-BR',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = response.data;
+          if (data['status'] == 'OK') {
+            setState(() {
+              _sugestoes = List<Map<String, dynamic>>.from(data['predictions'].map((p) => {
+                'description': p['description'],
+                'place_id': p['place_id'],
+                'main_text': p['structured_formatting']?['main_text'] ?? p['description'].toString().split(',').first,
+                'secondary_text': p['structured_formatting']?['secondary_text'] ?? p['description'],
+              }));
+              _isLoadingSearch = false;
+            });
+          } else {
+            setState(() {
+              _sugestoes = [];
+              _isLoadingSearch = false;
+            });
+          }
+        }
+      } catch (e) {
+        setState(() {
+          _sugestoes = [];
+          _isLoadingSearch = false;
+        });
+      }
     });
+  }
+
+  Future<void> _obterDetalhes(String placeId, String description) async {
+    setState(() {
+      _isLoadingSearch = true;
+    });
+
+    try {
+      final response = await _dio.get(
+        'https://maps.googleapis.com/maps/api/place/details/json',
+        queryParameters: {
+          'place_id': placeId,
+          'key': _googleApiKey,
+          'language': 'pt-BR',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['status'] == 'OK') {
+          final result = data['result'];
+          final components = result['address_components'] as List;
+
+          String rua = '';
+          String numero = '';
+          String bairro = '';
+          String cidade = '';
+          String estado = '';
+
+          for (var c in components) {
+            final types = c['types'] as List;
+            if (types.contains('route')) {
+              rua = c['long_name'];
+            }
+            if (types.contains('street_number')) {
+              numero = c['long_name'];
+            }
+            if (types.contains('sublocality') || types.contains('sublocality_level_1') || types.contains('neighborhood')) {
+              bairro = c['long_name'];
+            }
+            if (types.contains('administrative_area_level_2')) {
+              cidade = c['long_name'];
+            }
+            if (types.contains('administrative_area_level_1')) {
+              estado = c['short_name'];
+            }
+          }
+
+          if (mounted) {
+            Navigator.pop(context, {
+              'rua': rua,
+              'numero': numero,
+              'bairro': bairro,
+              'cidade': cidade,
+              'estado': estado,
+            });
+            context.showInfo('Endereço "${description.split(",").first}" selecionado!');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Erro ao obter detalhes do local: \$e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingSearch = false;
+        });
+      }
+    }
   }
 
   @override
@@ -510,13 +602,12 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
                                     child: const Icon(Icons.location_on_outlined, color: Colors.grey),
                                   ),
                                   title: Text(
-                                    '${item['rua']}, ${item['numero']}',
+                                    item['main_text'].toString(),
                                     style: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
-                                  subtitle: Text('${item['bairro']}, ${item['cidade']} - ${item['estado']}'),
+                                  subtitle: Text(item['secondary_text'].toString()),
                                   onTap: () {
-                                    Navigator.pop(context);
-                                    context.showInfo('Endereço "${item['rua']}" selecionado!');
+                                    _obterDetalhes(item['place_id'], item['description']);
                                   },
                                 );
                               },

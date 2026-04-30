@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:nhac/components/botao_largo_nhac.dart'; 
 import 'dart:async';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:flutter_svg/flutter_svg.dart'; 
 
 import 'package:nhac/globals/ui_utils.dart';
 

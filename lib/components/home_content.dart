@@ -8,6 +8,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 @NowaGenerated()
 class HomeContent extends StatefulWidget {
@@ -80,13 +82,29 @@ class _HomeContentState extends State<HomeContent> {
     ]);
   }
 
-  void _abrirBuscaEndereco(BuildContext context) {
-    showModalBottomSheet(
+  void _abrirBuscaEndereco(BuildContext context) async {
+    final result = await showModalBottomSheet<Map<String, String>>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const _AddressPickerSheet(),
     );
+
+    if (result != null && mounted) {
+      setState(() {
+        final rua = result['rua'] ?? '';
+        final numero = result['numero'] ?? '';
+        final bairro = result['bairro'] ?? '';
+        
+        if (numero.isNotEmpty) {
+          _currentAddress = '$rua, $numero';
+        } else if (bairro.isNotEmpty) {
+          _currentAddress = '$rua, $bairro';
+        } else {
+          _currentAddress = rua;
+        }
+      });
+    }
   }
 
   @override
@@ -251,10 +269,12 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
   final TextEditingController _searchController = TextEditingController();
   final DraggableScrollableController _sheetController = DraggableScrollableController();
   final FocusNode _focusNode = FocusNode();
-  List<Map<String, String>> _sugestoes = [];
+  List<Map<String, dynamic>> _sugestoes = [];
   bool _estaDigitando = false;
   bool _isLoadingSearch = false;
   Timer? _debounce;
+  final Dio _dio = Dio();
+  final String _googleApiKey = dotenv.env['GOOGLE_PLACES_API_KEY'] ?? '';
 
   @override
   void initState() {
@@ -269,16 +289,6 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
       }
     });
   }
-
-  final List<Map<String, String>> _mockEnderecos = [
-    {
-      'rua': 'Avenida Do seu Coração',
-      'numero': '4444',
-      'bairro': 'Solidão',
-      'cidade': 'São Paulo',
-      'estado': 'SP'
-    },
-  ];
 
   void _filtrarEnderecos(String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
@@ -297,15 +307,112 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
       _isLoadingSearch = true;
     });
 
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _sugestoes = _mockEnderecos.where((addr) {
-          final fullAddr = '${addr['rua']} ${addr['bairro']} ${addr['cidade']}'.toLowerCase();
-          return fullAddr.contains(query.toLowerCase());
-        }).toList();
-        _isLoadingSearch = false;
-      });
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final response = await _dio.get(
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json',
+          queryParameters: {
+            'input': query,
+            'key': _googleApiKey,
+            'components': 'country:br',
+            'language': 'pt-BR',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          final data = response.data;
+          if (data['status'] == 'OK') {
+            setState(() {
+              _sugestoes = List<Map<String, dynamic>>.from(data['predictions'].map((p) => {
+                'description': p['description'],
+                'place_id': p['place_id'],
+                'main_text': p['structured_formatting']?['main_text'] ?? p['description'].toString().split(',').first,
+                'secondary_text': p['structured_formatting']?['secondary_text'] ?? p['description'],
+              }));
+              _isLoadingSearch = false;
+            });
+          } else {
+            setState(() {
+              _sugestoes = [];
+              _isLoadingSearch = false;
+            });
+          }
+        }
+      } catch (e) {
+        setState(() {
+          _sugestoes = [];
+          _isLoadingSearch = false;
+        });
+      }
     });
+  }
+
+  Future<void> _obterDetalhes(String placeId) async {
+    setState(() {
+      _isLoadingSearch = true;
+    });
+
+    try {
+      final response = await _dio.get(
+        'https://maps.googleapis.com/maps/api/place/details/json',
+        queryParameters: {
+          'place_id': placeId,
+          'key': _googleApiKey,
+          'language': 'pt-BR',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['status'] == 'OK') {
+          final result = data['result'];
+          final components = result['address_components'] as List;
+
+          String rua = '';
+          String numero = '';
+          String bairro = '';
+          String cidade = '';
+          String estado = '';
+
+          for (var c in components) {
+            final types = c['types'] as List;
+            if (types.contains('route')) {
+              rua = c['long_name'];
+            }
+            if (types.contains('street_number')) {
+              numero = c['long_name'];
+            }
+            if (types.contains('sublocality') || types.contains('sublocality_level_1') || types.contains('neighborhood')) {
+              bairro = c['long_name'];
+            }
+            if (types.contains('administrative_area_level_2')) {
+              cidade = c['long_name'];
+            }
+            if (types.contains('administrative_area_level_1')) {
+              estado = c['short_name'];
+            }
+          }
+
+          if (mounted) {
+            Navigator.pop(context, {
+              'rua': rua,
+              'numero': numero,
+              'bairro': bairro,
+              'cidade': cidade,
+              'estado': estado,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Erro ao obter detalhes do local: \$e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingSearch = false;
+        });
+      }
+    }
   }
 
   @override
@@ -443,11 +550,11 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
                           child: const Icon(Icons.location_on_outlined, size: 20, color: Colors.grey),
                         ),
                         title: Text(
-                          '${item['rua']}, ${item['numero']}',
+                          item['main_text'].toString(),
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                         ),
-                        subtitle: Text('${item['bairro']}, ${item['cidade']}'),
-                        onTap: () => Navigator.pop(context),
+                        subtitle: Text(item['secondary_text'].toString()),
+                        onTap: () => _obterDetalhes(item['place_id']),
                       )),
                     const SizedBox(height: 20),
                   ],
