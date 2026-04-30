@@ -5,11 +5,14 @@ import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:email_validator/email_validator.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:nhac/globals/ui_utils.dart';
 
+
+import 'package:nhac/components/nhac_input_field.dart';
+
+import 'package:nhac/utils/validators.dart';
 
 @NowaGenerated()
 class EmailCliente extends StatefulWidget {
@@ -27,6 +30,7 @@ class _EmailClienteState extends State<EmailCliente> {
   final TextEditingController _emailController = TextEditingController();
 
   bool _emailValido = false;
+  String? _erroEmail;
   bool _isLoading = false;
   bool _isGoogleLoading = false;
 
@@ -45,14 +49,14 @@ class _EmailClienteState extends State<EmailCliente> {
   }
 
   void _verificarEmail() {
-    String emailUsuario = _emailController.text;
+    if (!mounted) return;
+    final texto = _emailController.text;
+    String? erroTemp = Validators.validarEmail(texto);
 
-    final bool ehValido = EmailValidator.validate(emailUsuario);
-    if (_emailValido != ehValido) {
-      setState(() {
-        _emailValido = ehValido;
-      });
-    }
+    setState(() {
+      _erroEmail = erroTemp;
+      _emailValido = erroTemp == null && texto.isNotEmpty;
+    });
   }
 
   @override
@@ -102,32 +106,13 @@ class _EmailClienteState extends State<EmailCliente> {
               ),
               const SizedBox(height: 22.0),
 
-              TextFormField(
+              NhacInputField(
                 controller: _emailController,
-                enabled: true,
                 autofocus: true,
-                showCursor: true,
-                cursorColor: const Color(0xFFFF6961),
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(
-                  color: Color(0xFF5D201C),
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.w600,
-                ),
-                decoration: const InputDecoration(
-                  filled: false,
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color(0xFFC9BCBC),
-                      width: 2.0,
-                    ),
-                  ),
-                  hintText: 'Email',
-                  hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
-                ),
+                hintText: 'Email',
+                errorText: _erroEmail,
+                validator: Validators.validarEmail,
               ),
               const SizedBox(height: 16.0),
 

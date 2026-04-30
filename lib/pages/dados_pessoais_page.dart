@@ -4,62 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
+import 'package:nhac/components/nhac_menu_tile.dart';
 
 class DadosPessoaisPage extends StatelessWidget {
   final bool? isGoogleUserOverride;
 
   const DadosPessoaisPage({super.key, this.isGoogleUserOverride});
-
-  Widget _buildListItem(String title, {String? value, VoidCallback? onTap, bool disabled = false}) {
-    return InkWell(
-      onTap: disabled ? null : (onTap ?? () {}),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 18.0),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFE7E5),
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.grey.shade100,
-              width: 1.0,
-            ),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Row(
-              children: [
-                if (value != null)
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                if (value != null) const SizedBox(width: 8.0),
-                Icon(
-                  disabled ? Icons.lock_outline : Icons.arrow_forward_ios,
-                  size: 14.0,
-                  color: Colors.grey.shade400,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,23 +58,30 @@ class DadosPessoaisPage extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           children: [
             const SizedBox(height: 16.0),
-            _buildListItem(
-              'Foto de Perfil',
-              value: usuario.fotoUrl.isNotEmpty ? 'Alterar foto' : 'Adicionar foto',
+            NhacMenuTile(
+              titulo: 'Foto de Perfil',
+              subtitulo: usuario.fotoUrl.isNotEmpty ? 'Alterar foto' : 'Adicionar foto',
               onTap: () => context.push('/editar-foto'),
             ),
-            _buildListItem('Nome', value: usuario.nome, onTap: () => context.push('/editar-nome-preferencia')),
-            _buildListItem(
-              'E-mail',
-              value: usuario.email.isEmpty ? 'Toque para adicionar' : usuario.email,
-              onTap: () => context.push('/editar-email'),
-              disabled: isGoogleUser,
+            NhacMenuTile(
+              titulo: 'Nome', 
+              subtitulo: usuario.nome, 
+              onTap: () => context.push('/editar-nome-preferencia')
             ),
-            _buildListItem('Telefone', value: usuario.telefone, disabled: true),
-            _buildListItem(
-              'Senha', 
-              value: hasPassword ? '**************' : 'Não cadastrada', 
-              disabled: isGoogleUser || !hasPassword,
+            NhacMenuTile(
+              titulo: 'E-mail',
+              subtitulo: usuario.email.isEmpty ? 'Toque para adicionar' : usuario.email,
+              onTap: isGoogleUser ? () {} : () => context.push('/editar-email'),
+            ),
+            NhacMenuTile(
+              titulo: 'Telefone', 
+              subtitulo: usuario.telefone, 
+              onTap: () {},
+            ),
+            NhacMenuTile(
+              titulo: 'Senha', 
+              subtitulo: hasPassword ? '**************' : 'Não cadastrada', 
+              onTap: () {},
             ),
           ],
         ),

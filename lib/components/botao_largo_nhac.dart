@@ -54,7 +54,7 @@ class BotaoLargoNhac extends StatelessWidget {
             ? Transform.scale(
                 scale: 2.5,
                 child: Lottie.asset(
-                  'assets/animations/botao_loading_nhac.json',
+                  'assets/animations/loading_nhac.json',
                   width: 60,
                   height: 60,
                   fit: BoxFit.contain,

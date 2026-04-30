@@ -10,6 +10,10 @@ import 'package:provider/provider.dart';
 
 import 'package:nhac/globals/ui_utils.dart';
 
+import 'package:nhac/components/nhac_input_field.dart';
+
+import 'package:nhac/utils/validators.dart';
+
 @NowaGenerated()
 class Senha extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -36,33 +40,24 @@ class _SenhaState extends State<Senha> {
   final FocusNode _confirmarSenhaFocus = FocusNode();
 
   void _verificarSenha() {
-    if (!mounted) {
-      return;
-    }
-    final senha = _senhaController.text;
+    if (!mounted) return;
+    final texto = _senhaController.text;
     final confirmacao = _confirmarSenhaController.text;
-    
-    String? erroSenhaTemp;
+
+    String? erroTemp = Validators.validarSenha(texto);
     String? erroConfirmacaoTemp;
-    
-    if (senha.isNotEmpty) {
-      if (senha.length < 8) {
-        erroSenhaTemp = 'Mínimo de 8 caracteres';
-      } else if (!senha.contains(RegExp('[A-Z]'))) {
-        erroSenhaTemp = 'Precisa de pelo menos uma letra maiúscula';
-      }
-    }
-    if (confirmacao.isNotEmpty && senha != confirmacao) {
+
+    if (confirmacao.isNotEmpty && texto != confirmacao) {
       erroConfirmacaoTemp = 'As senhas não coincidem';
     }
+
     setState(() {
-      _erroSenha = erroSenhaTemp;
+      _erroSenha = erroTemp;
       _erroConfirmacao = erroConfirmacaoTemp;
-      _senhaValida =
-          senha.isNotEmpty &&
+      _senhaValida = erroTemp == null &&
+          texto.isNotEmpty &&
           confirmacao.isNotEmpty &&
-          _erroSenha == null &&
-          _erroConfirmacao == null;
+          erroConfirmacaoTemp == null;
     });
   }
 
@@ -114,118 +109,80 @@ class _SenhaState extends State<Senha> {
                         ),
                       ),
                       const SizedBox(height: 24.0),
-                      TextFormField(
-                        controller: _senhaController,  
-                        focusNode: _senhaFocus, 
+                      NhacInputField(
+                        controller: _senhaController,
+                        focusNode: _senhaFocus,
                         onChanged: (value) => _verificarSenha(),
                         obscureText: !_senhaVisivel,
                         obscuringCharacter: '⬤',
                         autofocus: true,
-                        cursorColor: const Color(0xFFFF6961),
+                        hintText: 'Senha',
+                        errorText: _erroSenha,
+                        validator: Validators.validarSenha,
                         style: TextStyle(
                           color: const Color(0xFF5D201C),
                           fontFamily: 'Roboto',
                           fontWeight: FontWeight.w600,
                           letterSpacing: _senhaVisivel ? 0.0 : 4.0,
                         ),
-                        decoration: InputDecoration(
-                          enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFC9BCBC),
-                              width: 2.0,
-                            ),
-                          ),
-                          hintText: 'Senha',
-                          hintStyle: const TextStyle(
-                            color: Color(0xFFC9BCBC),
-                            letterSpacing: 0.0,
-                            fontSize: 16.0,
-                          ),
-                          errorText: _erroSenha,
-                          suffixIcon: IconButton(
-                            icon: _senhaVisivel
-                                ? const Icon(
-                                    Icons.visibility,
-                                    color: Color(0xFFFF6961),
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/olho-fechado.svg',
-                                    width: 24.0,
-                                    height: 24.0,
-                                    colorFilter: const ColorFilter.mode(
-                                      Color(0xFFC9BCBC),
-                                      BlendMode.srcIn,
-                                    ),
+                        suffixIcon: IconButton(
+                          icon: _senhaVisivel
+                              ? const Icon(
+                                  Icons.visibility,
+                                  color: Color(0xFFFF6961),
+                                )
+                              : SvgPicture.asset(
+                                  'assets/olho-fechado.svg',
+                                  width: 24.0,
+                                  height: 24.0,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFFC9BCBC),
+                                    BlendMode.srcIn,
                                   ),
-                            onPressed: () {
-                              setState(() {
-                                _senhaVisivel = !_senhaVisivel;
-                              });
-                            },
-                          ),
+                                ),
+                          onPressed: () {
+                            setState(() {
+                              _senhaVisivel = !_senhaVisivel;
+                            });
+                          },
                         ),
                       ),
                       const SizedBox(height: 24.0),
-                      TextFormField(
-                        controller: _confirmarSenhaController, 
-                        focusNode: _confirmarSenhaFocus, 
+                      NhacInputField(
+                        controller: _confirmarSenhaController,
+                        focusNode: _confirmarSenhaFocus,
                         onChanged: (value) => _verificarSenha(),
                         obscureText: !_confirmacaoVisivel,
                         obscuringCharacter: '⬤',
-                        cursorColor: const Color(0xFFFF6961),
+                        hintText: 'Confirmar senha',
+                        errorText: _erroConfirmacao,
+                        validator: Validators.validarSenha,
                         style: TextStyle(
                           color: const Color(0xFF5D201C),
                           fontFamily: 'Roboto',
                           fontWeight: FontWeight.w600,
                           letterSpacing: _confirmacaoVisivel ? 0.0 : 4.0,
                         ),
-                        decoration: InputDecoration(
-                          enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFC9BCBC),
-                              width: 2.0,
-                            ),
-                          ),
-                          hintText: 'Confirmar senha',
-                          hintStyle: const TextStyle(
-                            color: Color(0xFFC9BCBC),
-                            letterSpacing: 0.0,
-                            fontSize: 16.0,
-                          ),
-                          errorText: _erroConfirmacao,
-                          suffixIcon: IconButton(
-                            icon: _confirmacaoVisivel
-                                ? const Icon(
-                                    Icons.visibility,
-                                    color: Color(0xFFFF6961),
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/olho-fechado.svg',
-                                    width: 24.0,
-                                    height: 24.0,
-                                    colorFilter: const ColorFilter.mode(
-                                      Color(0xFFC9BCBC),
-                                      BlendMode.srcIn,
-                                    ),
+                        suffixIcon: IconButton(
+                          icon: _confirmacaoVisivel
+                              ? const Icon(
+                                  Icons.visibility,
+                                  color: Color(0xFFFF6961),
+                                )
+                              : SvgPicture.asset(
+                                  'assets/olho-fechado.svg',
+                                  width: 24.0,
+                                  height: 24.0,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFFC9BCBC),
+                                    BlendMode.srcIn,
                                   ),
-                            onPressed: () {
-                              setState(() {
-                                _confirmacaoVisivel = !_confirmacaoVisivel;
-                              });
-                            },
-                          ),
+                                ),
+                          onPressed: () {
+                            setState(() {
+                              _confirmacaoVisivel = !_confirmacaoVisivel;
+                            });
+                          },
                         ),
                       ),
                     ],

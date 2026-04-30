@@ -11,9 +11,23 @@ class AuthService with ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final UserRepository _userRepository = UserRepository();
 
+  bool _userExists = false;
+  bool get userExists => _userExists;
+  
+  StreamSubscription? _userDocSubscription;
+
   AuthService() {
-    _auth.authStateChanges().listen((_) {
-      notifyListeners();
+    _auth.authStateChanges().listen((user) {
+      _userDocSubscription?.cancel();
+      if (user != null) {
+        _userDocSubscription = _userRepository.ouvirUsuario(user.uid).listen((usuario) {
+          _userExists = usuario != null;
+          notifyListeners();
+        });
+      } else {
+        _userExists = false;
+        notifyListeners();
+      }
     });
   }
 
@@ -267,6 +281,22 @@ class AuthService with ChangeNotifier {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       notifyListeners();
       return userCredential;
+    } catch (e) {
+      throw mapException(e);
+    }
+  }
+
+  Future<void> reautenticarComSms({
+    required String verificationId,
+    required String smsCode,
+  }) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      await currentUser?.reauthenticateWithCredential(credential);
+      notifyListeners();
     } catch (e) {
       throw mapException(e);
     }

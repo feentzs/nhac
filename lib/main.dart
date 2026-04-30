@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nhac/controllers/endereco_provider.dart';
@@ -25,6 +26,11 @@ main() async {
   );
 
   sharedPrefs = await SharedPreferences.getInstance();
+
+   FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED, 
+  );
 
   runApp(const MyApp());
 }

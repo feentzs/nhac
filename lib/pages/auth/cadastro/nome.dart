@@ -9,6 +9,10 @@ import 'package:provider/provider.dart';
 
 import 'package:nhac/globals/ui_utils.dart';
 
+import 'package:nhac/components/nhac_input_field.dart';
+
+import 'package:nhac/utils/validators.dart';
+
 @NowaGenerated()
 class Nome extends StatefulWidget {
   @NowaGenerated({'loader': 'auto-constructor'})
@@ -24,6 +28,7 @@ class Nome extends StatefulWidget {
 class _NomeState extends State<Nome> {
   bool _nomeValido = false;
   bool _isLoading = false;
+  String? _erroNome;
 
   final TextEditingController _nomeController = TextEditingController();
 
@@ -34,12 +39,14 @@ class _NomeState extends State<Nome> {
   }
 
   void _verificarNome() {
-    final ehValido = _nomeController.text.trim().length >= 2;
-    if (_nomeValido != ehValido) {
-      setState(() {
-        _nomeValido = ehValido;
-      });
-    }
+    if (!mounted) return;
+    final texto = _nomeController.text;
+    String? erroTemp = Validators.validarNome(texto);
+
+    setState(() {
+      _erroNome = erroTemp;
+      _nomeValido = erroTemp == null && texto.isNotEmpty;
+    });
   }
 
   @override
@@ -79,34 +86,13 @@ class _NomeState extends State<Nome> {
                         ),
                       ),
                       const SizedBox(height: 16.0),
-                      TextFormField(
+                      NhacInputField(
                         controller: _nomeController,
-                        enabled: true,
-                        autofocus: true, 
-                        showCursor: true,
-                        cursorColor: const Color(0xFFFF6961),
+                        autofocus: true,
                         textCapitalization: TextCapitalization.words,
-                        style: const TextStyle(
-                          color: Color(0xFF5D201C),
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w600,
-                        ),
-                        decoration: const InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color(0xFFC9BCBC),
-                              width: 2.0,
-                            ),
-                          ),
-                          hintText: 'Nome',
-                          hintStyle: TextStyle(color: Color(0xFFC9BCBC)),
-                        ),
+                        hintText: 'Nome',
+                        errorText: _erroNome,
+                        validator: Validators.validarNome,
                       ),
                     ],
                   ),
