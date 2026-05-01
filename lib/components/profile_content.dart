@@ -436,12 +436,12 @@ class _ProfileContentState extends State<ProfileContent> {
                             children: [
                               Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
                               const SizedBox(width: 4.0),
-                              Expanded( // <-- Abrace o Text com o Expanded
+                              Expanded(
                                 child: Text(
                                   textoEndereco,
                                   style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
-                                  overflow: TextOverflow.ellipsis, // <-- Coloca os "..." no final
-                                  maxLines: 1, // <-- Limita a 1 linha
+                                  overflow: TextOverflow.ellipsis, 
+                                  maxLines: 1, 
                                 ),
                               ),
                             ],

@@ -181,8 +181,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                           parentContext.read<UserProvider>().iniciarEscutaUsuario();
 
                           timer?.cancel();
-                          if (context.mounted) Navigator.pop(context); // Fecha dialog
-                          if (parentContext.mounted) parentContext.pop(); // Fecha página
+                          if (context.mounted) Navigator.pop(context);  
+                          if (parentContext.mounted) parentContext.pop(); 
 
                           parentContext.showSuccess('E-mail atualizado com sucesso!');
                         } catch (e) {
@@ -330,8 +330,8 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                               if (!context.mounted) return;
                               parentContext.read<UserProvider>().iniciarEscutaUsuario();
 
-                              if (context.mounted) Navigator.pop(context); // Fecha dialog
-                              if (parentContext.mounted) parentContext.pop(); // Fecha página
+                              if (context.mounted) Navigator.pop(context);
+                              if (parentContext.mounted) parentContext.pop(); 
 
                               parentContext.showSuccess('E-mail atualizado com sucesso!');
                             }
