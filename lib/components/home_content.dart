@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
+import 'package:nhac/controllers/endereco_provider.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -57,8 +58,9 @@ class _HomeContentState extends State<HomeContent> {
 
     try {
       Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high));
-      
+          locationSettings:
+              const LocationSettings(accuracy: LocationAccuracy.high));
+
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
 
@@ -95,7 +97,7 @@ class _HomeContentState extends State<HomeContent> {
         final rua = result['rua'] ?? '';
         final numero = result['numero'] ?? '';
         final bairro = result['bairro'] ?? '';
-        
+
         if (numero.isNotEmpty) {
           _currentAddress = '$rua, $numero';
         } else if (bairro.isNotEmpty) {
@@ -109,6 +111,18 @@ class _HomeContentState extends State<HomeContent> {
 
   @override
   Widget build(BuildContext context) {
+    final enderecoProvider = context.watch<EnderecoProvider>();
+    final enderecoPadrao =
+        enderecoProvider.enderecos.where((e) => e.padrao).firstOrNull;
+
+    String enderecoTopo = _currentAddress; 
+    if (enderecoPadrao != null) {
+      enderecoTopo = '${enderecoPadrao.rua}, ${enderecoPadrao.numero}';
+      if (enderecoPadrao.complemento.isNotEmpty) {
+        enderecoTopo += ' - ${enderecoPadrao.complemento}';
+      }
+    }
+
     return CustomScrollView(
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
@@ -118,16 +132,18 @@ class _HomeContentState extends State<HomeContent> {
           refreshIndicatorExtent: 140.0,
           refreshTriggerPullDistance: 180.0,
           onRefresh: _onRefresh,
-          builder: (context, refreshState, pulledExtent, refreshTriggerPullDistance, refreshIndicatorExtent) {
+          builder: (context, refreshState, pulledExtent,
+              refreshTriggerPullDistance, refreshIndicatorExtent) {
             return Center(
               child: Opacity(
-                opacity: (pulledExtent / refreshIndicatorExtent).clamp(0.0, 1.0),
+                opacity:
+                    (pulledExtent / refreshIndicatorExtent).clamp(0.0, 1.0),
                 child: Lottie.asset(
                   'assets/animations/loading_nhac.json',
                   width: 240,
                   height: 240,
                   animate: refreshState == RefreshIndicatorMode.refresh ||
-                           refreshState == RefreshIndicatorMode.armed,
+                      refreshState == RefreshIndicatorMode.armed,
                 ),
               ),
             );
@@ -168,15 +184,18 @@ class _HomeContentState extends State<HomeContent> {
                         children: [
                           const Text(
                             'Sua Localização',
-                            style: TextStyle(color: Colors.grey, fontSize: 12.0),
+                            style:
+                                TextStyle(color: Colors.grey, fontSize: 12.0),
                           ),
                           Text(
-                            _currentAddress,
+                            enderecoTopo,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14.0,
                               color: Colors.black,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -185,7 +204,8 @@ class _HomeContentState extends State<HomeContent> {
                   GestureDetector(
                     onTap: () => _abrirBuscaEndereco(context),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 8.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(50.0),
@@ -208,7 +228,8 @@ class _HomeContentState extends State<HomeContent> {
                               fontSize: 12.0,
                             ),
                           ),
-                          Icon(Icons.chevron_right, color: Color(0xFFFF6961), size: 18.0),
+                          Icon(Icons.chevron_right,
+                              color: Color(0xFFFF6961), size: 18.0),
                         ],
                       ),
                     ),
@@ -267,7 +288,8 @@ class _AddressPickerSheet extends StatefulWidget {
 
 class _AddressPickerSheetState extends State<_AddressPickerSheet> {
   final TextEditingController _searchController = TextEditingController();
-  final DraggableScrollableController _sheetController = DraggableScrollableController();
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
   final FocusNode _focusNode = FocusNode();
   List<Map<String, dynamic>> _sugestoes = [];
   bool _estaDigitando = false;
@@ -323,12 +345,16 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
           final data = response.data;
           if (data['status'] == 'OK') {
             setState(() {
-              _sugestoes = List<Map<String, dynamic>>.from(data['predictions'].map((p) => {
-                'description': p['description'],
-                'place_id': p['place_id'],
-                'main_text': p['structured_formatting']?['main_text'] ?? p['description'].toString().split(',').first,
-                'secondary_text': p['structured_formatting']?['secondary_text'] ?? p['description'],
-              }));
+              _sugestoes = List<Map<String, dynamic>>.from(
+                  data['predictions'].map((p) => {
+                        'description': p['description'],
+                        'place_id': p['place_id'],
+                        'main_text': p['structured_formatting']?['main_text'] ??
+                            p['description'].toString().split(',').first,
+                        'secondary_text': p['structured_formatting']
+                                ?['secondary_text'] ??
+                            p['description'],
+                      }));
               _isLoadingSearch = false;
             });
           } else {
@@ -382,7 +408,9 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
             if (types.contains('street_number')) {
               numero = c['long_name'];
             }
-            if (types.contains('sublocality') || types.contains('sublocality_level_1') || types.contains('neighborhood')) {
+            if (types.contains('sublocality') ||
+                types.contains('sublocality_level_1') ||
+                types.contains('neighborhood')) {
               bairro = c['long_name'];
             }
             if (types.contains('administrative_area_level_2')) {
@@ -500,10 +528,12 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
                         hintText: 'Nome da rua e número',
                         hintStyle: const TextStyle(color: Color(0xFFC9BCBC)),
                         enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                          borderSide:
+                              BorderSide(color: Colors.grey, width: 1.0),
                         ),
                         focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: Color(0xFFC9BCBC), width: 2.0),
+                          borderSide:
+                              BorderSide(color: Color(0xFFC9BCBC), width: 2.0),
                         ),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
@@ -531,31 +561,35 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
                         child: Center(
                           child: Column(
                             children: [
-                              Icon(Icons.search_off_outlined, size: 48, color: Colors.grey.shade200),
+                              Icon(Icons.search_off_outlined,
+                                  size: 48, color: Colors.grey.shade200),
                               const SizedBox(height: 16),
-                              const Text('Nenhum endereço encontrado', style: TextStyle(color: Colors.grey)),
+                              const Text('Nenhum endereço encontrado',
+                                  style: TextStyle(color: Colors.grey)),
                             ],
                           ),
                         ),
                       )
                     else
                       ..._sugestoes.map((item) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.location_on_outlined, size: 20, color: Colors.grey),
-                        ),
-                        title: Text(
-                          item['main_text'].toString(),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                        subtitle: Text(item['secondary_text'].toString()),
-                        onTap: () => _obterDetalhes(item['place_id']),
-                      )),
+                            contentPadding: EdgeInsets.zero,
+                            leading: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.location_on_outlined,
+                                  size: 20, color: Colors.grey),
+                            ),
+                            title: Text(
+                              item['main_text'].toString(),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                            subtitle: Text(item['secondary_text'].toString()),
+                            onTap: () => _obterDetalhes(item['place_id']),
+                          )),
                     const SizedBox(height: 20),
                   ],
                 ),

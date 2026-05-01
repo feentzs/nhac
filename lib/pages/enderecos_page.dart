@@ -38,7 +38,8 @@ class _EnderecosPageState extends State<EnderecosPage> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -99,7 +100,7 @@ class _EnderecosPageState extends State<EnderecosPage> {
   }
 
   void _abrirBuscaEndereco(BuildContext context) {
-    Navigator.push(
+    Navigator.push<Map<String, dynamic>>(
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 400),
@@ -110,14 +111,137 @@ class _EnderecosPageState extends State<EnderecosPage> {
           const begin = Offset(0.0, 1.0);
           const end = Offset.zero;
           const curve = Curves.fastOutSlowIn;
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
           return SlideTransition(
             position: animation.drive(tween),
             child: child,
           );
         },
       ),
+    ).then((result) =>{
+      if (result != null) {
+        _mostrarFormularioComplemento(result)
+      }
+    });
+  
+  }
+  void _mostrarFormularioComplemento(Map<String, dynamic> enderecoGoogle) {
+    final numeroController = TextEditingController(text: enderecoGoogle['numero']);
+    final complementoController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, 
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom, 
+            left: 24.0,
+            right: 24.0,
+            top: 24.0,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Complete seu endereço',
+                style: TextStyle(
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF5D201C),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                '${enderecoGoogle['rua']}, ${enderecoGoogle['bairro']}\n${enderecoGoogle['cidade']} - ${enderecoGoogle['estado']}',
+                style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 24.0),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: TextField(
+                      controller: numeroController,
+                      keyboardType: TextInputType.number,
+                      cursorColor: const Color(0xFFFF6961),
+                      decoration: const InputDecoration(
+                        labelText: 'Número',
+                        labelStyle: TextStyle(color: Colors.grey),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFFF6961)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                      controller: complementoController,
+                      textCapitalization: TextCapitalization.sentences,
+                      cursorColor: const Color(0xFFFF6961),
+                      decoration: const InputDecoration(
+                        labelText: 'Complemento (Opcional)',
+                        hintText: 'Apto, Bloco, Casa 2...',
+                        labelStyle: TextStyle(color: Colors.grey),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFFF6961)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32.0),
+              BotaoLargoNhac(
+                texto: 'Salvar Endereço',
+                onPressed: () {
+                  enderecoGoogle['numero'] = numeroController.text.isEmpty ? 'S/N' : numeroController.text;
+                  enderecoGoogle['complemento'] = complementoController.text;
+                  
+                  Navigator.pop(context); 
+                  
+                  _salvarEnderecoSelecionado(enderecoGoogle);
+                },
+              ),
+              const SizedBox(height: 24.0),
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  Future<void> _salvarEnderecoSelecionado(Map<String, dynamic> result) async {
+    if (!mounted) return;
+
+    final isPrimeiroEndereco = context.read<EnderecoProvider>().enderecos.isEmpty;
+
+    final novoEndereco = EnderecoModel(
+      idDocumento: '', 
+      rua: result['rua'] ?? '',
+      numero: result['numero'] ?? 'S/N',
+      bairro: result['bairro'] ?? '',
+      cidade: result['cidade'] ?? '',
+      estado: result['estado'] ?? '',
+      cep: '', 
+      complemento: result['complemento'] ?? '', 
+      padrao: isPrimeiroEndereco,
+    );
+
+    try {
+      await context.read<EnderecoProvider>().adicionarEndereco(novoEndereco);
+      if (mounted) context.showSuccess('Endereço salvo com sucesso!');
+    } catch (e) {
+      if (mounted) context.showError('Erro ao salvar endereço.');
+    }
   }
 
   Widget _buildEmptyState() {
@@ -157,7 +281,7 @@ class _EnderecosPageState extends State<EnderecosPage> {
             offset: const Offset(0, 5),
           ),
         ],
-        border: endereco.padrao 
+        border: endereco.padrao
             ? Border.all(color: const Color(0xFFFE645C), width: 2)
             : Border.all(color: Colors.white, width: 2),
       ),
@@ -181,7 +305,10 @@ class _EnderecosPageState extends State<EnderecosPage> {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    endereco.bairro.toLowerCase().contains('tabalho') || endereco.complemento.toLowerCase().contains('trabalho')
+                    endereco.bairro.toLowerCase().contains('tabalho') ||
+                            endereco.complemento
+                                .toLowerCase()
+                                .contains('trabalho')
                         ? Icons.work_outline
                         : Icons.home_outlined,
                     color: const Color(0xFFFE645C),
@@ -206,7 +333,8 @@ class _EnderecosPageState extends State<EnderecosPage> {
                           if (endereco.padrao) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFE645C),
                                 borderRadius: BorderRadius.circular(12),
@@ -258,7 +386,9 @@ class _EnderecosPageState extends State<EnderecosPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onSelected: (value) async {
         if (value == 'padrao') {
-          await context.read<EnderecoProvider>().definirComoPadrao(endereco.idDocumento);
+          await context
+              .read<EnderecoProvider>()
+              .definirComoPadrao(endereco.idDocumento);
           if (mounted) context.showSuccess('Endereço padrão atualizado!');
         } else if (value == 'remover') {
           _confirmarRemocao(endereco);
@@ -296,7 +426,8 @@ class _EnderecosPageState extends State<EnderecosPage> {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Text('Definir como padrão?'),
-        content: Text('Deseja que ${endereco.rua} seja seu endereço principal?'),
+        content:
+            Text('Deseja que ${endereco.rua} seja seu endereço principal?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -305,14 +436,19 @@ class _EnderecosPageState extends State<EnderecosPage> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              await context.read<EnderecoProvider>().definirComoPadrao(endereco.idDocumento);
-              if (mounted && context.mounted) context.showSuccess('Endereço padrão atualizado!');
+              await context
+                  .read<EnderecoProvider>()
+                  .definirComoPadrao(endereco.idDocumento);
+              if (mounted && context.mounted)
+                context.showSuccess('Endereço padrão atualizado!');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFE645C),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('Confirmar', style: TextStyle(color: Colors.white)),
+            child:
+                const Text('Confirmar', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -334,12 +470,16 @@ class _EnderecosPageState extends State<EnderecosPage> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              await context.read<EnderecoProvider>().removerEndereco(endereco.idDocumento);
-              if (mounted && context.mounted) context.showSuccess('Endereço removido!');
+              await context
+                  .read<EnderecoProvider>()
+                  .removerEndereco(endereco.idDocumento);
+              if (mounted && context.mounted)
+                context.showSuccess('Endereço removido!');
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text('Remover', style: TextStyle(color: Colors.white)),
           ),
@@ -398,12 +538,16 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
           final data = response.data;
           if (data['status'] == 'OK') {
             setState(() {
-              _sugestoes = List<Map<String, dynamic>>.from(data['predictions'].map((p) => {
-                'description': p['description'],
-                'place_id': p['place_id'],
-                'main_text': p['structured_formatting']?['main_text'] ?? p['description'].toString().split(',').first,
-                'secondary_text': p['structured_formatting']?['secondary_text'] ?? p['description'],
-              }));
+              _sugestoes = List<Map<String, dynamic>>.from(
+                  data['predictions'].map((p) => {
+                        'description': p['description'],
+                        'place_id': p['place_id'],
+                        'main_text': p['structured_formatting']?['main_text'] ??
+                            p['description'].toString().split(',').first,
+                        'secondary_text': p['structured_formatting']
+                                ?['secondary_text'] ??
+                            p['description'],
+                      }));
               _isLoadingSearch = false;
             });
           } else {
@@ -457,7 +601,9 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
             if (types.contains('street_number')) {
               numero = c['long_name'];
             }
-            if (types.contains('sublocality') || types.contains('sublocality_level_1') || types.contains('neighborhood')) {
+            if (types.contains('sublocality') ||
+                types.contains('sublocality_level_1') ||
+                types.contains('neighborhood')) {
               bairro = c['long_name'];
             }
             if (types.contains('administrative_area_level_2')) {
@@ -476,7 +622,8 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
               'cidade': cidade,
               'estado': estado,
             });
-            context.showInfo('Endereço "${description.split(",").first}" selecionado!');
+            context.showInfo(
+                'Endereço "${description.split(",").first}" selecionado!');
           }
         }
       }
@@ -506,7 +653,8 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -566,7 +714,8 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
                       icon: null,
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.clear, size: 20, color: Colors.grey),
+                              icon: const Icon(Icons.clear,
+                                  size: 20, color: Colors.grey),
                               onPressed: () {
                                 _searchController.clear();
                                 _filtrarEnderecos('');
@@ -588,26 +737,33 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
                           : ListView.separated(
                               physics: const BouncingScrollPhysics(),
                               itemCount: _sugestoes.length,
-                              separatorBuilder: (context, index) => const Divider(height: 1, indent: 70),
+                              separatorBuilder: (context, index) =>
+                                  const Divider(height: 1, indent: 70),
                               itemBuilder: (context, index) {
                                 final item = _sugestoes[index];
                                 return ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 8),
                                   leading: Container(
                                     padding: const EdgeInsets.all(10),
                                     decoration: BoxDecoration(
                                       color: Colors.grey.shade100,
                                       shape: BoxShape.circle,
                                     ),
-                                    child: const Icon(Icons.location_on_outlined, color: Colors.grey),
+                                    child: const Icon(
+                                        Icons.location_on_outlined,
+                                        color: Colors.grey),
                                   ),
                                   title: Text(
                                     item['main_text'].toString(),
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
-                                  subtitle: Text(item['secondary_text'].toString()),
+                                  subtitle:
+                                      Text(item['secondary_text'].toString()),
                                   onTap: () {
-                                    _obterDetalhes(item['place_id'], item['description']);
+                                    _obterDetalhes(
+                                        item['place_id'], item['description']);
                                   },
                                 );
                               },
@@ -655,7 +811,8 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off_outlined, size: 60, color: Colors.grey.shade200),
+          Icon(Icons.search_off_outlined,
+              size: 60, color: Colors.grey.shade200),
           const SizedBox(height: 16),
           Text(
             'Endereço não encontrado',
