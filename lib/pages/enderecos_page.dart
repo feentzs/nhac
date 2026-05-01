@@ -398,6 +398,8 @@ class _EnderecosPageState extends State<EnderecosPage> {
               .read<EnderecoProvider>()
               .definirComoPadrao(endereco.idDocumento);
           if (mounted) context.showSuccess('Endereço padrão atualizado!');
+        } else if (value == 'editar') {
+          _abrirEdicaoEndereco(endereco);
         } else if (value == 'remover') {
           _confirmarRemocao(endereco);
         }
@@ -415,6 +417,16 @@ class _EnderecosPageState extends State<EnderecosPage> {
             ),
           ),
         const PopupMenuItem(
+          value: 'editar',
+          child: Row(
+            children: [
+              Icon(Icons.edit_outlined, size: 20, color: Colors.blue),
+              SizedBox(width: 8),
+              Text('Editar', style: TextStyle(color: Colors.blue)),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
           value: 'remover',
           child: Row(
             children: [
@@ -425,6 +437,113 @@ class _EnderecosPageState extends State<EnderecosPage> {
           ),
         ),
       ],
+    );
+  }
+
+  void _abrirEdicaoEndereco(EnderecoModel enderecoAtual) {
+    final numeroController = TextEditingController(text: enderecoAtual.numero);
+    final complementoController =
+        TextEditingController(text: enderecoAtual.complemento);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 24.0,
+            right: 24.0,
+            top: 24.0,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Editar endereço',
+                style: TextStyle(
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF5D201C),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                '${enderecoAtual.rua}, ${enderecoAtual.bairro}\n${enderecoAtual.cidade} - ${enderecoAtual.estado}',
+                style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 24.0),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: TextField(
+                      controller: numeroController,
+                      keyboardType: TextInputType.number,
+                      cursorColor: const Color(0xFFFF6961),
+                      decoration: const InputDecoration(
+                        labelText: 'Número',
+                        labelStyle: TextStyle(color: Colors.grey),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFFF6961)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                      controller: complementoController,
+                      textCapitalization: TextCapitalization.sentences,
+                      cursorColor: const Color(0xFFFF6961),
+                      decoration: const InputDecoration(
+                        labelText: 'Complemento (Opcional)',
+                        hintText: 'Apto, Bloco, Casa 2...',
+                        labelStyle: TextStyle(color: Colors.grey),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Color(0xFFFF6961)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32.0),
+              BotaoLargoNhac(
+                texto: 'Salvar Alterações',
+                onPressed: () async {
+                  final enderecoAtualizado = enderecoAtual.copyWith(
+                    numero: numeroController.text.isEmpty
+                        ? 'S/N'
+                        : numeroController.text,
+                    complemento: complementoController.text,
+                  );
+
+                  Navigator.pop(context);
+
+                  try {
+                    await context
+                        .read<EnderecoProvider>()
+                        .atualizarEndereco(enderecoAtualizado);
+                    if (mounted) {
+                      context.showSuccess('Endereço atualizado com sucesso!');
+                    }
+                  } catch (e) {
+                    if (mounted) context.showError('Erro ao atualizar endereço.');
+                  }
+                },
+              ),
+              const SizedBox(height: 24.0),
+            ],
+          ),
+        );
+      },
     );
   }
 

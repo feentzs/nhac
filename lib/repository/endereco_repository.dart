@@ -73,4 +73,13 @@ class EnderecoRepository {
         .doc(enderecoId)
         .delete();
   }
+
+  Future<void> atualizarEndereco(String uid, EnderecoModel endereco) async {
+    await _firestore
+        .collection(AppConstants.firestoreUsuarios)
+        .doc(uid)
+        .collection(AppConstants.firestoreEnderecos)
+        .doc(endereco.idDocumento)
+        .update(endereco.toMap());
+  }
 }

@@ -52,6 +52,26 @@ class EnderecoProvider with ChangeNotifier {
     }
   }
 
+  Future<void> atualizarEndereco(EnderecoModel endereco) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      await _enderecoRepository.atualizarEndereco(user.uid, endereco);
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      debugPrint("Erro ao atualizar endereço: $e");
+      rethrow;
+    }
+  }
+
   @override
   void dispose() {
     _subscription?.cancel();
