@@ -1,17 +1,13 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/endereco_provider.dart';
-import 'package:nhac/models/usuario/endereco_model.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 @NowaGenerated()
 class HomeContent extends StatefulWidget {
@@ -85,46 +81,22 @@ class _HomeContentState extends State<HomeContent> {
     ]);
   }
 
-  void _abrirBuscaEndereco(BuildContext context) async {
-    final result = await showModalBottomSheet<Map<String, String>>(
+  void _abrirSelecaoEndereco(BuildContext context) {
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const _AddressPickerSheet(),
+      builder: (context) => const _SelecaoEnderecoBottomSheet(),
     );
-
-    if (result != null && mounted) {
-      setState(() {
-        final rua = result['rua'] ?? '';
-        final numero = result['numero'] ?? '';
-        final bairro = result['bairro'] ?? '';
-
-        if (numero.isNotEmpty) {
-          _currentAddress = '$rua, $numero';
-        } else if (bairro.isNotEmpty) {
-          _currentAddress = '$rua, $bairro';
-        } else {
-          _currentAddress = rua;
-        }
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // 1. Puxa a lista direto (sem o ?? [] porque ela nunca é nula)
     final enderecoProvider = context.watch<EnderecoProvider>();
     final listaEnderecos = enderecoProvider.enderecos;
-    
-    // 2. Busca o endereço padrão de forma super segura (sem usar firstOrNull)
-    EnderecoModel? enderecoPadrao;
-    final filtrados = listaEnderecos.where((e) => e.padrao);
-    if (filtrados.isNotEmpty) {
-      enderecoPadrao = filtrados.first;
-    }
-    
-    // 3. Monta o texto do topo
-    String enderecoTopo = _currentAddress; // ou a variável que você usa pro GPS
+    final enderecoPadrao = listaEnderecos.where((e) => e.padrao).firstOrNull;
+
+    String enderecoTopo = _currentAddress;
     if (enderecoPadrao != null) {
       enderecoTopo = '${enderecoPadrao.rua}, ${enderecoPadrao.numero}';
       if (enderecoPadrao.complemento.isNotEmpty) {
@@ -195,8 +167,8 @@ class _HomeContentState extends State<HomeContent> {
                             children: [
                               const Text(
                                 'Sua Localização',
-                                style:
-                                    TextStyle(color: Colors.grey, fontSize: 12.0),
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 12.0),
                               ),
                               Text(
                                 enderecoTopo,
@@ -216,7 +188,7 @@ class _HomeContentState extends State<HomeContent> {
                   ),
                   const SizedBox(width: 16.0),
                   GestureDetector(
-                    onTap: () => _abrirBuscaEndereco(context),
+                    onTap: () => _abrirSelecaoEndereco(context),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12.0, vertical: 8.0),
@@ -293,334 +265,143 @@ class _HomeContentState extends State<HomeContent> {
   }
 }
 
-class _AddressPickerSheet extends StatefulWidget {
-  const _AddressPickerSheet();
-
-  @override
-  State<_AddressPickerSheet> createState() => _AddressPickerSheetState();
-}
-
-class _AddressPickerSheetState extends State<_AddressPickerSheet> {
-  final TextEditingController _searchController = TextEditingController();
-  final DraggableScrollableController _sheetController =
-      DraggableScrollableController();
-  final FocusNode _focusNode = FocusNode();
-  List<Map<String, dynamic>> _sugestoes = [];
-  bool _estaDigitando = false;
-  bool _isLoadingSearch = false;
-  Timer? _debounce;
-  final Dio _dio = Dio();
-  final String _googleApiKey = dotenv.env['GOOGLE_PLACES_API_KEY'] ?? '';
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        _sheetController.animateTo(
-          0.95,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
-  }
-
- void _filtrarEnderecos(String query) {
-    if (_debounce?.isActive ?? false) _debounce?.cancel();
-    
-    if (query.isEmpty) {
-      setState(() {
-        _sugestoes = [];
-        _estaDigitando = false;
-        _isLoadingSearch = false;
-      });
-      return;
-    }
-    
-    setState(() {
-      _estaDigitando = true;
-      _isLoadingSearch = true;
-    });
-
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
-      if (_googleApiKey.isEmpty) {
-        debugPrint('🚨 ERRO CRÍTICO: A chave do Google (API Key) está vazia!');
-        debugPrint('Verifique se o arquivo .env existe e se está declarado no pubspec.yaml.');
-        setState(() => _isLoadingSearch = false);
-        return;
-      }
-
-      try {
-        final response = await _dio.get(
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json',
-          queryParameters: {
-            'input': query,
-            'key': _googleApiKey,
-            'components': 'country:br', 
-            'language': 'pt-BR',
-          },
-        );
-
-        if (response.statusCode == 200) {
-          final data = response.data;
-          
-          if (data['status'] == 'OK') {
-            setState(() {
-              _sugestoes = List<Map<String, dynamic>>.from(data['predictions'].map((p) => {
-                'description': p['description'],
-                'place_id': p['place_id'],
-                'main_text': p['structured_formatting']?['main_text'] ?? p['description'].toString().split(',').first,
-                'secondary_text': p['structured_formatting']?['secondary_text'] ?? p['description'],
-              }));
-              _isLoadingSearch = false;
-            });
-          } else {
-            debugPrint('⚠️ RECUSA DO GOOGLE: Status = ${data['status']}');
-            if (data.containsKey('error_message')) {
-              debugPrint('Motivo detalhado: ${data['error_message']}');
-            }
-            
-            setState(() {
-              _sugestoes = [];
-              _isLoadingSearch = false;
-            });
-          }
-        }
-      } catch (e) {
-        debugPrint('⚠️ ERRO DE REQUISIÇÃO (Dio): $e');
-        setState(() {
-          _sugestoes = [];
-          _isLoadingSearch = false;
-        });
-      }
-    });
-  }
-  Future<void> _obterDetalhes(String placeId) async {
-    setState(() {
-      _isLoadingSearch = true;
-    });
-
-    try {
-      final response = await _dio.get(
-        'https://maps.googleapis.com/maps/api/place/details/json',
-        queryParameters: {
-          'place_id': placeId,
-          'key': _googleApiKey,
-          'language': 'pt-BR',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['status'] == 'OK') {
-          final result = data['result'];
-          final components = result['address_components'] as List;
-
-          String rua = '';
-          String numero = '';
-          String bairro = '';
-          String cidade = '';
-          String estado = '';
-
-          for (var c in components) {
-            final types = c['types'] as List;
-            if (types.contains('route')) {
-              rua = c['long_name'];
-            }
-            if (types.contains('street_number')) {
-              numero = c['long_name'];
-            }
-            if (types.contains('sublocality') ||
-                types.contains('sublocality_level_1') ||
-                types.contains('neighborhood')) {
-              bairro = c['long_name'];
-            }
-            if (types.contains('administrative_area_level_2')) {
-              cidade = c['long_name'];
-            }
-            if (types.contains('administrative_area_level_1')) {
-              estado = c['short_name'];
-            }
-          }
-
-          if (mounted) {
-            Navigator.pop(context, {
-              'rua': rua,
-              'numero': numero,
-              'bairro': bairro,
-              'cidade': cidade,
-              'estado': estado,
-            });
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Erro ao obter detalhes do local: \$e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingSearch = false;
-        });
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    _searchController.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
+class _SelecaoEnderecoBottomSheet extends StatelessWidget {
+  const _SelecaoEnderecoBottomSheet();
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      controller: _sheetController,
-      initialChildSize: 0.60,
-      minChildSize: 0.60,
-      maxChildSize: 0.95,
-      snap: true,
-      snapSizes: const [0.60, 0.95],
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+    final enderecoProvider = context.watch<EnderecoProvider>();
+    final enderecos = enderecoProvider.enderecos;
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      padding: const EdgeInsets.only(top: 16, bottom: 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ],
+          const SizedBox(height: 24),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Onde você quer receber seu pedido?',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF5D201C),
                 ),
               ),
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  children: [
-                    const Text(
-                      'Onde você quer receber o seu pedido?',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF5D201C),
-                      ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.5,
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              itemCount: enderecos.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final endereco = enderecos[index];
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  onTap: () {
+                    context
+                        .read<EnderecoProvider>()
+                        .definirComoPadrao(endereco.idDocumento);
+                    Navigator.pop(context);
+                  },
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF6961).withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(height: 8),
+                    child: Icon(
+                      endereco.bairro.toLowerCase().contains('trabalho') ||
+                              endereco.complemento
+                                  .toLowerCase()
+                                  .contains('trabalho')
+                          ? Icons.work_outline
+                          : Icons.home_outlined,
+                      color: const Color(0xFFFF6961),
+                      size: 20,
+                    ),
+                  ),
+                  title: Text(
+                    '${endereco.rua}, ${endereco.numero}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
+                  subtitle: Text(
+                    '${endereco.bairro}${endereco.complemento.isNotEmpty ? ' - ${endereco.complemento}' : ''}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  trailing: endereco.padrao
+                      ? const Icon(Icons.check_circle, color: Color(0xFFFF6961))
+                      : null,
+                );
+              },
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            child: Divider(height: 32),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/enderecos-salvos');
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.add, color: Colors.grey),
+                    ),
+                    const SizedBox(width: 16),
                     const Text(
-                      'Busque pelo nome da rua e pelo número do seu endereço.',
+                      'Adicionar novo endereço',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
                         color: Colors.grey,
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    TextField(
-                      controller: _searchController,
-                      focusNode: _focusNode,
-                      onChanged: _filtrarEnderecos,
-                      style: const TextStyle(
-                        color: Color(0xFF5D201C),
-                        fontWeight: FontWeight.w600,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'Nome da rua e número',
-                        hintStyle: const TextStyle(color: Color(0xFFC9BCBC)),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.grey, width: 1.0),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Color(0xFFC9BCBC), width: 2.0),
-                        ),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear, size: 20),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  _filtrarEnderecos('');
-                                },
-                              )
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    if (_isLoadingSearch)
-                      Center(
-                        child: Lottie.asset(
-                          'assets/animations/loading_nhac.json',
-                          width: 150,
-                          height: 150,
-                        ),
-                      )
-                    else if (_sugestoes.isEmpty && _estaDigitando)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 40),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              Icon(Icons.search_off_outlined,
-                                  size: 48, color: Colors.grey.shade200),
-                              const SizedBox(height: 16),
-                              const Text('Nenhum endereço encontrado',
-                                  style: TextStyle(color: Colors.grey)),
-                            ],
-                          ),
-                        ),
-                      )
-                    else
-                      ..._sugestoes.map((item) => ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.location_on_outlined,
-                                  size: 20, color: Colors.grey),
-                            ),
-                            title: Text(
-                              item['main_text'].toString(),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                            subtitle: Text(item['secondary_text'].toString()),
-                            onTap: () => _obterDetalhes(item['place_id']),
-                          )),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }
