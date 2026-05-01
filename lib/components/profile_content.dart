@@ -211,7 +211,7 @@ class _ProfileContentState extends State<ProfileContent> {
     final enderecoProvider = context.watch<EnderecoProvider>();
     final enderecoPadrao = enderecoProvider.enderecos.where((e) => e.padrao).firstOrNull;
     final String textoEndereco = enderecoPadrao != null 
-        ? '${enderecoPadrao.rua}, ${enderecoPadrao.numero}${enderecoPadrao.complemento.isNotEmpty ? ' - ' + enderecoPadrao.complemento : ''}'
+        ? '${enderecoPadrao.rua}, ${enderecoPadrao.numero}${enderecoPadrao.complemento.isNotEmpty ? ' - ${enderecoPadrao.complemento}' : ''}'
         : 'Nenhum endereço cadastrado';
 
     if (usuario == null) {
@@ -433,15 +433,19 @@ class _ProfileContentState extends State<ProfileContent> {
                         ),
                         const SizedBox(height: 4.0),
                         Row(
-                          children: [
-                            Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
-                            const SizedBox(width: 4.0),
-                            Text(
-                            textoEndereco,
-                              style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
-                            ),
-                          ],
-                        ),
+                            children: [
+                              Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                              const SizedBox(width: 4.0),
+                              Expanded( // <-- Abrace o Text com o Expanded
+                                child: Text(
+                                  textoEndereco,
+                                  style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                                  overflow: TextOverflow.ellipsis, // <-- Coloca os "..." no final
+                                  maxLines: 1, // <-- Limita a 1 linha
+                                ),
+                              ),
+                            ],
+                          ),
                         const SizedBox(height: 8.0),
                       ],
                     ),

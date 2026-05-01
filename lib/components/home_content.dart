@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:nhac/controllers/endereco_provider.dart';
+import 'package:nhac/models/usuario/endereco_model.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -111,11 +112,19 @@ class _HomeContentState extends State<HomeContent> {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Puxa a lista direto (sem o ?? [] porque ela nunca é nula)
     final enderecoProvider = context.watch<EnderecoProvider>();
-    final enderecoPadrao =
-        enderecoProvider.enderecos.where((e) => e.padrao).firstOrNull;
-
-    String enderecoTopo = _currentAddress; 
+    final listaEnderecos = enderecoProvider.enderecos;
+    
+    // 2. Busca o endereço padrão de forma super segura (sem usar firstOrNull)
+    EnderecoModel? enderecoPadrao;
+    final filtrados = listaEnderecos.where((e) => e.padrao);
+    if (filtrados.isNotEmpty) {
+      enderecoPadrao = filtrados.first;
+    }
+    
+    // 3. Monta o texto do topo
+    String enderecoTopo = _currentAddress; // ou a variável que você usa pro GPS
     if (enderecoPadrao != null) {
       enderecoTopo = '${enderecoPadrao.rua}, ${enderecoPadrao.numero}';
       if (enderecoPadrao.complemento.isNotEmpty) {
@@ -157,50 +166,55 @@ class _HomeContentState extends State<HomeContent> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 10.0,
-                              offset: const Offset(0.0, 4.0),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.location_on_outlined,
-                          color: Colors.grey,
-                          size: 20.0,
-                        ),
-                      ),
-                      const SizedBox(width: 12.0),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Sua Localização',
-                            style:
-                                TextStyle(color: Colors.grey, fontSize: 12.0),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 10.0,
+                                offset: const Offset(0.0, 4.0),
+                              ),
+                            ],
                           ),
-                          Text(
-                            enderecoTopo,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.0,
-                              color: Colors.black,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          child: const Icon(
+                            Icons.location_on_outlined,
+                            color: Colors.grey,
+                            size: 20.0,
                           ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 12.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Sua Localização',
+                                style:
+                                    TextStyle(color: Colors.grey, fontSize: 12.0),
+                              ),
+                              Text(
+                                enderecoTopo,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.0,
+                                  color: Colors.black,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 16.0),
                   GestureDetector(
                     onTap: () => _abrirBuscaEndereco(context),
                     child: Container(

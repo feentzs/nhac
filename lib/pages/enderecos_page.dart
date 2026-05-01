@@ -322,14 +322,18 @@ class _EnderecosPageState extends State<EnderecosPage> {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            '${endereco.rua}, ${endereco.numero}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0,
-                              color: Color(0xFF5D201C),
+                            Flexible(
+                              child: Text(
+                                '${endereco.rua}, ${endereco.numero}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                  fontSize: 16.0,
+                                  color: Color(0xFF5D201C),
+                              ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
                             ),
-                          ),
                           if (endereco.padrao) ...[
                             const SizedBox(width: 8),
                             Container(
@@ -358,6 +362,8 @@ class _EnderecosPageState extends State<EnderecosPage> {
                           color: Colors.grey.shade600,
                           fontSize: 13.0,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                       if (endereco.complemento.isNotEmpty)
                         Text(
@@ -367,6 +373,8 @@ class _EnderecosPageState extends State<EnderecosPage> {
                             fontSize: 12.0,
                             fontStyle: FontStyle.italic,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                     ],
                   ),
