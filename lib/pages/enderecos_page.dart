@@ -439,8 +439,9 @@ class _EnderecosPageState extends State<EnderecosPage> {
               await context
                   .read<EnderecoProvider>()
                   .definirComoPadrao(endereco.idDocumento);
-              if (mounted && context.mounted)
+              if (mounted && context.mounted) {
                 context.showSuccess('Endereço padrão atualizado!');
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFE645C),
@@ -473,8 +474,9 @@ class _EnderecosPageState extends State<EnderecosPage> {
               await context
                   .read<EnderecoProvider>()
                   .removerEndereco(endereco.idDocumento);
-              if (mounted && context.mounted)
+              if (mounted && context.mounted) {
                 context.showSuccess('Endereço removido!');
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -505,9 +507,9 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
   final Dio _dio = Dio();
   final String _googleApiKey = dotenv.env['GOOGLE_PLACES_API_KEY'] ?? '';
 
-  void _filtrarEnderecos(String query) {
+ void _filtrarEnderecos(String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-
+    
     if (query.isEmpty) {
       setState(() {
         _sugestoes = [];
@@ -516,13 +518,20 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
       });
       return;
     }
-
+    
     setState(() {
       _estaDigitando = true;
       _isLoadingSearch = true;
     });
 
     _debounce = Timer(const Duration(milliseconds: 500), () async {
+      if (_googleApiKey.isEmpty) {
+        debugPrint('🚨 ERRO CRÍTICO: A chave do Google (API Key) está vazia!');
+        debugPrint('Verifique se o arquivo .env existe e se está declarado no pubspec.yaml.');
+        setState(() => _isLoadingSearch = false);
+        return;
+      }
+
       try {
         final response = await _dio.get(
           'https://maps.googleapis.com/maps/api/place/autocomplete/json',
@@ -536,21 +545,23 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
 
         if (response.statusCode == 200) {
           final data = response.data;
+          
           if (data['status'] == 'OK') {
             setState(() {
-              _sugestoes = List<Map<String, dynamic>>.from(
-                  data['predictions'].map((p) => {
-                        'description': p['description'],
-                        'place_id': p['place_id'],
-                        'main_text': p['structured_formatting']?['main_text'] ??
-                            p['description'].toString().split(',').first,
-                        'secondary_text': p['structured_formatting']
-                                ?['secondary_text'] ??
-                            p['description'],
-                      }));
+              _sugestoes = List<Map<String, dynamic>>.from(data['predictions'].map((p) => {
+                'description': p['description'],
+                'place_id': p['place_id'],
+                'main_text': p['structured_formatting']?['main_text'] ?? p['description'].toString().split(',').first,
+                'secondary_text': p['structured_formatting']?['secondary_text'] ?? p['description'],
+              }));
               _isLoadingSearch = false;
             });
           } else {
+            debugPrint('⚠️ RECUSA DO GOOGLE: Status = ${data['status']}');
+            if (data.containsKey('error_message')) {
+              debugPrint('Motivo detalhado: ${data['error_message']}');
+            }
+            
             setState(() {
               _sugestoes = [];
               _isLoadingSearch = false;
@@ -558,6 +569,7 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
           }
         }
       } catch (e) {
+        debugPrint('⚠️ ERRO DE REQUISIÇÃO (Dio): $e');
         setState(() {
           _sugestoes = [];
           _isLoadingSearch = false;
@@ -565,7 +577,6 @@ class _BuscaEnderecoOverlayState extends State<_BuscaEnderecoOverlay> {
       }
     });
   }
-
   Future<void> _obterDetalhes(String placeId, String description) async {
     setState(() {
       _isLoadingSearch = true;

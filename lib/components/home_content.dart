@@ -312,9 +312,9 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
     });
   }
 
-  void _filtrarEnderecos(String query) {
+ void _filtrarEnderecos(String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-
+    
     if (query.isEmpty) {
       setState(() {
         _sugestoes = [];
@@ -323,41 +323,50 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
       });
       return;
     }
-
+    
     setState(() {
       _estaDigitando = true;
       _isLoadingSearch = true;
     });
 
     _debounce = Timer(const Duration(milliseconds: 500), () async {
+      if (_googleApiKey.isEmpty) {
+        debugPrint('🚨 ERRO CRÍTICO: A chave do Google (API Key) está vazia!');
+        debugPrint('Verifique se o arquivo .env existe e se está declarado no pubspec.yaml.');
+        setState(() => _isLoadingSearch = false);
+        return;
+      }
+
       try {
         final response = await _dio.get(
           'https://maps.googleapis.com/maps/api/place/autocomplete/json',
           queryParameters: {
             'input': query,
             'key': _googleApiKey,
-            'components': 'country:br',
+            'components': 'country:br', 
             'language': 'pt-BR',
           },
         );
 
         if (response.statusCode == 200) {
           final data = response.data;
+          
           if (data['status'] == 'OK') {
             setState(() {
-              _sugestoes = List<Map<String, dynamic>>.from(
-                  data['predictions'].map((p) => {
-                        'description': p['description'],
-                        'place_id': p['place_id'],
-                        'main_text': p['structured_formatting']?['main_text'] ??
-                            p['description'].toString().split(',').first,
-                        'secondary_text': p['structured_formatting']
-                                ?['secondary_text'] ??
-                            p['description'],
-                      }));
+              _sugestoes = List<Map<String, dynamic>>.from(data['predictions'].map((p) => {
+                'description': p['description'],
+                'place_id': p['place_id'],
+                'main_text': p['structured_formatting']?['main_text'] ?? p['description'].toString().split(',').first,
+                'secondary_text': p['structured_formatting']?['secondary_text'] ?? p['description'],
+              }));
               _isLoadingSearch = false;
             });
           } else {
+            debugPrint('⚠️ RECUSA DO GOOGLE: Status = ${data['status']}');
+            if (data.containsKey('error_message')) {
+              debugPrint('Motivo detalhado: ${data['error_message']}');
+            }
+            
             setState(() {
               _sugestoes = [];
               _isLoadingSearch = false;
@@ -365,6 +374,7 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
           }
         }
       } catch (e) {
+        debugPrint('⚠️ ERRO DE REQUISIÇÃO (Dio): $e');
         setState(() {
           _sugestoes = [];
           _isLoadingSearch = false;
@@ -372,7 +382,6 @@ class _AddressPickerSheetState extends State<_AddressPickerSheet> {
       }
     });
   }
-
   Future<void> _obterDetalhes(String placeId) async {
     setState(() {
       _isLoadingSearch = true;
