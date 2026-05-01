@@ -105,7 +105,10 @@ class AuthService with ChangeNotifier {
 
       await _userRepository.atualizarDadosUsuario(
         credencial.user!.uid, 
-        {'ultimo_login': FieldValue.serverTimestamp()}
+        {
+          'ultimo_login': FieldValue.serverTimestamp(),
+          'email': credencial.user!.email ?? email,
+        }
       );
 
       notifyListeners();
@@ -231,10 +234,6 @@ class AuthService with ChangeNotifier {
   Future<void> uptadeEmail({required String newEmail}) async {
     try {
       await currentUser?.verifyBeforeUpdateEmail(newEmail);
-
-      if (currentUser != null) {
-        await _userRepository.atualizarDadosUsuario(currentUser!.uid, {'email': newEmail});
-      }
 
       notifyListeners();
     } catch (e) {

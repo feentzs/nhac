@@ -184,7 +184,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                           if (context.mounted) Navigator.pop(context); // Fecha dialog
                           if (parentContext.mounted) parentContext.pop(); // Fecha página
 
-                          parentContext.showSuccess('E-mail atualizado com sucesso!');
+                          parentContext.showSuccess('Link de confirmação enviado para o novo e-mail!');
                         } catch (e) {
                           setStateDialog(() {
                             verificandoCodigo = false;
@@ -333,7 +333,7 @@ class _EditarEmailPageState extends State<EditarEmailPage> {
                               if (context.mounted) Navigator.pop(context); // Fecha dialog
                               if (parentContext.mounted) parentContext.pop(); // Fecha página
 
-                              parentContext.showSuccess('E-mail atualizado com sucesso!');
+                              parentContext.showSuccess('Link de confirmação enviado para o novo e-mail!');
                             }
                           } catch (e) {
                             if (context.mounted) {
