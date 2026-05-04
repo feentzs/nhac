@@ -516,6 +516,7 @@ class _ProfileContentState extends State<ProfileContent> {
                       iconColor: const Color(0xFFFF6961),
                       title: 'Formas de Pagamento',
                       subtitle: 'PIX, Cartões de Crédito...',
+                      onTap: () => context.push('/formas-pagamento'),
                     ),
                   ],
                 ),
