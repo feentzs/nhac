@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
@@ -461,7 +461,10 @@ class _ProfileContentState extends State<ProfileContent> {
                   Container(height: 30, width: 1, color: Colors.grey.shade300),
                   _buildStatItem('1', 'Avaliações'),
                   Container(height: 30, width: 1, color: Colors.grey.shade300),
-                  _buildStatItem('67', 'Cupons'),
+                  GestureDetector(
+                    onTap: () => context.push('/cupons'),
+                    child: _buildStatItem('67', 'Cupons'),
+                  ),
                 ],
               ),
               const SizedBox(height: 40.0),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/pages/bem_vindo.dart';
 import 'package:nhac/pages/auth/continuar_senha.dart';
@@ -19,6 +19,7 @@ import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:nhac/pages/auth/cadastro/telefone_cadastro.dart';
 import 'package:nhac/pages/enderecos_page.dart';
 import 'package:nhac/pages/formas_pagamento_page.dart';
+import 'package:nhac/pages/cupons_page.dart';
 
 class _SlideRightToLeftPageRoute<T> extends PageRoute<T>
     with MaterialRouteTransitionMixin<T> {
@@ -261,6 +262,13 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => _buildSlideRightToLeftPage(
         key: state.pageKey,
         child: const FormasPagamentoPage(),
+      ),
+    ),
+    GoRoute(
+      path: '/cupons',
+      pageBuilder: (context, state) => _buildSlideRightToLeftPage(
+        key: state.pageKey,
+        child: const CuponsPage(),
       ),
     ),
   ],
