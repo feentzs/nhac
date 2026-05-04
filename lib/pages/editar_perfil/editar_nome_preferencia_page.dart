@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/components/botao_largo_nhac.dart';
 import 'package:nhac/controllers/user_provider.dart';
@@ -80,7 +80,7 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
         backgroundColor: const Color(0xFFFFE7E5),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF5D201C), size: 20),
           onPressed: () => context.pop(),
         ),
       ),
@@ -100,9 +100,9 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                       const Text(
                         'Editar Nome',
                         style: TextStyle(
-                          fontSize: 26.0,
+                          fontSize: 28.0,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Color(0xFF5D201C),
                           height: 1.2,
                         ),
                       ),
@@ -110,7 +110,7 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                       Text(
                         'O nome é muito utilizado em nossas comunicações e em nosso atendimento.',
                         style: TextStyle(
-                          fontSize: 15.0,
+                          fontSize: 16.0,
                           color: Colors.grey.shade800,
                           height: 1.5,
                         ),

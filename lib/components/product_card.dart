@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:provider/provider.dart';
@@ -35,7 +35,7 @@ class ProductCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Color(0xFF5D201C).withValues(alpha: 0.05),
             blurRadius: 10.0,
             offset: const Offset(0.0, 4.0),
           ),
@@ -66,7 +66,7 @@ class ProductCard extends StatelessWidget {
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14.0,
-                    color: Colors.black,
+                    color: Color(0xFF5D201C),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -85,7 +85,7 @@ class ProductCard extends StatelessWidget {
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16.0,
-                        color: Colors.black,
+                        color: Color(0xFF5D201C),
                       ),
                     ),
                InkWell(
@@ -109,7 +109,7 @@ class ProductCard extends StatelessWidget {
   child: Container(
     padding: const EdgeInsets.all(4.0),
     decoration: const BoxDecoration(
-      color: Colors.black,
+      color: Color(0xFF5D201C),
       shape: BoxShape.circle,
     ),
     child: const Icon(

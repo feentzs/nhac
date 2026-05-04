@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/pages/bem_vindo.dart';
 import 'package:nhac/pages/auth/continuar_senha.dart';
@@ -64,7 +64,7 @@ class _SlideRightToLeftPageRoute<T> extends PageRoute<T>
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Color(0xFF5D201C).withValues(alpha: 0.1),
               blurRadius: 10,
               spreadRadius: 2,
             ),

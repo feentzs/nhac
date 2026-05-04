@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nhac/components/seta_voltar.dart';
 
 class FormasPagamentoPage extends StatelessWidget {
   const FormasPagamentoPage({super.key});
@@ -15,13 +16,10 @@ class FormasPagamentoPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    GestureDetector(
-                      onTap: () => context.pop(),
-                      child: const Icon(Icons.arrow_back_ios_new, size: 20),
-                    ),
+                    SetaVoltar(),
                   ],
                 ),
                 const SizedBox(height: 32),

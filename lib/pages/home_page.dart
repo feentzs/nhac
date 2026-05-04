@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:nhac/components/home_content.dart';
 import 'package:nhac/components/profile_content.dart';
 import 'package:nhac/controllers/cart_provider.dart';
@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               // context.push('/carrinho');
             },
-            backgroundColor: Colors.black, 
+            backgroundColor: Color(0xFF5D201C), 
             child: Badge(
               label: Text(quantidadeNoCarrinho.toString()),
               backgroundColor: Colors.red,
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
         Center(
           child: Text(
             'tela $index',
-            style: const TextStyle(color: Colors.black, fontSize: 24),
+            style: const TextStyle(color: Color(0xFF5D201C), fontSize: 24),
           ),
         ),
         const Positioned(
@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
             borderRadius: BorderRadius.circular(50.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
+                color: Color(0xFF5D201C).withValues(alpha: 0.1),
                 blurRadius: 15.0,
                 offset: const Offset(0, 9),
               ),

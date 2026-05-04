@@ -1,4 +1,4 @@
-import 'dart:io';
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
@@ -106,7 +106,7 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
         backgroundColor: const Color(0xFFFFE7E5),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF5D201C), size: 20),
           onPressed: () => context.pop(),
         ),
       ),
@@ -126,9 +126,9 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                       const Text(
                         'Foto de Perfil',
                         style: TextStyle(
-                          fontSize: 26.0,
+                          fontSize: 28.0,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Color(0xFF5D201C),
                           height: 1.2,
                         ),
                       ),
@@ -136,7 +136,7 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                       Text(
                         'Escolha uma foto bem bonita para que todos possam te reconhecer.',
                         style: TextStyle(
-                          fontSize: 15.0,
+                          fontSize: 16.0,
                           color: Colors.grey.shade800,
                           height: 1.5,
                         ),
@@ -155,7 +155,7 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                                   border: Border.all(color: Colors.white, width: 4),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
+                                      color: Color(0xFF5D201C).withOpacity(0.1),
                                       blurRadius: 10,
                                       spreadRadius: 2,
                                     ),
@@ -194,7 +194,7 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                           'Toque para mudar a foto',
                           style: TextStyle(
                             fontSize: 14.0,
-                            color: Colors.black54,
+                            color: Color(0xFF5D201C),
                           ),
                         ),
                       ),

@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+﻿import 'package:flutter/cupertino.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -148,7 +148,7 @@ class _HomeContentState extends State<HomeContent> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
+                                color: Color(0xFF5D201C).withValues(alpha: 0.05),
                                 blurRadius: 10.0,
                                 offset: const Offset(0.0, 4.0),
                               ),
@@ -175,7 +175,7 @@ class _HomeContentState extends State<HomeContent> {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14.0,
-                                  color: Colors.black,
+                                  color: Color(0xFF5D201C),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -197,7 +197,7 @@ class _HomeContentState extends State<HomeContent> {
                         borderRadius: BorderRadius.circular(50.0),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
+                            color: Color(0xFF5D201C).withValues(alpha: 0.05),
                             blurRadius: 10.0,
                             offset: const Offset(0.0, 4.0),
                           ),
@@ -233,7 +233,7 @@ class _HomeContentState extends State<HomeContent> {
                   borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: Color(0xFF5D201C).withValues(alpha: 0.05),
                       blurRadius: 10.0,
                       offset: const Offset(0.0, 4.0),
                     ),
