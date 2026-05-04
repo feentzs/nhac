@@ -94,8 +94,8 @@ jobs:
       - name: Create Pre-Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "v1.0.${{ github.run_number }}"
-          name: "Pre-Release v1.0.${{ github.run_number }}"
+          tag_name: "v0.${{ github.run_number }}.0"
+          name: "Pre-Release v0.${{ github.run_number }}.0"
           prerelease: true
           generate_release_notes: true
           files: build/app/outputs/flutter-apk/app-release.apk
