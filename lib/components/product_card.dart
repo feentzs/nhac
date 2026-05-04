@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:provider/provider.dart';
@@ -49,10 +50,31 @@ class ProductCard extends StatelessWidget {
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(16.0),
               ),
-              child: Image.network(
-                imageUrl,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
                 fit: BoxFit.cover,
                 width: double.infinity,
+                placeholder: (context, url) => Container(
+                  color: const Color(0xFFFFF0EE),
+                  child: const Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color(0xFF5D201C),
+                      ),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: const Color(0xFFFFF0EE),
+                  child: const Icon(
+                    Icons.image_not_supported_outlined,
+                    color: Color(0xFF5D201C),
+                    size: 32,
+                  ),
+                ),
               ),
             ),
           ),

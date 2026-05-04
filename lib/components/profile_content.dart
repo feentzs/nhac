@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
@@ -320,7 +321,7 @@ class _ProfileContentState extends State<ProfileContent> {
                         color: Colors.white,
                         image: (usuario.fotoUrl.isNotEmpty)
                             ? DecorationImage(
-                                image: NetworkImage(usuario.fotoUrl),
+                                image: CachedNetworkImageProvider(usuario.fotoUrl),
                                 fit: BoxFit.cover,
                               )
                             : null,
@@ -714,7 +715,7 @@ class _ProfileContentState extends State<ProfileContent> {
                   border: Border.all(color: Colors.white, width: 4),
                   image: (fotoUrl != null && fotoUrl.isNotEmpty)
                       ? DecorationImage(
-                          image: NetworkImage(fotoUrl),
+                          image: CachedNetworkImageProvider(fotoUrl),
                           fit: BoxFit.cover,
                         )
                       : null,

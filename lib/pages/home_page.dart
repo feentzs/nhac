@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:nhac/components/home_content.dart';
 import 'package:nhac/components/profile_content.dart';
 import 'package:nhac/controllers/cart_provider.dart';
@@ -20,10 +20,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    context.read<UserProvider>().iniciarEscutaUsuario();
-    context.read<CartProvider>().iniciarEscutaCarrinho();
-    context.read<EnderecoProvider>().iniciarEscutaEnderecos();
     _pageController = PageController(initialPage: _selectedIndex);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<UserProvider>().iniciarEscutaUsuario();
+      context.read<CartProvider>().iniciarEscutaCarrinho();
+      context.read<EnderecoProvider>().iniciarEscutaEnderecos();
+    });
   }
 
   @override

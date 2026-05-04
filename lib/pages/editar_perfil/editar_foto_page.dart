@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
@@ -165,7 +166,18 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                                   child: _image != null
                                       ? Image.file(_image!, fit: BoxFit.cover)
                                       : (usuario!.fotoUrl.isNotEmpty == true
-                                          ? Image.network(usuario.fotoUrl, fit: BoxFit.cover)
+                                          ? CachedNetworkImage(
+                                              imageUrl: usuario.fotoUrl,
+                                              fit: BoxFit.cover,
+                                              placeholder: (ctx, url) => Container(
+                                                color: Colors.grey.shade200,
+                                                child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF5D201C))),
+                                              ),
+                                              errorWidget: (ctx, url, err) => Container(
+                                                color: Colors.grey.shade300,
+                                                child: Icon(Icons.person, size: 80, color: Colors.grey.shade600),
+                                              ),
+                                            )
                                           : Container(
                                               color: Colors.grey.shade300,
                                               child: Icon(Icons.person, size: 80, color: Colors.grey.shade600),

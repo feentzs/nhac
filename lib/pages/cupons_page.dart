@@ -17,23 +17,29 @@ class _CuponsPageState extends State<CuponsPage> {
   final List<Map<String, dynamic>> _cupons = [
     {
       'titulo': '20% desconto em Frutas',
-      'validade': 'Válido até 02/08/2025',
+      'validade': 'Válido até 02/08/2026',
       'icone': Icons.apple,
       'status': 0,
     },
     {
       'titulo': '25% desconto em Vegetais',
-      'validade': 'Válido até 04/08/2025',
+      'validade': 'Válido até 04/08/2026',
       'icone': Icons.eco,
       'status': 0,
     },
     {
       'titulo': '20% desconto em Peixes',
-      'validade': 'Válido até 05/08/2025',
+      'validade': 'Válido até 05/08/2026',
       'icone': Icons.set_meal,
       'status': 0,
     },
   ];
+
+  @override
+  void dispose() {
+    _cupomController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

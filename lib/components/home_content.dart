@@ -1,8 +1,10 @@
-﻿import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/endereco_provider.dart';
+import 'package:nhac/models/usuario/endereco_model.dart';
+import 'package:nhac/services/local_cache_service.dart';
 import 'package:nowa_runtime/nowa_runtime.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -24,6 +26,15 @@ class _HomeContentState extends State<HomeContent> {
   @override
   void initState() {
     super.initState();
+    _carregarGpsComCache();
+  }
+
+  /// Primeiro exibe o cache salvo, depois atualiza em background.
+  Future<void> _carregarGpsComCache() async {
+    final cachedGps = await LocalCacheService.carregarLocalizacaoGps();
+    if (cachedGps != null && mounted) {
+      setState(() => _currentAddress = cachedGps);
+    }
     _pegarLocalizacaoUsuario();
   }
 
@@ -63,10 +74,11 @@ class _HomeContentState extends State<HomeContent> {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
+        final endereco = '${place.street}, ${place.subLocality}';
         if (mounted) {
-          setState(() {
-            _currentAddress = '${place.street}, ${place.subLocality}';
-          });
+          setState(() => _currentAddress = endereco);
+          // Salva no cache para próxima abertura
+          LocalCacheService.salvarLocalizacaoGps(endereco);
         }
       }
     } catch (e) {
@@ -92,9 +104,9 @@ class _HomeContentState extends State<HomeContent> {
 
   @override
   Widget build(BuildContext context) {
-    final enderecoProvider = context.watch<EnderecoProvider>();
-    final listaEnderecos = enderecoProvider.enderecos;
-    final enderecoPadrao = listaEnderecos.where((e) => e.padrao).firstOrNull;
+    final enderecoPadrao = context.select<EnderecoProvider, EnderecoModel?>(
+      (p) => p.enderecos.where((e) => e.padrao).firstOrNull,
+    );
 
     String enderecoTopo = _currentAddress;
     if (enderecoPadrao != null) {
