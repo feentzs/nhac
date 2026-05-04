@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:nhac/components/seta_voltar.dart';
 
 class FormasPagamentoPage extends StatelessWidget {
@@ -50,10 +49,10 @@ class FormasPagamentoPage extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFFFF6961),
+                          color: Color(0xFFFF6961),
                         ),
                       ),
-                      Icon(Icons.add, color: const Color(0xFFFF6961)),
+                      Icon(Icons.add, color: Color(0xFFFF6961)),
                     ],
                   ),
                 ),

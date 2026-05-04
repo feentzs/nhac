@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
@@ -155,7 +155,7 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                                   border: Border.all(color: Colors.white, width: 4),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Color(0xFF5D201C).withOpacity(0.1),
+                                      color: Color(0xFF5D201C).withValues(alpha: 0.1),
                                       blurRadius: 10,
                                       spreadRadius: 2,
                                     ),

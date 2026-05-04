@@ -19,7 +19,7 @@ class _CuponsPageState extends State<CuponsPage> {
       'titulo': '20% desconto em Frutas',
       'validade': 'Válido até 02/08/2025',
       'icone': Icons.apple,
-      'status': 0, // 0: Disponível, 1: Usado, 2: Expirado
+      'status': 0,
     },
     {
       'titulo': '25% desconto em Vegetais',

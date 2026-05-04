@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -530,11 +530,11 @@ class _EnderecosPageState extends State<EnderecosPage> {
                     await context
                         .read<EnderecoProvider>()
                         .atualizarEndereco(enderecoAtualizado);
-                    if (mounted) {
+                    if (context.mounted) {
                       context.showSuccess('Endereço atualizado com sucesso!');
                     }
                   } catch (e) {
-                    if (mounted) context.showError('Erro ao atualizar endereço.');
+                    if (context.mounted) context.showError('Erro ao atualizar endereço.');
                   }
                 },
               ),
