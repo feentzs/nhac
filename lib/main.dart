@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nhac/controllers/cadastro_controller.dart';
 import 'package:nhac/controllers/cart_provider.dart';
 import 'package:nhac/controllers/endereco_provider.dart';
@@ -14,17 +15,27 @@ import 'package:firebase_core/firebase_core.dart';
 import './firebase_options.dart';
 
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 @NowaGenerated()
 late final SharedPreferences sharedPrefs;
 
 @NowaGenerated()
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  await dotenv.load(fileName: ".env");
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   sharedPrefs = await SharedPreferences.getInstance();
+
+   FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED, 
+  );
 
   runApp(const MyApp());
 }

@@ -8,6 +8,10 @@ import 'package:provider/provider.dart';
 
 import 'package:nhac/globals/ui_utils.dart';
 
+import 'package:nhac/components/nhac_input_field.dart';
+
+import 'package:nhac/utils/validators.dart';
+
 class EditarNomePreferenciaPage extends StatefulWidget {
   const EditarNomePreferenciaPage({super.key});
 
@@ -18,11 +22,31 @@ class EditarNomePreferenciaPage extends StatefulWidget {
 class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
   final TextEditingController _nameController = TextEditingController();
   bool _isLoading = false;
+  bool _nomeValido = false;
+  String? _erroNome;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_verificarNome);
+  }
 
   @override
   void dispose() {
+    _nameController.removeListener(_verificarNome);
     _nameController.dispose();
     super.dispose();
+  }
+
+  void _verificarNome() {
+    if (!mounted) return;
+    final texto = _nameController.text;
+    String? erroTemp = Validators.validarNome(texto);
+
+    setState(() {
+      _erroNome = erroTemp;
+      _nomeValido = erroTemp == null && texto.isNotEmpty;
+    });
   }
 
   void renameName() async {
@@ -93,29 +117,18 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
                         ),
                       ),
                       const SizedBox(height: 28.0),
-                      TextField(
+                      NhacInputField(
                         controller: _nameController,
-                        onChanged: (value) {
-                          setState(() {});
-                        },
-                        textCapitalization: TextCapitalization.words, 
-                        decoration: InputDecoration(
-                          labelText: 'Nome',
-                          labelStyle: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 16.0,
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.black87),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-                        ),
+                        onChanged: (value) => _verificarNome(),
+                        textCapitalization: TextCapitalization.words,
+                        hintText: 'Nome',
+                        errorText: _erroNome,
+                        validator: Validators.validarNome,
                         style: const TextStyle(
                           fontSize: 18.0,
-                          color: Colors.black87,
+                          color: Color(0xFF5D201C),
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -129,9 +142,7 @@ class _EditarNomePreferenciaPageState extends State<EditarNomePreferenciaPage> {
               child: BotaoLargoNhac(
                 texto: 'Salvar alterações',
                 carregando: _isLoading,
-                onPressed: (_nameController.text.trim().isNotEmpty && !_isLoading)
-                      ? () => renameName()
-                      : null,
+                onPressed: _nomeValido ? () => renameName() : null,
               ),
             ),
           ],

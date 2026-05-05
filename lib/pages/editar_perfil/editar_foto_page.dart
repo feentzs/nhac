@@ -155,7 +155,6 @@ class _EditarFotoPageState extends State<EditarFotoPage> {
                                   border: Border.all(color: Colors.white, width: 4),
                                   boxShadow: [
                                     BoxShadow(
-                                      // ignore: deprecated_member_use
                                       color: Colors.black.withOpacity(0.1),
                                       blurRadius: 10,
                                       spreadRadius: 2,

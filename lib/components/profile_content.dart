@@ -6,6 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nhac/controllers/cart_provider.dart';
+import 'package:nhac/controllers/endereco_provider.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:nhac/services/auth_service.dart';
 import 'package:nhac/services/biometric_service.dart';
@@ -206,6 +207,12 @@ class _ProfileContentState extends State<ProfileContent> {
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
     final usuario = userProvider.usuario;
+
+    final enderecoProvider = context.watch<EnderecoProvider>();
+    final enderecoPadrao = enderecoProvider.enderecos.where((e) => e.padrao).firstOrNull;
+    final String textoEndereco = enderecoPadrao != null 
+        ? '${enderecoPadrao.rua}, ${enderecoPadrao.numero}${enderecoPadrao.complemento.isNotEmpty ? ' - ${enderecoPadrao.complemento}' : ''}'
+        : 'Nenhum endereço cadastrado';
 
     if (usuario == null) {
       return Container(
@@ -426,15 +433,19 @@ class _ProfileContentState extends State<ProfileContent> {
                         ),
                         const SizedBox(height: 4.0),
                         Row(
-                          children: [
-                            Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
-                            const SizedBox(width: 4.0),
-                            Text(
-                              'Rua das Palmeiras, 120',
-                              style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
-                            ),
-                          ],
-                        ),
+                            children: [
+                              Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade600),
+                              const SizedBox(width: 4.0),
+                              Expanded(
+                                child: Text(
+                                  textoEndereco,
+                                  style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                                  overflow: TextOverflow.ellipsis, 
+                                  maxLines: 1, 
+                                ),
+                              ),
+                            ],
+                          ),
                         const SizedBox(height: 8.0),
                       ],
                     ),

@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:nhac/components/botao_largo_nhac.dart';
 import 'package:nhac/components/seta_voltar.dart';
 
+import 'package:nhac/components/nhac_input_field.dart';
+import 'package:nhac/utils/validators.dart';
+
 class TelefoneCadastro extends StatefulWidget {
   const TelefoneCadastro({super.key});
 
@@ -15,10 +18,16 @@ class TelefoneCadastro extends StatefulWidget {
 class _TelefoneCadastroState extends State<TelefoneCadastro> {
   final TextEditingController _telefoneController = TextEditingController();
   bool _telefoneValido = false;
+  String? _erroTelefone;
 
   void _verificarTelefone() {
+    if (!mounted) return;
+    final texto = _telefoneController.text;
+    String? erroTemp = Validators.validarTelefone(texto);
+
     setState(() {
-      _telefoneValido = _telefoneController.text.trim().length >= 10;
+      _erroTelefone = erroTemp;
+      _telefoneValido = erroTemp == null && texto.isNotEmpty;
     });
   }
 
@@ -60,18 +69,19 @@ class _TelefoneCadastroState extends State<TelefoneCadastro> {
                         style: TextStyle(fontSize: 15.0, color: Colors.grey.shade800),
                       ),
                       const SizedBox(height: 32.0),
-                      TextField(
+                      NhacInputField(
                         controller: _telefoneController,
                         onChanged: (value) => _verificarTelefone(),
-                        keyboardType: TextInputType.phone, 
+                        keyboardType: TextInputType.phone,
                         autofocus: true,
-                        cursorColor: const Color(0xFFFF6961),
-                        style: const TextStyle(fontSize: 20.0, color: Colors.black87, fontWeight: FontWeight.w600, letterSpacing: 2.0),
-                        decoration: const InputDecoration(
-                          hintText: '11999999999',
-                          hintStyle: TextStyle(color: Colors.grey, letterSpacing: 0),
-                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFFF6961), width: 2)),
+                        hintText: '11999999999',
+                        errorText: _erroTelefone,
+                        validator: Validators.validarTelefone,
+                        style: const TextStyle(
+                          fontSize: 20.0,
+                          color: Color(0xFF5D201C),
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 2.0,
                         ),
                       ),
                     ],

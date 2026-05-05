@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nhac/components/home_content.dart';
 import 'package:nhac/components/profile_content.dart';
 import 'package:nhac/controllers/cart_provider.dart';
+import 'package:nhac/controllers/endereco_provider.dart';
 import 'package:nhac/controllers/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +22,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     context.read<UserProvider>().iniciarEscutaUsuario();
     context.read<CartProvider>().iniciarEscutaCarrinho();
+    context.read<EnderecoProvider>().iniciarEscutaEnderecos();
     _pageController = PageController(initialPage: _selectedIndex);
   }
 

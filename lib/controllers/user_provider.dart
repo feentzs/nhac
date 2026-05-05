@@ -63,7 +63,6 @@ class UserProvider with ChangeNotifier {
 
       debugPrint("Caminho no Storage: ${ref.fullPath}");
 
-      // Upload direto aguardando o snapshot
       TaskSnapshot snapshot = await ref.putFile(
         imagem,
         SettableMetadata(contentType: 'image/jpeg'),
@@ -71,7 +70,6 @@ class UserProvider with ChangeNotifier {
 
       debugPrint("Upload concluído com sucesso.");
 
-      // Busca a URL diretamente da referência do snapshot
       final url = await snapshot.ref.getDownloadURL();
       debugPrint("URL obtida: $url");
 
