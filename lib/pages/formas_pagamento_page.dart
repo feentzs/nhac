@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:nhac/components/seta_voltar.dart';
+import 'package:pay/pay.dart'; // 👈 IMPORT DO PACOTE AQUI
 
-class FormasPagamentoPage extends StatelessWidget {
+class FormasPagamentoPage extends StatefulWidget {
   const FormasPagamentoPage({super.key});
+
+  @override
+  State<FormasPagamentoPage> createState() => _FormasPagamentoPageState();
+}
+
+class _FormasPagamentoPageState extends State<FormasPagamentoPage> {
+  late final Future<PaymentConfiguration> _googlePayConfigFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _googlePayConfigFuture = PaymentConfiguration.fromAsset('gpay_config.json');
+  }
+
+  void _onGooglePayResult(dynamic paymentResult) {
+    debugPrint('Resultado do Google Pay: $paymentResult');
+    // TODO: Enviar o paymentResult para o backend do MercadoPago
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +46,7 @@ class FormasPagamentoPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF5D201C), 
+                    color: Color(0xFF5D201C),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -39,6 +58,38 @@ class FormasPagamentoPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 48),
+
+                FutureBuilder<PaymentConfiguration>(
+                  future: _googlePayConfigFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Center(
+                        child: GooglePayButton(
+                          paymentConfiguration: snapshot.data!,
+                          paymentItems: const [
+                            PaymentItem(
+                              label: 'Total do Pedido',
+                              amount: '0.00', 
+                              status: PaymentItemStatus.final_price,
+                            )
+                          ],
+                          type: GooglePayButtonType.pay,
+                          margin: const EdgeInsets.only(bottom: 32.0),
+                          onPaymentResult: _onGooglePayResult,
+                          loadingIndicator: const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFFFF6961),
+                            ),
+                          ),
+                        ),
+                      );
+                    } else if (snapshot.hasError) {
+                      return const Text('Erro ao carregar Google Pay');
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+
                 GestureDetector(
                   onTap: () {},
                   child: const Row(
@@ -95,13 +146,17 @@ class FormasPagamentoPage extends StatelessWidget {
     );
   }
 
-  Widget _buildPaymentItem({required IconData icon, required String title, required String subtitle}) {
+  Widget _buildPaymentItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 32.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 26, color: Color(0xFF5D201C)),
+          Icon(icon, size: 26, color: const Color(0xFF5D201C)),
           const SizedBox(width: 20),
           Expanded(
             child: Column(
@@ -112,7 +167,7 @@ class FormasPagamentoPage extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF5D201C), 
+                    color: Color(0xFF5D201C),
                   ),
                 ),
                 const SizedBox(height: 4),
