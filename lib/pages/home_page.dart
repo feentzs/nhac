@@ -39,18 +39,67 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       extendBody: true,
       backgroundColor: const Color(0xFFFFE7E5),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+      body: Stack(
         children: [
-          const HomeContent(),
-          _buildPlaceholderContent(1),
-          _buildPlaceholderContent(2),
-          const ProfileContent(),
+          PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            children: [
+              const HomeContent(),
+              _buildPlaceholderContent(1),
+              _buildPlaceholderContent(2),
+              const ProfileContent(),
+            ],
+          ),
+
+
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 40, 
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      const Color(0xFFFFE7E5).withValues(alpha: 0.7),
+                      const Color(0xFFFFE7E5).withValues(alpha: 0.6),
+                      const Color(0xFFFFE7E5).withValues(alpha: 0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 50,
+            child: IgnorePointer(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      const Color(0xFFFFE7E5).withValues(alpha: 0.0),
+                      const Color(0xFFFFE7E5).withValues(alpha: 0.6),
+                      const Color(0xFFFFE7E5),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
 
@@ -84,7 +133,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildFloatingNavBar() {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 24.0),
+        padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 10.0),
         child: Container(
           height: 75.0,
           decoration: BoxDecoration(
