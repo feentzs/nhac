@@ -53,24 +53,7 @@ class _HomePageState extends State<HomePage> {
           const ProfileContent(),
         ],
       ),
-      floatingActionButton: Selector<CartProvider, int>(
-        selector: (context, provider) => provider.totalDeUnidades,
-        builder: (context, quantidadeNoCarrinho, child) {
-          if (quantidadeNoCarrinho == 0) return const SizedBox.shrink();
 
-          return FloatingActionButton(
-            onPressed: () {
-              // context.push('/carrinho');
-            },
-            backgroundColor: Color(0xFF5D201C), 
-            child: Badge(
-              label: Text(quantidadeNoCarrinho.toString()),
-              backgroundColor: Colors.red,
-              child: const Icon(Icons.shopping_cart, color: Colors.white),
-            ),
-          );
-        }
-      ),
       bottomNavigationBar: _buildFloatingNavBar(),
     );
   }
@@ -164,13 +147,31 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 28.0,
-              color: isSelected
-                  ? const Color(0xFFFF6961)
-                  : const Color(0xFFA0A0A0),
-            ),
+            index == 1 
+              ? Selector<CartProvider, int>(
+                  selector: (context, provider) => provider.totalDeUnidades,
+                  builder: (context, count, child) {
+                    return Badge(
+                      label: count > 0 ? Text(count.toString()) : null,
+                      isLabelVisible: count > 0,
+                      backgroundColor: const Color(0xFFFF6961),
+                      child: Icon(
+                        icon,
+                        size: 28.0,
+                        color: isSelected
+                            ? const Color(0xFFFF6961)
+                            : const Color(0xFFA0A0A0),
+                      ),
+                    );
+                  },
+                )
+              : Icon(
+                  icon,
+                  size: 28.0,
+                  color: isSelected
+                      ? const Color(0xFFFF6961)
+                      : const Color(0xFFA0A0A0),
+                ),
             AnimatedSize(
               duration: const Duration(milliseconds: 400),
               curve: Curves.fastOutSlowIn,

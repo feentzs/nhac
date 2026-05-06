@@ -1,3 +1,4 @@
+import 'package:shimmer/shimmer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:nhac/controllers/cart_provider.dart';
@@ -54,17 +55,13 @@ class ProductCard extends StatelessWidget {
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
                 width: double.infinity,
-                placeholder: (context, url) => Container(
-                  color: const Color(0xFFFFF0EE),
-                  child: const Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Color(0xFF5D201C),
-                      ),
-                    ),
+                placeholder: (context, url) => Shimmer.fromColors(
+                  baseColor: Colors.grey.shade300,
+                  highlightColor: Colors.grey.shade100,
+                  child: Container(
+                    color: Colors.white,
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
                 ),
                 errorWidget: (context, url, error) => Container(
@@ -103,7 +100,7 @@ class ProductCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '\$${price.toStringAsFixed(2)}',
+                      'R\$ ${price.toStringAsFixed(2)}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16.0,
@@ -121,7 +118,7 @@ class ProductCard extends StatelessWidget {
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$name adicionado ao carrinho! 🍔'),
+        content: Text('$name adicionado ao carrinho!'),
         duration: const Duration(seconds: 1),
         backgroundColor: Colors.green,
       ),
