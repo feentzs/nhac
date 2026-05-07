@@ -199,9 +199,16 @@ onTap: () {
   }
 
 Widget _buildSecaoProdutosFirebase(String titulo) {
+
+  
   return StreamBuilder<QuerySnapshot>(
     stream: FirebaseFirestore.instance.collection('produtos').limit(5).snapshots(),
     builder: (context, snapshot) {
+      if (snapshot.hasError) {
+        print("🔴 ERRO DO FIREBASE: ${snapshot.error}");
+      } else if (snapshot.hasData) {
+        print("🟢 LOJAS ENCONTRADAS: ${snapshot.data!.docs.length}");
+      }
       if (snapshot.connectionState == ConnectionState.waiting) {
         return _buildSectionSkeleton(); 
       }
